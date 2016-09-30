@@ -174,17 +174,23 @@ class CharColumnTest extends \PHPUnit_Framework_TestCase
         $instance = new CharColumn('foo', $type, $length + 1);
     }
 
-    public function testValueTooLong()
+    /**
+     * @dataProvider dataProviderCharTypes
+     */
+    public function testTooLong(string $type, int $length)
     {
         $this->expectException(ColumnException::class);
-        $instance = new CharColumn('foo', 'varchar', 0);
-        $instance->check('foo');
+        $instance = new CharColumn('foo', $type, $length);
+        $instance->check(str_repeat('a', $length + 1));
     }
 
-    public function testDefaultValueTooLong()
+    /**
+     * @dataProvider dataProviderCharTypes
+     */
+    public function testDefaultTooLong(string $type, int $length)
     {
         $this->expectException(ColumnException::class);
-        $instance = new CharColumn('foo', 'varchar', 0);
-        $instance->default('foo');
+        $instance = new CharColumn('foo', $type, $length);
+        $instance->default(str_repeat('a', $length + 1));
     }
 }

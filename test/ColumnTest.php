@@ -22,5 +22,11 @@ class ColumnTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals((new IntColumn('foo', 'int'))->unsigned()->autoIncrement(), Column::serial('foo'));
         $this->assertEquals((new IntColumn('foo', 'mediumint'))->unsigned()->autoIncrement(), Column::mediumserial('foo'));
         $this->assertEquals((new IntColumn('foo', 'bigint'))->unsigned()->autoIncrement(), Column::bigserial('foo'));
+
+        // text
+        $this->assertEquals(new TextColumn('foo', 'tinytext'), Column::tinytext('foo'));
+        $this->assertEquals(new TextColumn('foo', 'text'), Column::text('foo'));
+        $this->assertEquals(new TextColumn('foo', 'mediumtext'), Column::mediumtext('foo'));
+        $this->assertEquals(new TextColumn('foo', 'longtext'), Column::longtext('foo'));
     }
 }

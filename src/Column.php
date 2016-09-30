@@ -152,4 +152,24 @@ abstract class Column
     {
         return static::bigint($name)->unsigned()->autoIncrement();
     }
+
+    public static function tinytext(string $name): Column
+    {
+        return new TextColumn($name, 'tinytext');
+    }
+
+    public static function text(string $name): Column
+    {
+        return new TextColumn($name, 'text');
+    }
+
+    public static function mediumtext(string $name): Column
+    {
+        return new TextColumn($name, 'mediumtext');
+    }
+
+    public static function longtext(string $name): Column
+    {
+        return new TextColumn($name, 'longtext');
+    }
 }

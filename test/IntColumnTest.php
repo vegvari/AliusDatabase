@@ -7,7 +7,7 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider dataProviderIntTypes
      */
-    public function testInt(string $type, int $signed_min, int $signed_max, int $unsigned_max)
+    public function testIntColumn(string $type, int $signed_min, int $signed_max, int $unsigned_max)
     {
         $column = new IntColumn('foo', $type);
         $this->assertSame('foo', $column->getName());
@@ -144,34 +144,34 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testIntInvalidType()
+    public function testInvalidType()
     {
         $this->expectException(ColumnException::class);
         $instance = new IntColumn('foo', 'bar');
     }
 
-    public function testIntAutoIncrementAndNullable()
+    public function testAutoIncrementAndNullable()
     {
         $this->expectException(ColumnException::class);
         $instance = new IntColumn('foo', 'int');
         $instance->autoIncrement()->nullable();
     }
 
-    public function testIntNullableAndAutoIncrement()
+    public function testNullableAndAutoIncrement()
     {
         $this->expectException(ColumnException::class);
         $instance = new IntColumn('foo', 'int');
         $instance->nullable()->autoIncrement();
     }
 
-    public function testIntAutoIncrementAndDefault()
+    public function testAutoIncrementAndDefault()
     {
         $this->expectException(ColumnException::class);
         $instance = new IntColumn('foo', 'int');
         $instance->autoIncrement()->default(1);
     }
 
-    public function testIntDefaultAndAutoIncrement()
+    public function testDefaultAndAutoIncrement()
     {
         $this->expectException(ColumnException::class);
         $instance = new IntColumn('foo', 'int');
