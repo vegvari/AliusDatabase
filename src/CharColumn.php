@@ -2,7 +2,7 @@
 
 namespace Alius\Database;
 
-class CharColumn extends Column
+class CharColumn extends TextColumn
 {
     use DefaultValue;
 
@@ -12,9 +12,6 @@ class CharColumn extends Column
     ];
 
     protected $length;
-    protected $charset = '';
-    protected $collation = '';
-    protected $binary = false;
 
     public function __construct(string $name, string $type, int $length)
     {
@@ -38,54 +35,6 @@ class CharColumn extends Column
     public function getLength(): int
     {
         return $this->length;
-    }
-
-    public function binary(): Column
-    {
-        $this->binary = true;
-        return $this;
-    }
-
-    public function isBinary(): bool
-    {
-        return $this->binary;
-    }
-
-    public function charset(string $charset): Column
-    {
-        $this->charset = $charset;
-        return $this;
-    }
-
-    public function getCharset(): string
-    {
-        return $this->charset;
-    }
-
-    public function collation(string $collation): Column
-    {
-        $this->collation = $collation;
-        return $this;
-    }
-
-    public function getCollation(): string
-    {
-        return $this->collation;
-    }
-
-    public function check($value)
-    {
-        if ($value === null || $value === '') {
-            return;
-        }
-
-        $value = (string) $value;
-
-        if (mb_strlen($value) > $this->getLength()) {
-            throw new ColumnException(sprintf('Value is too long for %s', $this->getType()));
-        }
-
-        return $value;
     }
 
     public function build(): string

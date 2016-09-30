@@ -48,17 +48,6 @@ class TextColumn extends Column
         return $this->collation;
     }
 
-    public function nullable(): Column
-    {
-        $this->nullable = true;
-        return $this;
-    }
-
-    public function isNullable(): bool
-    {
-        return $this->nullable;
-    }
-
     public function getLength(): int
     {
         return static::TYPES[$this->getType()];
