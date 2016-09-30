@@ -1,0 +1,25 @@
+{
+    "name": "alius/database",
+    "description": "Not an ORM",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Romeo Vegvari",
+            "email": "vegvari@users.noreply.github.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Alius\\Database\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Alius\\Database\\": "test/"
+        }
+    }
+}
