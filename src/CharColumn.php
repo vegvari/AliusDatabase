@@ -9,9 +9,6 @@ class CharColumn extends Column
         'varchar' => 65535,
     ];
 
-    const CHAR_MAX_LENGTH = 255;
-    const VARCHAR_MAX_LENGTH = 65535;
-
     protected $length;
     protected $charset = '';
     protected $collation = '';
@@ -26,8 +23,8 @@ class CharColumn extends Column
     protected function length(int $length): Column
     {
         if ($length < 0
-            || ($this->getType() === 'char' && $length > self::CHAR_MAX_LENGTH)
-            || ($this->getType() === 'varchar' && $length > self::VARCHAR_MAX_LENGTH)
+            || ($this->getType() === 'char' && $length > static::TYPES['char'])
+            || ($this->getType() === 'varchar' && $length > static::TYPES['varchar'])
         ) {
             throw new ColumnException(sprintf('Invalid length for %s column: "%s"', $this->getType(), $length));
         }
