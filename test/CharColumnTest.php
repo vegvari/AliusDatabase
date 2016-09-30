@@ -7,7 +7,7 @@ class CharColumnTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider dataProviderCharTypes
      */
-    public function testCharColumn(string $type)
+    public function testCharColumn(string $type, int $length)
     {
         $instance = new CharColumn('foo', $type, 255);
         $this->assertSame('foo', $instance->getName());
@@ -132,43 +132,46 @@ class CharColumnTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(sprintf('`foo` %s(255) NOT NULL COMMENT "foobar"', $type), $instance->build());
     }
 
-    public function dataProviderCharTypes(): array
+    /**
+     * @dataProvider dataProviderCharTypes
+     */
+    public function testCheck(string $type)
     {
-        foreach (array_keys(CharColumn::TYPES) as $type) {
-            $result[] = [$type];
-        }
-
-        return $result;
+        $instance = new CharColumn('foo', $type, 255);
+        $this->assertSame(null, $instance->check(null));
+        $this->assertSame(null, $instance->check(''));
     }
 
-    public function testCharInvalidType()
+    public function dataProviderCharTypes(): array
+    {
+        return [
+            ['char', 255],
+            ['varchar', 65535],
+        ];
+    }
+
+    public function testInvalidType()
     {
         $this->expectException(ColumnException::class);
         $instance = new CharColumn('foo', 'bar', 0);
     }
 
-    public function testCharLengthMin()
+    /**
+     * @dataProvider dataProviderCharTypes
+     */
+    public function testLengthMin(string $type)
     {
         $this->expectException(ColumnException::class);
-        $instance = new CharColumn('foo', 'char', -1);
+        $instance = new CharColumn('foo', $type, -1);
     }
 
-    public function testVarCharLengthMin()
+    /**
+     * @dataProvider dataProviderCharTypes
+     */
+    public function testLengthMax(string $type, int $length)
     {
         $this->expectException(ColumnException::class);
-        $instance = new CharColumn('foo', 'varchar', -1);
-    }
-
-    public function testCharLengthMax()
-    {
-        $this->expectException(ColumnException::class);
-        $instance = new CharColumn('foo', 'char', CharColumn::TYPES['char'] + 1);
-    }
-
-    public function testVarCharLengthMax()
-    {
-        $this->expectException(ColumnException::class);
-        $instance = new CharColumn('foo', 'varchar', CharColumn::TYPES['varchar'] + 1);
+        $instance = new CharColumn('foo', $type, $length + 1);
     }
 
     public function testValueTooLong()

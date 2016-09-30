@@ -73,6 +73,10 @@ class CharColumn extends Column
 
     public function check($value)
     {
+        if ($value === null || $value === '') {
+            return;
+        }
+
         $value = (string) $value;
 
         if (mb_strlen($value) > $this->getLength()) {
