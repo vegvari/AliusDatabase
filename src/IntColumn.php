@@ -4,6 +4,8 @@ namespace Alius\Database;
 
 class IntColumn extends Column
 {
+    use DefaultValue;
+
     const TYPES = [
         'tinyint' => ['signed' => 127, 'unsigned' => 255],
         'smallint' => ['signed' => 32767, 'unsigned' => 65535],
@@ -41,7 +43,8 @@ class IntColumn extends Column
             throw new ColumnException('Auto increment column can\'t have default value');
         }
 
-        return parent::default($value);
+        $this->default = $this->check($value);
+        return $this;
     }
 
     public function autoIncrement(): Column

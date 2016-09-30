@@ -2,7 +2,7 @@
 
 namespace Alius\Database;
 
-final class TextColumn extends Column
+class TextColumn extends Column
 {
     const TYPES = [
         'tinytext' => 255,

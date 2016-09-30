@@ -7,7 +7,6 @@ abstract class Column
     protected $name;
     protected $type;
     protected $nullable = false;
-    protected $default;
     protected $comment = '';
 
     public function __construct(string $name, string $type)
@@ -40,22 +39,6 @@ abstract class Column
     public function isNullable(): bool
     {
         return $this->nullable;
-    }
-
-    public function default($value): Column
-    {
-        $this->default = $this->check($value);
-        return $this;
-    }
-
-    public function hasDefault(): bool
-    {
-        return $this->default !== null;
-    }
-
-    public function getDefault()
-    {
-        return $this->default;
     }
 
     public function comment(string $comment): Column
