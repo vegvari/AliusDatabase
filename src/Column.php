@@ -93,7 +93,6 @@ abstract class Column
         return $this->build();
     }
 
-
     public static function char(string $name, int $length): Column
     {
         return new CharColumn($name, 'char', $length);
@@ -102,5 +101,55 @@ abstract class Column
     public static function varchar(string $name, int $length): Column
     {
         return new CharColumn($name, 'varchar', $length);
+    }
+
+    public static function tinyint(string $name): Column
+    {
+        return new IntColumn($name, 'tinyint');
+    }
+
+    public static function smallint(string $name): Column
+    {
+        return new IntColumn($name, 'smallint');
+    }
+
+    public static function mediumint(string $name): Column
+    {
+        return new IntColumn($name, 'mediumint');
+    }
+
+    public static function int(string $name): Column
+    {
+        return new IntColumn($name, 'int');
+    }
+
+    public static function bigint(string $name): Column
+    {
+        return new IntColumn($name, 'bigint');
+    }
+
+    public static function tinyserial(string $name): Column
+    {
+        return static::tinyint($name)->unsigned()->autoIncrement();
+    }
+
+    public static function smallserial(string $name): Column
+    {
+        return static::smallint($name)->unsigned()->autoIncrement();
+    }
+
+    public static function mediumserial(string $name): Column
+    {
+        return static::mediumint($name)->unsigned()->autoIncrement();
+    }
+
+    public static function serial(string $name): Column
+    {
+        return static::int($name)->unsigned()->autoIncrement();
+    }
+
+    public static function bigserial(string $name): Column
+    {
+        return static::bigint($name)->unsigned()->autoIncrement();
     }
 }
