@@ -2,5 +2,9 @@ language: php
 php:
     - 7.0
 script: phpunit
+services:
+    - mysql
+before_install:
+    - mysql -e "CREATE DATABASE IF NOT EXISTS test;" -uroot
 before_script:
     - composer install --no-interaction
