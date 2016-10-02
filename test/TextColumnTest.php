@@ -9,95 +9,95 @@ class TextColumnTest extends \PHPUnit_Framework_TestCase
      */
     public function testTextColumn(string $type, int $length)
     {
-        $instance = new TextColumn('foo', $type);
-        $this->assertSame('foo', $instance->getName());
-        $this->assertSame($type, $instance->getType());
-        $this->assertSame(false, $instance->isBinary());
-        $this->assertSame('', $instance->getCharset());
-        $this->assertSame('', $instance->getCollation());
-        $this->assertSame(false, $instance->isNullable());
-        $this->assertSame(false, $instance->hasComment());
-        $this->assertSame('', $instance->getComment());
-        $this->assertSame($length, $instance->getLength());
-        $this->assertSame(sprintf('`foo` %s NOT NULL', $type), $instance->build());
+        $column = new TextColumn('foo', $type);
+        $this->assertSame('foo', $column->getName());
+        $this->assertSame($type, $column->getType());
+        $this->assertSame(false, $column->isBinary());
+        $this->assertSame('', $column->getCharset());
+        $this->assertSame('', $column->getCollation());
+        $this->assertSame(false, $column->isNullable());
+        $this->assertSame(false, $column->hasComment());
+        $this->assertSame('', $column->getComment());
+        $this->assertSame($length, $column->getLength());
+        $this->assertSame(sprintf('`foo` %s NOT NULL', $type), $column->build());
 
         // binary
-        $instance->binary();
-        $this->assertSame(true, $instance->isBinary());
-        $this->assertSame(sprintf('`foo` %s BINARY NOT NULL', $type), $instance->build());
+        $column->binary();
+        $this->assertSame(true, $column->isBinary());
+        $this->assertSame(sprintf('`foo` %s BINARY NOT NULL', $type), $column->build());
 
         // binary + charset
-        $instance->charset('utf8');
-        $this->assertSame(sprintf('`foo` %s BINARY CHARACTER SET utf8 NOT NULL', $type), $instance->build());
+        $column->charset('utf8');
+        $this->assertSame(sprintf('`foo` %s BINARY CHARACTER SET utf8 NOT NULL', $type), $column->build());
 
         // binary + charset + collation
-        $instance->collation('utf8_bin');
-        $this->assertSame(sprintf('`foo` %s BINARY CHARACTER SET utf8 COLLATE utf8_bin NOT NULL', $type), $instance->build());
+        $column->collation('utf8_bin');
+        $this->assertSame(sprintf('`foo` %s BINARY CHARACTER SET utf8 COLLATE utf8_bin NOT NULL', $type), $column->build());
 
         // binary + charset + collation + nullable
-        $instance->nullable();
-        $this->assertSame(sprintf('`foo` %s BINARY CHARACTER SET utf8 COLLATE utf8_bin', $type), $instance->build());
+        $column->nullable();
+        $this->assertSame(sprintf('`foo` %s BINARY CHARACTER SET utf8 COLLATE utf8_bin', $type), $column->build());
 
         // binary + charset + collation + nullable + comment
-        $instance->comment('foobar');
-        $this->assertSame(sprintf('`foo` %s BINARY CHARACTER SET utf8 COLLATE utf8_bin COMMENT "foobar"', $type), $instance->build());
+        $column->comment('foobar');
+        $this->assertSame(sprintf('`foo` %s BINARY CHARACTER SET utf8 COLLATE utf8_bin COMMENT "foobar"', $type), $column->build());
 
 
 
         // charset
-        $instance = new TextColumn('foo', $type);
-        $instance->charset('utf8');
-        $this->assertSame('utf8', $instance->getCharset());
-        $this->assertSame(sprintf('`foo` %s CHARACTER SET utf8 NOT NULL', $type), $instance->build());
+        $column = new TextColumn('foo', $type);
+        $column->charset('utf8');
+        $this->assertSame('utf8', $column->getCharset());
+        $this->assertSame(sprintf('`foo` %s CHARACTER SET utf8 NOT NULL', $type), $column->build());
 
         // charset + collation
-        $instance->collation('utf8_bin');
-        $this->assertSame(sprintf('`foo` %s CHARACTER SET utf8 COLLATE utf8_bin NOT NULL', $type), $instance->build());
+        $column->collation('utf8_bin');
+        $this->assertSame(sprintf('`foo` %s CHARACTER SET utf8 COLLATE utf8_bin NOT NULL', $type), $column->build());
 
         // charset + collation + nullable
-        $instance->nullable();
-        $this->assertSame(sprintf('`foo` %s CHARACTER SET utf8 COLLATE utf8_bin', $type), $instance->build());
+        $column->nullable();
+        $this->assertSame(sprintf('`foo` %s CHARACTER SET utf8 COLLATE utf8_bin', $type), $column->build());
 
         // charset + collation + nullable + comment
-        $instance->comment('foobar');
-        $this->assertSame(sprintf('`foo` %s CHARACTER SET utf8 COLLATE utf8_bin COMMENT "foobar"', $type), $instance->build());
+        $column->comment('foobar');
+        $this->assertSame(sprintf('`foo` %s CHARACTER SET utf8 COLLATE utf8_bin COMMENT "foobar"', $type), $column->build());
 
 
 
         // collation
-        $instance = new TextColumn('foo', $type);
-        $instance->collation('utf8_bin');
-        $this->assertSame('utf8_bin', $instance->getCollation());
-        $this->assertSame(sprintf('`foo` %s COLLATE utf8_bin NOT NULL', $type), $instance->build());
+        $column = new TextColumn('foo', $type);
+        $column->collation('utf8_bin');
+        $this->assertSame('utf8_bin', $column->getCollation());
+        $this->assertSame(sprintf('`foo` %s COLLATE utf8_bin NOT NULL', $type), $column->build());
 
         // collation + nullable
-        $instance->nullable();
-        $this->assertSame(sprintf('`foo` %s COLLATE utf8_bin', $type), $instance->build());
+        $column->nullable();
+        $this->assertSame(sprintf('`foo` %s COLLATE utf8_bin', $type), $column->build());
 
         // collation + nullable + comment
-        $instance->comment('foobar');
-        $this->assertSame(sprintf('`foo` %s COLLATE utf8_bin COMMENT "foobar"', $type), $instance->build());
+        $column->comment('foobar');
+        $this->assertSame(sprintf('`foo` %s COLLATE utf8_bin COMMENT "foobar"', $type), $column->build());
 
 
 
         // nullable
-        $instance = new TextColumn('foo', $type);
-        $instance->nullable();
-        $this->assertSame(true, $instance->isNullable());
-        $this->assertSame(sprintf('`foo` %s', $type), $instance->build());
+        $column = new TextColumn('foo', $type);
+        $column->nullable();
+        $this->assertSame(true, $column->isNullable());
+        $this->assertSame(sprintf('`foo` %s', $type), $column->build());
 
         // nullable + comment
-        $instance->comment('foobar');
-        $this->assertSame(sprintf('`foo` %s COMMENT "foobar"', $type), $instance->build());
+        $column->comment('foobar');
+        $this->assertSame(sprintf('`foo` %s COMMENT "foobar"', $type), $column->build());
 
 
 
         // comment
-        $instance = new TextColumn('foo', $type);
-        $instance->comment('foobar');
-        $this->assertSame(true, $instance->hasComment());
-        $this->assertSame('foobar', $instance->getComment());
-        $this->assertSame(sprintf('`foo` %s NOT NULL COMMENT "foobar"', $type), $instance->build());
+        $column = new TextColumn('foo', $type);
+        $column->comment('foobar');
+        $this->assertSame(true, $column->hasComment());
+        $this->assertSame('foobar', $column->getComment());
+        $this->assertSame(sprintf('`foo` %s NOT NULL COMMENT "foobar"', $type), $column->build());
     }
 
     /**
@@ -105,9 +105,14 @@ class TextColumnTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheck(string $type, int $length)
     {
-        $instance = new TextColumn('foo', $type);
-        $this->assertSame(null, $instance->check(null));
-        $this->assertSame(null, $instance->check(''));
+        $column = new TextColumn('foo', $type);
+        $this->assertSame(null, $column->check(null));
+        $this->assertSame(null, $column->check(''));
+
+        $this->assertSame('1', $column->check(true));
+        $this->assertSame('1', $column->check(1.0));
+        $this->assertSame('1', $column->check(1));
+        $this->assertSame('1', $column->check('1'));
     }
 
     public function dataProviderTextTypes(): array
@@ -123,13 +128,13 @@ class TextColumnTest extends \PHPUnit_Framework_TestCase
     public function testInvalidType()
     {
         $this->expectException(ColumnException::class);
-        $instance = new TextColumn('foo', 'bar');
+        $column = new TextColumn('foo', 'bar');
     }
 
     public function testTooLong()
     {
         $this->expectException(ColumnException::class);
-        $instance = new TextColumn('foo', 'text');
-        $instance->check(str_repeat('a', 65536));
+        $column = new TextColumn('foo', 'text');
+        $column->check(str_repeat('a', 65536));
     }
 }

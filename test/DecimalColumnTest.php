@@ -105,6 +105,11 @@ class DecimalColumnTest extends \PHPUnit_Framework_TestCase
         $column = new DecimalColumn('foo', 10, 2);
         $this->assertSame(null, $column->check(null));
         $this->assertSame(null, $column->check(''));
+
+        $this->assertSame(1.0, $column->check(true));
+        $this->assertSame(1.0, $column->check(1.0));
+        $this->assertSame(1.0, $column->check(1));
+        $this->assertSame(1.0, $column->check('1'));
     }
 
     public function testPrecisionAndScale()

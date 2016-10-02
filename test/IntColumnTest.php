@@ -128,9 +128,14 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheck(string $type)
     {
-        $instance = new IntColumn('foo', $type);
-        $this->assertSame(null, $instance->check(null));
-        $this->assertSame(null, $instance->check(''));
+        $column = new IntColumn('foo', $type);
+        $this->assertSame(null, $column->check(null));
+        $this->assertSame(null, $column->check(''));
+
+        $this->assertSame(1, $column->check(true));
+        $this->assertSame(1, $column->check(1.0));
+        $this->assertSame(1, $column->check(1));
+        $this->assertSame(1, $column->check('1'));
     }
 
     public function dataProviderIntTypes(): array
@@ -147,35 +152,35 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
     public function testInvalidType()
     {
         $this->expectException(ColumnException::class);
-        $instance = new IntColumn('foo', 'bar');
+        $column = new IntColumn('foo', 'bar');
     }
 
     public function testAutoIncrementAndNullable()
     {
         $this->expectException(ColumnException::class);
-        $instance = new IntColumn('foo', 'int');
-        $instance->autoIncrement()->nullable();
+        $column = new IntColumn('foo', 'int');
+        $column->autoIncrement()->nullable();
     }
 
     public function testNullableAndAutoIncrement()
     {
         $this->expectException(ColumnException::class);
-        $instance = new IntColumn('foo', 'int');
-        $instance->nullable()->autoIncrement();
+        $column = new IntColumn('foo', 'int');
+        $column->nullable()->autoIncrement();
     }
 
     public function testAutoIncrementAndDefault()
     {
         $this->expectException(ColumnException::class);
-        $instance = new IntColumn('foo', 'int');
-        $instance->autoIncrement()->default(1);
+        $column = new IntColumn('foo', 'int');
+        $column->autoIncrement()->default(1);
     }
 
     public function testDefaultAndAutoIncrement()
     {
         $this->expectException(ColumnException::class);
-        $instance = new IntColumn('foo', 'int');
-        $instance->default(1)->autoIncrement();
+        $column = new IntColumn('foo', 'int');
+        $column->default(1)->autoIncrement();
     }
 
     /**
@@ -184,8 +189,8 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
     public function testCheckSignedMin(string $type, int $signed_min, int $signed_max, int $unsigned_max)
     {
         $this->expectException(ColumnException::class);
-        $instance = new IntColumn('foo', $type);
-        $instance->check($signed_min - 1);
+        $column = new IntColumn('foo', $type);
+        $column->check($signed_min - 1);
     }
 
     /**
@@ -194,8 +199,8 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
     public function testCheckSignedMax(string $type, int $signed_min, int $signed_max, int $unsigned_max)
     {
         $this->expectException(ColumnException::class);
-        $instance = new IntColumn('foo', $type);
-        $instance->check($signed_max + 1);
+        $column = new IntColumn('foo', $type);
+        $column->check($signed_max + 1);
     }
 
     /**
@@ -204,9 +209,9 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
     public function testCheckUnsignedMin(string $type, int $signed_min, int $signed_max, int $unsigned_max)
     {
         $this->expectException(ColumnException::class);
-        $instance = new IntColumn('foo', $type);
-        $instance->unsigned();
-        $instance->check(-1);
+        $column = new IntColumn('foo', $type);
+        $column->unsigned();
+        $column->check(-1);
     }
 
     /**
@@ -215,9 +220,9 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
     public function testCheckUnsignedMax(string $type, int $signed_min, int $signed_max, int $unsigned_max)
     {
         $this->expectException(ColumnException::class);
-        $instance = new IntColumn('foo', $type);
-        $instance->unsigned();
-        $instance->check($unsigned_max + 1);
+        $column = new IntColumn('foo', $type);
+        $column->unsigned();
+        $column->check($unsigned_max + 1);
     }
 
     /**
@@ -226,8 +231,8 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
     public function testCheckDefaultSignedMin(string $type, int $signed_min, int $signed_max, int $unsigned_max)
     {
         $this->expectException(ColumnException::class);
-        $instance = new IntColumn('foo', $type);
-        $instance->default($signed_min - 1);
+        $column = new IntColumn('foo', $type);
+        $column->default($signed_min - 1);
     }
 
     /**
@@ -236,8 +241,8 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
     public function testCheckDefaultSignedMax(string $type, int $signed_min, int $signed_max, int $unsigned_max)
     {
         $this->expectException(ColumnException::class);
-        $instance = new IntColumn('foo', $type);
-        $instance->default($signed_max + 1);
+        $column = new IntColumn('foo', $type);
+        $column->default($signed_max + 1);
     }
 
     /**
@@ -246,9 +251,9 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
     public function testCheckDefaultUnsignedMin(string $type, int $signed_min, int $signed_max, int $unsigned_max)
     {
         $this->expectException(ColumnException::class);
-        $instance = new IntColumn('foo', $type);
-        $instance->unsigned();
-        $instance->default(-1);
+        $column = new IntColumn('foo', $type);
+        $column->unsigned();
+        $column->default(-1);
     }
 
     /**
@@ -257,8 +262,8 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
     public function testCheckDefaultUnsignedMax(string $type, int $signed_min, int $signed_max, int $unsigned_max)
     {
         $this->expectException(ColumnException::class);
-        $instance = new IntColumn('foo', $type);
-        $instance->unsigned();
-        $instance->default($unsigned_max + 1);
+        $column = new IntColumn('foo', $type);
+        $column->unsigned();
+        $column->default($unsigned_max + 1);
     }
 }
