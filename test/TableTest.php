@@ -279,14 +279,14 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setForeignKey('id', 'foo', 'id');
         $this->assertSame(true, $table->hasForeignKey());
         $this->assertSame(true, $table->hasForeignKey('fk_foo_1'));
-        $this->assertSame(['columns' => ['id'], 'parent_table' => 'foo', 'parent_columns' => ['id'], 'on_update' => 'RESTRICT', 'on_delete' => 'RESTRICT'], $table->getForeignKey('fk_foo_1'));
-        $this->assertSame(['fk_foo_1' => ['columns' => ['id'], 'parent_table' => 'foo', 'parent_columns' => ['id'], 'on_update' => 'RESTRICT', 'on_delete' => 'RESTRICT']], $table->getForeignKeys());
+        $this->assertEquals(new ForeignKey('fk_foo_1', 'id', 'foo', 'id'), $table->getForeignKey('fk_foo_1'));
+        $this->assertSame(['fk_foo_1' => $table->getForeignKey('fk_foo_1')], $table->getForeignKeys());
 
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $table->setColumn(Column::int('id'));
         $table->setForeignKey('id', 'foo');
-        $this->assertSame(['fk_foo_1' => ['columns' => ['id'], 'parent_table' => 'foo', 'parent_columns' => ['id'], 'on_update' => 'RESTRICT', 'on_delete' => 'RESTRICT']], $table->getForeignKeys());
+        $this->assertSame(['fk_foo_1' => $table->getForeignKey('fk_foo_1')], $table->getForeignKeys());
 
         // composite
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
@@ -296,7 +296,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setForeignKey(['id', 'id2'], 'foo');
         $this->assertSame(true, $table->hasForeignKey());
         $this->assertSame(true, $table->hasForeignKey('fk_foo_1'));
-        $this->assertSame(['fk_foo_1' => ['columns' => ['id', 'id2'], 'parent_table' => 'foo', 'parent_columns' => ['id', 'id2'], 'on_update' => 'RESTRICT', 'on_delete' => 'RESTRICT']], $table->getForeignKeys());
+        $this->assertSame(['fk_foo_1' => $table->getForeignKey('fk_foo_1')], $table->getForeignKeys());
     }
 
     public function testGetNotDefinedForeignKey()
@@ -304,15 +304,6 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectException(TableException::class);
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
         $table->getForeignKey('foo');
-    }
-
-    public function testForeignKeyNoAction()
-    {
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setName('foo');
-        $table->setColumn(Column::int('id'));
-        $table->setForeignKey('id', 'foo', 'id', 'NO ACTION', 'NO ACTION');
-        $this->assertSame(['fk_foo_1' => ['columns' => ['id'], 'parent_table' => 'foo', 'parent_columns' => ['id'], 'on_update' => 'RESTRICT', 'on_delete' => 'RESTRICT']], $table->getForeignKeys());
     }
 
     public function testForeignKeySetTwice()
@@ -329,38 +320,5 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectException(TableException::class);
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
         $table->setForeignKey('id', 'foo', 'id');
-    }
-
-    public function testForeignKeySetSameChildTwice()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setColumn(Column::int('id'));
-        $table->setForeignKey(['id', 'id'], 'foo', ['id', 'id2']);
-    }
-
-    public function testForeignKeySetSameParentTwice()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setColumn(Column::int('id'));
-        $table->setColumn(Column::int('id2'));
-        $table->setForeignKey(['id', 'id2'], 'foo', ['id', 'id']);
-    }
-
-    public function testForeignKeyInvalidOnUpdate()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setColumn(Column::int('id'));
-        $table->setForeignKey('id', 'foo', 'id', 'foo');
-    }
-
-    public function testForeignKeyInvalidOnDelete()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setColumn(Column::int('id'));
-        $table->setForeignKey('id', 'foo', 'id', 'CASCADE', 'foo');
     }
 }

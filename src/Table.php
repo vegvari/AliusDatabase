@@ -267,50 +267,13 @@ class Table
         }
 
         $columns = is_array($columns) ? $columns : [$columns];
-        if (count($columns) !== count(array_unique($columns))) {
-            throw new TableException('Invalid foreign key, duplicated child column');
-        }
-
         foreach ($columns as $column) {
             if (! $this->hasColumn($column)) {
                 throw new TableException(sprintf('Column is not defined: "%s"', $column));
             }
         }
 
-        if ($parent_columns === null) {
-            $parent_columns = $columns;
-        } elseif (! is_array($parent_columns)) {
-            $parent_columns = [$parent_columns];
-        }
-
-        if (count($parent_columns) !== count(array_unique($parent_columns))) {
-            throw new TableException('Invalid foreign key, duplicated parent column');
-        }
-
-        if (! in_array($on_update, ['CASCADE', 'SET NULL', 'RESTRICT', 'NO ACTION', 'SET DEFAULT'])) {
-            throw new TableException(sprintf('Invalid foreign key, on update action is not supported: "%s"', $on_update));
-        }
-
-        if ($on_update === 'NO ACTION') {
-            $on_update = 'RESTRICT';
-        }
-
-        if (! in_array($on_delete, ['CASCADE', 'SET NULL', 'RESTRICT', 'NO ACTION', 'SET DEFAULT'])) {
-            throw new TableException(sprintf('Invalid foreign key, on update action is not supported: "%s"', $on_delete));
-        }
-
-        if ($on_delete === 'NO ACTION') {
-            $on_delete = 'RESTRICT';
-        }
-
-        $this->foreign_key[$name] = [
-            'columns' => $columns,
-            'parent_table' => $parent_table,
-            'parent_columns' => $parent_columns,
-            'on_update' => $on_update,
-            'on_delete' => $on_delete,
-        ];
-
+        $this->foreign_key[$name] = new ForeignKey($name, $columns, $parent_table, $parent_columns, $on_update, $on_delete);
         return $this;
     }
 
@@ -329,7 +292,7 @@ class Table
         return $this->foreign_key !== [];
     }
 
-    public function getForeignKey(string $name): array
+    public function getForeignKey(string $name): ForeignKey
     {
         if (! $this->hasForeignKey($name)) {
             throw new TableException(sprintf('Foreign key is not defined: "%s"', $name));
