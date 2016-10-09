@@ -225,7 +225,7 @@ class Table
 
     public function setIndex(string ...$columns): self
     {
-        array_unshift($columns, sprintf('index_%s_%d', $this->getName(), count($this->index) + 1));
+        array_unshift($columns, sprintf('index-%s', implode('-', $columns)));
         return call_user_func_array([$this, 'setIndexWithName'], $columns);
     }
 

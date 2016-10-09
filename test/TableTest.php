@@ -183,23 +183,22 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function testIndex()
     {
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setName('foo');
         $this->assertSame(false, $table->hasIndex());
-        $this->assertSame(false, $table->hasIndex('index_foo_1'));
+        $this->assertSame(false, $table->hasIndex('index-id'));
         $this->assertSame([], $table->getIndexes());
 
         // simple
         $table->setColumn(Column::int('id'));
         $table->setIndex('id');
         $this->assertSame(true, $table->hasIndex());
-        $this->assertSame(true, $table->hasIndex('index_foo_1'));
-        $this->assertSame(['id'], $table->getIndex('index_foo_1'));
-        $this->assertSame(['index_foo_1' => ['id']], $table->getIndexes());
+        $this->assertSame(true, $table->hasIndex('index-id'));
+        $this->assertSame(['id'], $table->getIndex('index-id'));
+        $this->assertSame(['index-id' => ['id']], $table->getIndexes());
 
-        $table->setIndex('id');
-        $this->assertSame(true, $table->hasIndex('index_foo_2'));
-        $this->assertSame(['id'], $table->getIndex('index_foo_2'));
-        $this->assertSame(['index_foo_1' => ['id'], 'index_foo_2' => ['id']], $table->getIndexes());
+        $table->setIndexWithName('foo', 'id');
+        $this->assertSame(true, $table->hasIndex('foo'));
+        $this->assertSame(['id'], $table->getIndex('foo'));
+        $this->assertSame(['index-id' => ['id'], 'foo' => ['id']], $table->getIndexes());
 
         // composite
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
@@ -208,8 +207,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setColumn(Column::int('id2'));
         $table->setIndex('id', 'id2');
         $this->assertSame(true, $table->hasIndex());
-        $this->assertSame(true, $table->hasIndex('index_foo_1'));
-        $this->assertSame(['index_foo_1' => ['id', 'id2']], $table->getIndexes());
+        $this->assertSame(true, $table->hasIndex('index-id-id2'));
+        $this->assertSame(['index-id-id2' => ['id', 'id2']], $table->getIndexes());
     }
 
     public function testGetNotDefinedIndex()
