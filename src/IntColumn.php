@@ -4,8 +4,6 @@ namespace Alius\Database;
 
 class IntColumn extends Column
 {
-    use DefaultValue;
-
     const TYPES = [
         'tinyint' => ['signed' => 127, 'unsigned' => 255],
         'smallint' => ['signed' => 32767, 'unsigned' => 65535],

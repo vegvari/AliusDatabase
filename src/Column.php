@@ -7,13 +7,14 @@ abstract class Column
     protected $name;
     protected $type;
     protected $nullable = false;
+    protected $default;
     protected $comment = '';
 
     public function __construct(string $name, string $type)
     {
         $this->name = $name;
 
-        if (! isset(static::TYPES[$type])) {
+        if (! isset(static::TYPES[$type]) && array_search($type, static::TYPES) === false) {
             throw new ColumnException(sprintf('Invalid type: "%s"', $type));
         }
 
@@ -39,6 +40,22 @@ abstract class Column
     public function isNullable(): bool
     {
         return $this->nullable;
+    }
+
+    public function default($value): Column
+    {
+        $this->default = $this->check($value);
+        return $this;
+    }
+
+    public function hasDefault(): bool
+    {
+        return $this->default !== null;
+    }
+
+    public function getDefault()
+    {
+        return $this->default;
     }
 
     public function comment(string $comment): Column
@@ -84,6 +101,21 @@ abstract class Column
     public static function varchar(string $name, int $length): Column
     {
         return new CharColumn($name, 'varchar', $length);
+    }
+
+    public static function datetime(string $name): Column
+    {
+        return new DateTimeColumn($name);
+    }
+
+    public static function decimal(string $name, int $precision, int $scale): Column
+    {
+        return new DecimalColumn($name, $precision, $scale);
+    }
+
+    public static function float(string $name, int $precision, int $scale): Column
+    {
+        return new FloatColumn($name, $precision, $scale);
     }
 
     public static function tinyint(string $name): Column
@@ -154,5 +186,10 @@ abstract class Column
     public static function longtext(string $name): Column
     {
         return new TextColumn($name, 'longtext');
+    }
+
+    public static function timestamp(string $name): Column
+    {
+        return new TimestampColumn($name);
     }
 }

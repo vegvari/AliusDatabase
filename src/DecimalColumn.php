@@ -4,15 +4,13 @@ namespace Alius\Database;
 
 class DecimalColumn extends Column
 {
-    use DefaultValue;
-
-    const TYPES = ['decimal' => true];
+    const TYPES = ['decimal'];
 
     protected $precision;
     protected $scale;
     protected $unsigned = false;
 
-    public function __construct(string $name, int $precision, int $scale)
+    public function __construct(string $name, int $precision, int $scale, string $type = 'decimal')
     {
         if ($precision < 1 || $precision > 65) {
             throw new ColumnException(sprintf('Invalid precision: "%d", it must be 1-65', $precision));
@@ -29,7 +27,7 @@ class DecimalColumn extends Column
         $this->precision = $precision;
         $this->scale = $scale;
 
-        parent::__construct($name, 'decimal');
+        parent::__construct($name, $type);
     }
 
     public function getPrecision(): int

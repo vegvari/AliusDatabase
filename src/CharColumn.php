@@ -4,8 +4,6 @@ namespace Alius\Database;
 
 class CharColumn extends TextColumn
 {
-    use DefaultValue;
-
     const TYPES = [
         'char' => 255,
         'varchar' => 65535,
