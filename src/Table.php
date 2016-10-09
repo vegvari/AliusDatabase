@@ -170,11 +170,7 @@ class Table
             }
         }
 
-        if (count($columns) !== count(array_unique($columns))) {
-            throw new TableException('Invalid unique key, duplicated column');
-        }
-
-        $this->unique_key[$name] = $columns;
+        $this->unique_key[$name] = new UniqueKey($name, $columns);
         return $this;
     }
 
@@ -193,7 +189,7 @@ class Table
         return $this->unique_key !== [];
     }
 
-    public function getUniqueKey(string $name): array
+    public function getUniqueKey(string $name): UniqueKey
     {
         if (! $this->hasUniqueKey($name)) {
             throw new TableException(sprintf('Unique key is not defined: "%s"', $name));
