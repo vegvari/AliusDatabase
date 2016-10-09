@@ -241,4 +241,78 @@ class Table
     {
         return $this->index;
     }
+
+    public function setForeignKeyWithName(string $name, $columns, string $parent_table, $parent_columns = null, string $on_update = 'RESTRICT', string $on_delete = 'RESTRICT'): self
+    {
+        if ($this->hasForeignKey($name)) {
+            throw new TableException(sprintf('Foreign key is already defined: "%s"', $name));
+        }
+
+        $columns = is_array($columns) ? $columns : [$columns];
+        if (count($columns) !== count(array_unique($columns))) {
+            throw new TableException('Invalid foreign key, duplicated child column');
+        }
+
+        foreach ($columns as $column) {
+            if (! $this->hasColumn($column)) {
+                throw new TableException(sprintf('Column is not defined: "%s"', $column));
+            }
+        }
+
+        if ($parent_columns === null) {
+            $parent_columns = $columns;
+        } elseif (! is_array($parent_columns)) {
+            $parent_columns = [$parent_columns];
+        }
+
+        if (count($parent_columns) !== count(array_unique($parent_columns))) {
+            throw new TableException('Invalid foreign key, duplicated parent column');
+        }
+
+        if (! in_array($on_update, ['CASCADE', 'SET NULL', 'RESTRICT', 'NO ACTION', 'SET DEFAULT'])) {
+            throw new TableException(sprintf('Invalid foreign key, on update action is not supported: "%s"', $on_update));
+        }
+
+        if ($on_update === 'NO ACTION') {
+            $on_update = 'RESTRICT';
+        }
+
+        if (! in_array($on_delete, ['CASCADE', 'SET NULL', 'RESTRICT', 'NO ACTION', 'SET DEFAULT'])) {
+            throw new TableException(sprintf('Invalid foreign key, on update action is not supported: "%s"', $on_delete));
+        }
+
+        if ($on_delete === 'NO ACTION') {
+            $on_delete = 'RESTRICT';
+        }
+
+        $this->foreign_key[$name] = [
+            'columns' => $columns,
+            'parent_table' => $parent_table,
+            'parent_columns' => $parent_columns,
+            'on_update' => $on_update,
+            'on_delete' => $on_delete,
+        ];
+
+        return $this;
+    }
+
+    public function setForeignKey($columns, string $parent_table, $parent_columns = null, string $on_update = 'RESTRICT', string $on_delete = 'RESTRICT'): self
+    {
+        $name = sprintf('fk_%s_%d', $this->getName(), count($this->foreign_key) + 1);
+        return $this->setForeignKeyWithName($name, $columns, $parent_table, $parent_columns, $on_update, $on_delete);
+    }
+
+    public function hasForeignKey(string $name = null): bool
+    {
+        if ($name !== null) {
+            return isset($this->foreign_key[$name]);
+        }
+
+        return $this->foreign_key !== [];
+    }
+
+    public function getForeignKey(): array
+    {
+        return $this->foreign_key;
+    }
 }
