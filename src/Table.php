@@ -176,7 +176,7 @@ class Table
 
     public function setUniqueKey(string ...$columns): self
     {
-        array_unshift($columns, sprintf('unique_%s_%d', $this->getName(), count($this->unique_key) + 1));
+        array_unshift($columns, sprintf('unique-%s', implode('-', $columns)));
         return call_user_func_array([$this, 'setUniqueKeyWithName'], $columns);
     }
 

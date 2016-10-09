@@ -135,21 +135,26 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function testUniqueKey()
     {
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setName('foo');
         $this->assertSame(false, $table->hasUniqueKey());
-        $this->assertSame(false, $table->hasUniqueKey('unique_foo_1'));
+        $this->assertSame(false, $table->hasUniqueKey('unique-id'));
         $this->assertSame([], $table->getUniqueKeys());
 
         $table->setColumn(Column::int('id'));
         $table->setUniqueKey('id');
+        $table->setColumn(Column::int('id2'));
         $this->assertSame(true, $table->hasUniqueKey());
-        $this->assertSame(true, $table->hasUniqueKey('unique_foo_1'));
-        $this->assertEquals(new UniqueKey('unique_foo_1', ['id']), $table->getUniqueKey('unique_foo_1'));
+        $this->assertSame(true, $table->hasUniqueKey('unique-id'));
+        $this->assertEquals(new UniqueKey('unique-id', ['id']), $table->getUniqueKey('unique-id'));
 
-        $table->setUniqueKey('id');
-        $this->assertSame(true, $table->hasUniqueKey('unique_foo_2'));
-        $this->assertEquals(new UniqueKey('unique_foo_2', ['id']), $table->getUniqueKey('unique_foo_2'));
-        $this->assertSame(['unique_foo_1' => $table->getUniqueKey('unique_foo_1'), 'unique_foo_2' => $table->getUniqueKey('unique_foo_2')], $table->getUniqueKeys());
+        $table->setUniqueKey('id2');
+        $this->assertSame(true, $table->hasUniqueKey('unique-id2'));
+        $this->assertEquals(new UniqueKey('unique-id2', ['id2']), $table->getUniqueKey('unique-id2'));
+        $this->assertSame(['unique-id' => $table->getUniqueKey('unique-id'), 'unique-id2' => $table->getUniqueKey('unique-id2')], $table->getUniqueKeys());
+
+        $table->setUniqueKeyWithName('foo', 'id');
+        $this->assertSame(true, $table->hasUniqueKey('foo'));
+        $this->assertEquals(new UniqueKey('foo', ['id']), $table->getUniqueKey('foo'));
+        $this->assertSame(['unique-id' => $table->getUniqueKey('unique-id'), 'unique-id2' => $table->getUniqueKey('unique-id2'), 'foo' => $table->getUniqueKey('foo')], $table->getUniqueKeys());
     }
 
     public function testGetNotDefinedUniqueKey()
