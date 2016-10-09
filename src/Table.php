@@ -103,13 +103,13 @@ class Table
         return $this;
     }
 
-    public function getColumn(string $column_name): Column
+    public function getColumn(string $name): Column
     {
-        if (! $this->hasColumn($column_name)) {
-            throw new TableException(sprintf('Column is not defined: "%s"', $column_name));
+        if (! $this->hasColumn($name)) {
+            throw new TableException(sprintf('Column is not defined: "%s"', $name));
         }
 
-        return $this->columns[$column_name];
+        return $this->columns[$name];
     }
 
     public function getColumns(): array
@@ -117,9 +117,9 @@ class Table
         return $this->columns;
     }
 
-    public function hasColumn(string $column_name): bool
+    public function hasColumn(string $name): bool
     {
-        return isset($this->getColumns()[$column_name]);
+        return isset($this->getColumns()[$name]);
     }
 
     public function setPrimaryKey(string ...$columns): self
@@ -197,7 +197,16 @@ class Table
         return $this->unique_key !== [];
     }
 
-    public function getUniqueKey(): array
+    public function getUniqueKey(string $name): array
+    {
+        if (! $this->hasUniqueKey($name)) {
+            throw new TableException(sprintf('Unique key is not defined: "%s"', $name));
+        }
+
+        return $this->unique_key[$name];
+    }
+
+    public function getUniqueKeys(): array
     {
         return $this->unique_key;
     }
@@ -237,7 +246,16 @@ class Table
         return $this->index !== [];
     }
 
-    public function getIndex(): array
+    public function getIndex(string $name): array
+    {
+        if (! $this->hasIndex($name)) {
+            throw new TableException(sprintf('Index is not defined: "%s"', $name));
+        }
+
+        return $this->index[$name];
+    }
+
+    public function getIndexes(): array
     {
         return $this->index;
     }
@@ -311,7 +329,16 @@ class Table
         return $this->foreign_key !== [];
     }
 
-    public function getForeignKey(): array
+    public function getForeignKey(string $name): array
+    {
+        if (! $this->hasForeignKey($name)) {
+            throw new TableException(sprintf('Foreign key is not defined: "%s"', $name));
+        }
+
+        return $this->foreign_key[$name];
+    }
+
+    public function getForeignKeys(): array
     {
         return $this->foreign_key;
     }

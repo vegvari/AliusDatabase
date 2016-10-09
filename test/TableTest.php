@@ -146,18 +146,20 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setName('foo');
         $this->assertSame(false, $table->hasUniqueKey());
         $this->assertSame(false, $table->hasUniqueKey('unique_foo_1'));
-        $this->assertSame([], $table->getUniqueKey());
+        $this->assertSame([], $table->getUniqueKeys());
 
         // simple
         $table->setColumn(Column::int('id'));
         $table->setUniqueKey('id');
         $this->assertSame(true, $table->hasUniqueKey());
         $this->assertSame(true, $table->hasUniqueKey('unique_foo_1'));
-        $this->assertSame(['unique_foo_1' => ['id']], $table->getUniqueKey());
+        $this->assertSame(['id'], $table->getUniqueKey('unique_foo_1'));
+        $this->assertSame(['unique_foo_1' => ['id']], $table->getUniqueKeys());
 
         $table->setUniqueKey('id');
         $this->assertSame(true, $table->hasUniqueKey('unique_foo_2'));
-        $this->assertSame(['unique_foo_1' => ['id'], 'unique_foo_2' => ['id']], $table->getUniqueKey());
+        $this->assertSame(['id'], $table->getUniqueKey('unique_foo_2'));
+        $this->assertSame(['unique_foo_1' => ['id'], 'unique_foo_2' => ['id']], $table->getUniqueKeys());
 
         // composite
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
@@ -167,7 +169,14 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setUniqueKey('id', 'id2');
         $this->assertSame(true, $table->hasUniqueKey());
         $this->assertSame(true, $table->hasUniqueKey('unique_foo_1'));
-        $this->assertSame(['unique_foo_1' => ['id', 'id2']], $table->getUniqueKey());
+        $this->assertSame(['unique_foo_1' => ['id', 'id2']], $table->getUniqueKeys());
+    }
+
+    public function testGetNotDefinedUniqueKey()
+    {
+        $this->expectException(TableException::class);
+        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table->getUniqueKey('foo');
     }
 
     public function testUniqueKeySetTwice()
@@ -200,18 +209,20 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setName('foo');
         $this->assertSame(false, $table->hasIndex());
         $this->assertSame(false, $table->hasIndex('index_foo_1'));
-        $this->assertSame([], $table->getIndex());
+        $this->assertSame([], $table->getIndexes());
 
         // simple
         $table->setColumn(Column::int('id'));
         $table->setIndex('id');
         $this->assertSame(true, $table->hasIndex());
         $this->assertSame(true, $table->hasIndex('index_foo_1'));
-        $this->assertSame(['index_foo_1' => ['id']], $table->getIndex());
+        $this->assertSame(['id'], $table->getIndex('index_foo_1'));
+        $this->assertSame(['index_foo_1' => ['id']], $table->getIndexes());
 
         $table->setIndex('id');
         $this->assertSame(true, $table->hasIndex('index_foo_2'));
-        $this->assertSame(['index_foo_1' => ['id'], 'index_foo_2' => ['id']], $table->getIndex());
+        $this->assertSame(['id'], $table->getIndex('index_foo_2'));
+        $this->assertSame(['index_foo_1' => ['id'], 'index_foo_2' => ['id']], $table->getIndexes());
 
         // composite
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
@@ -221,7 +232,14 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setIndex('id', 'id2');
         $this->assertSame(true, $table->hasIndex());
         $this->assertSame(true, $table->hasIndex('index_foo_1'));
-        $this->assertSame(['index_foo_1' => ['id', 'id2']], $table->getIndex());
+        $this->assertSame(['index_foo_1' => ['id', 'id2']], $table->getIndexes());
+    }
+
+    public function testGetNotDefinedIndex()
+    {
+        $this->expectException(TableException::class);
+        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table->getIndex('foo');
     }
 
     public function testIndexSetTwice()
@@ -254,34 +272,38 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setName('foo');
         $this->assertSame(false, $table->hasForeignKey());
         $this->assertSame(false, $table->hasForeignKey('fk_foo_1'));
-        $this->assertSame([], $table->getForeignKey());
+        $this->assertSame([], $table->getForeignKeys());
 
         // simple
         $table->setColumn(Column::int('id'));
         $table->setForeignKey('id', 'foo', 'id');
         $this->assertSame(true, $table->hasForeignKey());
         $this->assertSame(true, $table->hasForeignKey('fk_foo_1'));
-        $this->assertSame(['fk_foo_1' => ['columns' => ['id'], 'parent_table' => 'foo', 'parent_columns' => ['id'], 'on_update' => 'RESTRICT', 'on_delete' => 'RESTRICT']], $table->getForeignKey());
+        $this->assertSame(['columns' => ['id'], 'parent_table' => 'foo', 'parent_columns' => ['id'], 'on_update' => 'RESTRICT', 'on_delete' => 'RESTRICT'], $table->getForeignKey('fk_foo_1'));
+        $this->assertSame(['fk_foo_1' => ['columns' => ['id'], 'parent_table' => 'foo', 'parent_columns' => ['id'], 'on_update' => 'RESTRICT', 'on_delete' => 'RESTRICT']], $table->getForeignKeys());
 
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $table->setColumn(Column::int('id'));
         $table->setForeignKey('id', 'foo');
-        $this->assertSame(['fk_foo_1' => ['columns' => ['id'], 'parent_table' => 'foo', 'parent_columns' => ['id'], 'on_update' => 'RESTRICT', 'on_delete' => 'RESTRICT']], $table->getForeignKey());
-
-        // $table->setForeignKey('id');
-        // $this->assertSame(true, $table->hasForeignKey('fk_foo_2'));
-        // $this->assertSame(['fk_foo_1' => ['columns' => ['id'], 'parent_table' => 'foo', 'parent_columns' => ['id'], 'on_update' => 'RESTRICT', 'on_delete' => 'RESTRICT']], $table->getForeignKey());
+        $this->assertSame(['fk_foo_1' => ['columns' => ['id'], 'parent_table' => 'foo', 'parent_columns' => ['id'], 'on_update' => 'RESTRICT', 'on_delete' => 'RESTRICT']], $table->getForeignKeys());
 
         // composite
-        // $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
-        // $table->setName('foo');
-        // $table->setColumn(Column::int('id'));
-        // $table->setColumn(Column::int('id2'));
-        // $table->setForeignKey('id', 'id2');
-        // $this->assertSame(true, $table->hasForeignKey());
-        // $this->assertSame(true, $table->hasForeignKey('fk_foo_1'));
-        // $this->assertSame(['fk_foo_1' => ['id', 'id2']], $table->getForeignKey());
+        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table->setName('foo');
+        $table->setColumn(Column::int('id'));
+        $table->setColumn(Column::int('id2'));
+        $table->setForeignKey(['id', 'id2'], 'foo');
+        $this->assertSame(true, $table->hasForeignKey());
+        $this->assertSame(true, $table->hasForeignKey('fk_foo_1'));
+        $this->assertSame(['fk_foo_1' => ['columns' => ['id', 'id2'], 'parent_table' => 'foo', 'parent_columns' => ['id', 'id2'], 'on_update' => 'RESTRICT', 'on_delete' => 'RESTRICT']], $table->getForeignKeys());
+    }
+
+    public function testGetNotDefinedForeignKey()
+    {
+        $this->expectException(TableException::class);
+        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table->getForeignKey('foo');
     }
 
     public function testForeignKeyNoAction()
@@ -290,7 +312,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setName('foo');
         $table->setColumn(Column::int('id'));
         $table->setForeignKey('id', 'foo', 'id', 'NO ACTION', 'NO ACTION');
-        $this->assertSame(['fk_foo_1' => ['columns' => ['id'], 'parent_table' => 'foo', 'parent_columns' => ['id'], 'on_update' => 'RESTRICT', 'on_delete' => 'RESTRICT']], $table->getForeignKey());
+        $this->assertSame(['fk_foo_1' => ['columns' => ['id'], 'parent_table' => 'foo', 'parent_columns' => ['id'], 'on_update' => 'RESTRICT', 'on_delete' => 'RESTRICT']], $table->getForeignKeys());
     }
 
     public function testForeignKeySetTwice()
