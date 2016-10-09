@@ -35,7 +35,7 @@ class CharColumn extends TextColumn
         return $this->length;
     }
 
-    public function build(): string
+    public function buildCreate(): string
     {
         $build[] = sprintf('%s(%d)', $this->buildNameAndType(), $this->getLength());
 

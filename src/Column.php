@@ -86,11 +86,27 @@ abstract class Column
         return sprintf('COMMENT "%s"', $this->getComment());
     }
 
-    abstract public function build(): string;
+    abstract public function buildCreate(): string;
 
-    public function __toString(): string
+    public function buildDrop(): string
     {
-        return $this->build();
+        return sprintf('DROP COLUMN `%s`', $this->getName());
+    }
+
+    public function buildAdd(Column $after = null): string
+    {
+        $build = sprintf('ADD COLUMN %s', $this->buildCreate());
+
+        if ($after !== null) {
+            $build .= sprintf(' AFTER `%s`', $after->getName());
+        }
+
+        return $build;
+    }
+
+    public function buildChange(Column $column): string
+    {
+        return sprintf('CHANGE COLUMN `%s` %s', $column->getName(), $this->buildCreate());
     }
 
     public static function char(string $name, int $length): Column

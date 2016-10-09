@@ -306,7 +306,7 @@ class Table
 
         if ($this->getColumns() !== []) {
             foreach ($this->getColumns() as $column) {
-                $create[] = $column;
+                $create[] = $column->buildCreate();
             }
         }
 

@@ -75,7 +75,7 @@ class DateTimeColumn extends Column
         return $value->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s');
     }
 
-    public function build(): string
+    public function buildCreate(): string
     {
         $build[] = $this->buildNameAndType();
 

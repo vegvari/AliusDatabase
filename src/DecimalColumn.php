@@ -86,7 +86,7 @@ class DecimalColumn extends Column
         return $value;
     }
 
-    public function build(): string
+    public function buildCreate(): string
     {
         $build[] = sprintf('%s(%d,%d)', $this->buildNameAndType(), $this->getPrecision(), $this->getScale());
 

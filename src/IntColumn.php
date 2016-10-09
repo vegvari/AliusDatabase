@@ -103,7 +103,7 @@ class IntColumn extends Column
         return $value;
     }
 
-    public function build(): string
+    public function buildCreate(): string
     {
         $build[] = $this->buildNameAndType();
 

@@ -17,39 +17,43 @@ class DecimalColumnTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(null, $column->getDefault());
         $this->assertSame(false, $column->hasComment());
         $this->assertSame('', $column->getComment());
-        $this->assertSame('`foo` decimal(10,2) NOT NULL', $column->build());
+        $this->assertSame('`foo` decimal(10,2) NOT NULL', $column->buildCreate());
+        $this->assertSame('DROP COLUMN `foo`', $column->buildDrop());
+        $this->assertSame('ADD COLUMN `foo` decimal(10,2) NOT NULL', $column->buildAdd());
+        $this->assertSame('ADD COLUMN `foo` decimal(10,2) NOT NULL AFTER `bar`', $column->buildAdd(Column::int('bar')));
+        $this->assertSame('CHANGE COLUMN `bar` `foo` decimal(10,2) NOT NULL', $column->buildChange(Column::int('bar')));
 
         // unsigned
         $column = new DecimalColumn('foo', 10, 2);
         $column->unsigned();
         $this->assertSame(true, $column->isUnsigned());
-        $this->assertSame('`foo` decimal(10,2) UNSIGNED NOT NULL', $column->build());
+        $this->assertSame('`foo` decimal(10,2) UNSIGNED NOT NULL', $column->buildCreate());
 
         // unsigned + nullable
         $column->nullable();
-        $this->assertSame('`foo` decimal(10,2) UNSIGNED', $column->build());
+        $this->assertSame('`foo` decimal(10,2) UNSIGNED', $column->buildCreate());
 
         // unsigned + nullable + default
         $column->default(1);
-        $this->assertSame('`foo` decimal(10,2) UNSIGNED DEFAULT "1.00"', $column->build());
+        $this->assertSame('`foo` decimal(10,2) UNSIGNED DEFAULT "1.00"', $column->buildCreate());
 
         // unsigned + nullable + default + comment
         $column->comment('foobar');
-        $this->assertSame('`foo` decimal(10,2) UNSIGNED DEFAULT "1.00" COMMENT "foobar"', $column->build());
+        $this->assertSame('`foo` decimal(10,2) UNSIGNED DEFAULT "1.00" COMMENT "foobar"', $column->buildCreate());
 
         // unsigned + default
         $column = new DecimalColumn('foo', 10, 2);
         $column->unsigned()->default(1);
-        $this->assertSame('`foo` decimal(10,2) UNSIGNED NOT NULL DEFAULT "1.00"', $column->build());
+        $this->assertSame('`foo` decimal(10,2) UNSIGNED NOT NULL DEFAULT "1.00"', $column->buildCreate());
 
         // unsigned + default + comment
         $column->comment('foobar');
-        $this->assertSame('`foo` decimal(10,2) UNSIGNED NOT NULL DEFAULT "1.00" COMMENT "foobar"', $column->build());
+        $this->assertSame('`foo` decimal(10,2) UNSIGNED NOT NULL DEFAULT "1.00" COMMENT "foobar"', $column->buildCreate());
 
         // unsigned + comment
         $column = new DecimalColumn('foo', 10, 2);
         $column->unsigned()->comment('foobar');
-        $this->assertSame('`foo` decimal(10,2) UNSIGNED NOT NULL COMMENT "foobar"', $column->build());
+        $this->assertSame('`foo` decimal(10,2) UNSIGNED NOT NULL COMMENT "foobar"', $column->buildCreate());
 
 
 
@@ -57,20 +61,20 @@ class DecimalColumnTest extends \PHPUnit_Framework_TestCase
         $column = new DecimalColumn('foo', 10, 2);
         $column->nullable();
         $this->assertSame(true, $column->isNullable());
-        $this->assertSame('`foo` decimal(10,2)', $column->build());
+        $this->assertSame('`foo` decimal(10,2)', $column->buildCreate());
 
         // nullable + default
         $column->default(1);
-        $this->assertSame('`foo` decimal(10,2) DEFAULT "1.00"', $column->build());
+        $this->assertSame('`foo` decimal(10,2) DEFAULT "1.00"', $column->buildCreate());
 
         // nullable + default + comment
         $column->comment('foobar');
-        $this->assertSame('`foo` decimal(10,2) DEFAULT "1.00" COMMENT "foobar"', $column->build());
+        $this->assertSame('`foo` decimal(10,2) DEFAULT "1.00" COMMENT "foobar"', $column->buildCreate());
 
         // nullable + comment
         $column = new DecimalColumn('foo', 10, 2);
         $column->nullable()->comment('foobar');
-        $this->assertSame('`foo` decimal(10,2) COMMENT "foobar"', $column->build());
+        $this->assertSame('`foo` decimal(10,2) COMMENT "foobar"', $column->buildCreate());
 
 
 
@@ -78,17 +82,17 @@ class DecimalColumnTest extends \PHPUnit_Framework_TestCase
         $column = new DecimalColumn('foo', 10, 4);
         $column->default(1.12345);
         $this->assertSame(1.12345, $column->getDefault());
-        $this->assertSame('`foo` decimal(10,4) NOT NULL DEFAULT "1.1235"', $column->build());
+        $this->assertSame('`foo` decimal(10,4) NOT NULL DEFAULT "1.1235"', $column->buildCreate());
 
         $column = new DecimalColumn('foo', 10, 4);
         $column->default(1);
         $this->assertSame(true, $column->hasDefault());
         $this->assertSame(1.0, $column->getDefault());
-        $this->assertSame('`foo` decimal(10,4) NOT NULL DEFAULT "1.0000"', $column->build());
+        $this->assertSame('`foo` decimal(10,4) NOT NULL DEFAULT "1.0000"', $column->buildCreate());
 
         // default + comment
         $column->comment('foobar');
-        $this->assertSame('`foo` decimal(10,4) NOT NULL DEFAULT "1.0000" COMMENT "foobar"', $column->build());
+        $this->assertSame('`foo` decimal(10,4) NOT NULL DEFAULT "1.0000" COMMENT "foobar"', $column->buildCreate());
 
 
 
@@ -97,7 +101,7 @@ class DecimalColumnTest extends \PHPUnit_Framework_TestCase
         $column->comment('foobar');
         $this->assertSame(true, $column->hasComment());
         $this->assertSame('foobar', $column->getComment());
-        $this->assertSame('`foo` decimal(10,2) NOT NULL COMMENT "foobar"', $column->build());
+        $this->assertSame('`foo` decimal(10,2) NOT NULL COMMENT "foobar"', $column->buildCreate());
     }
 
     public function testCheck()
@@ -120,7 +124,7 @@ class DecimalColumnTest extends \PHPUnit_Framework_TestCase
                     $column = new DecimalColumn('foo', $precision, $scale);
                     $this->assertSame($precision, $column->getPrecision());
                     $this->assertSame($scale, $column->getScale());
-                    $this->assertSame(sprintf('`foo` decimal(%d,%d) NOT NULL', $precision, $scale), $column->build());
+                    $this->assertSame(sprintf('`foo` decimal(%d,%d) NOT NULL', $precision, $scale), $column->buildCreate());
                 }
             }
         }
