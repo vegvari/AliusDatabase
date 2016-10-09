@@ -124,14 +124,6 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setPrimaryKey('id');
     }
 
-    public function testPrimaryKeySetSameTwice()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setColumn(Column::int('id'));
-        $table->setPrimaryKey('id', 'id');
-    }
-
     public function testPrimaryKeyAutoIncrement()
     {
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');

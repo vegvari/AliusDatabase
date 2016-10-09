@@ -11,7 +11,7 @@ class Table
     protected $collation;
     protected $comment = '';
 
-    protected $primary_key = [];
+    protected $primary_key;
     protected $unique_key = [];
     protected $foreign_key = [];
     protected $index = [];
@@ -134,32 +134,28 @@ class Table
             }
         }
 
-        if (count($columns) !== count(array_unique($columns))) {
-            throw new TableException('Invalid primary key, duplicated column');
-        }
-
-        $this->primary_key = $columns;
+        $this->primary_key = new PrimaryKey($columns);
         return $this;
     }
 
-    public function getPrimaryKey(): array
+    public function getPrimaryKey(): PrimaryKey
     {
         return $this->primary_key;
     }
 
     public function hasPrimaryKey(): bool
     {
-        return $this->getPrimaryKey() !== [];
+        return $this->primary_key !== null;
     }
 
     public function hasSimplePrimaryKey(): bool
     {
-        return count($this->getPrimaryKey()) === 1;
+        return $this->hasPrimaryKey() && ! $this->getPrimaryKey()->isComposite();
     }
 
     public function hasCompositePrimaryKey(): bool
     {
-        return $this->hasPrimaryKey() && ! $this->hasSimplePrimaryKey();
+        return $this->hasPrimaryKey() && $this->getPrimaryKey()->isComposite();
     }
 
     public function setUniqueKeyWithName(string $name, string ...$columns): self

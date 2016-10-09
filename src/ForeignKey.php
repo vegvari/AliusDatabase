@@ -2,12 +2,11 @@
 
 namespace Alius\Database;
 
-class ForeignKey
+class ForeignKey extends Constraint
 {
     const ACTIONS = ['CASCADE', 'NO ACTION', 'RESTRICT', 'SET DEFAULT', 'SET NULL'];
 
     protected $name;
-    protected $columns;
     protected $parent_table;
     protected $parent_columns;
     protected $on_update;
@@ -55,11 +54,6 @@ class ForeignKey
     public function getName(): string
     {
         return $this->name;
-    }
-
-    public function getColumns(): array
-    {
-        return $this->columns;
     }
 
     public function getParentTable(): string
