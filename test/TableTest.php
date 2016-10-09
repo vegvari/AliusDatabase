@@ -139,4 +139,59 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(true, $table->hasPrimaryKey());
         $this->assertSame(true, $table->hasSimplePrimaryKey());
     }
+
+    public function testUniqueKey()
+    {
+        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table->setName('foo');
+        $this->assertSame(false, $table->hasUniqueKey());
+        $this->assertSame(false, $table->hasUniqueKey('uk_foo_1'));
+        $this->assertSame([], $table->getUniqueKey());
+
+        // simple
+        $table->setColumn(Column::int('id'));
+        $table->setUniqueKey('id');
+        $this->assertSame(true, $table->hasUniqueKey());
+        $this->assertSame(true, $table->hasUniqueKey('uk_foo_1'));
+        $this->assertSame(['uk_foo_1' => ['id']], $table->getUniqueKey());
+
+        $table->setUniqueKey('id');
+        $this->assertSame(true, $table->hasUniqueKey('uk_foo_2'));
+        $this->assertSame(['uk_foo_1' => ['id'], 'uk_foo_2' => ['id']], $table->getUniqueKey());
+
+        // composite
+        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table->setName('foo');
+        $table->setColumn(Column::int('id'));
+        $table->setColumn(Column::int('id2'));
+        $table->setUniqueKey('id', 'id2');
+        $this->assertSame(true, $table->hasUniqueKey());
+        $this->assertSame(true, $table->hasUniqueKey('uk_foo_1'));
+        $this->assertSame(['uk_foo_1' => ['id', 'id2']], $table->getUniqueKey());
+    }
+
+    public function testUniqueKeySetTwice()
+    {
+        $this->expectException(TableException::class);
+        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table->setColumn(Column::int('id'));
+        $table->setUniqueKeyWithName('id', 'id');
+        $table->setUniqueKeyWithName('id', 'id');
+    }
+
+    public function testUniqueKeySetNotDefinedColumn()
+    {
+        $this->expectException(TableException::class);
+        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table->setUniqueKey('id');
+    }
+
+    public function testUniqueKeySetSameTwice()
+    {
+        $this->expectException(TableException::class);
+        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table->setColumn(Column::int('id'));
+        $table->setUniqueKey('id', 'id');
+    }
+
 }

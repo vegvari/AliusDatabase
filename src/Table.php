@@ -161,4 +161,44 @@ class Table
     {
         return $this->hasPrimaryKey() && ! $this->hasSimplePrimaryKey();
     }
+
+    public function setUniqueKeyWithName(string $name, string ...$columns): self
+    {
+        if ($this->hasUniqueKey($name)) {
+            throw new TableException(sprintf('Unique key "%s" is already defined for table "%s"', $name, $this->getName()));
+        }
+
+        foreach ($columns as $column) {
+            if (! $this->hasColumn($column)) {
+                throw new TableException(sprintf('Column is not defined: "%s"', $column));
+            }
+        }
+
+        if (count($columns) !== count(array_unique($columns))) {
+            throw new TableException('Invalid unique key, duplicated column');
+        }
+
+        $this->unique_key[$name] = $columns;
+        return $this;
+    }
+
+    public function setUniqueKey(string ...$columns): self
+    {
+        array_unshift($columns, sprintf('uk_%s_%d', $this->getName(), count($this->unique_key) + 1));
+        return call_user_func_array([$this, 'setUniqueKeyWithName'], $columns);
+    }
+
+    public function hasUniqueKey(string $name = null): bool
+    {
+        if ($name !== null) {
+            return isset($this->unique_key[$name]);
+        }
+
+        return $this->unique_key !== [];
+    }
+
+    public function getUniqueKey(): array
+    {
+        return $this->unique_key;
+    }
 }
