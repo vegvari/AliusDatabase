@@ -145,19 +145,19 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $this->assertSame(false, $table->hasUniqueKey());
-        $this->assertSame(false, $table->hasUniqueKey('uk_foo_1'));
+        $this->assertSame(false, $table->hasUniqueKey('unique_foo_1'));
         $this->assertSame([], $table->getUniqueKey());
 
         // simple
         $table->setColumn(Column::int('id'));
         $table->setUniqueKey('id');
         $this->assertSame(true, $table->hasUniqueKey());
-        $this->assertSame(true, $table->hasUniqueKey('uk_foo_1'));
-        $this->assertSame(['uk_foo_1' => ['id']], $table->getUniqueKey());
+        $this->assertSame(true, $table->hasUniqueKey('unique_foo_1'));
+        $this->assertSame(['unique_foo_1' => ['id']], $table->getUniqueKey());
 
         $table->setUniqueKey('id');
-        $this->assertSame(true, $table->hasUniqueKey('uk_foo_2'));
-        $this->assertSame(['uk_foo_1' => ['id'], 'uk_foo_2' => ['id']], $table->getUniqueKey());
+        $this->assertSame(true, $table->hasUniqueKey('unique_foo_2'));
+        $this->assertSame(['unique_foo_1' => ['id'], 'unique_foo_2' => ['id']], $table->getUniqueKey());
 
         // composite
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
@@ -166,8 +166,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setColumn(Column::int('id2'));
         $table->setUniqueKey('id', 'id2');
         $this->assertSame(true, $table->hasUniqueKey());
-        $this->assertSame(true, $table->hasUniqueKey('uk_foo_1'));
-        $this->assertSame(['uk_foo_1' => ['id', 'id2']], $table->getUniqueKey());
+        $this->assertSame(true, $table->hasUniqueKey('unique_foo_1'));
+        $this->assertSame(['unique_foo_1' => ['id', 'id2']], $table->getUniqueKey());
     }
 
     public function testUniqueKeySetTwice()
@@ -194,4 +194,57 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setUniqueKey('id', 'id');
     }
 
+public function testIndex()
+    {
+        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table->setName('foo');
+        $this->assertSame(false, $table->hasIndex());
+        $this->assertSame(false, $table->hasIndex('index_foo_1'));
+        $this->assertSame([], $table->getIndex());
+
+        // simple
+        $table->setColumn(Column::int('id'));
+        $table->setIndex('id');
+        $this->assertSame(true, $table->hasIndex());
+        $this->assertSame(true, $table->hasIndex('index_foo_1'));
+        $this->assertSame(['index_foo_1' => ['id']], $table->getIndex());
+
+        $table->setIndex('id');
+        $this->assertSame(true, $table->hasIndex('index_foo_2'));
+        $this->assertSame(['index_foo_1' => ['id'], 'index_foo_2' => ['id']], $table->getIndex());
+
+        // composite
+        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table->setName('foo');
+        $table->setColumn(Column::int('id'));
+        $table->setColumn(Column::int('id2'));
+        $table->setIndex('id', 'id2');
+        $this->assertSame(true, $table->hasIndex());
+        $this->assertSame(true, $table->hasIndex('index_foo_1'));
+        $this->assertSame(['index_foo_1' => ['id', 'id2']], $table->getIndex());
+    }
+
+    public function testIndexSetTwice()
+    {
+        $this->expectException(TableException::class);
+        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table->setColumn(Column::int('id'));
+        $table->setIndexWithName('id', 'id');
+        $table->setIndexWithName('id', 'id');
+    }
+
+    public function testIndexSetNotDefinedColumn()
+    {
+        $this->expectException(TableException::class);
+        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table->setIndex('id');
+    }
+
+    public function testIndexSetSameTwice()
+    {
+        $this->expectException(TableException::class);
+        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table->setColumn(Column::int('id'));
+        $table->setIndex('id', 'id');
+    }
 }

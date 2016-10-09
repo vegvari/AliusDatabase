@@ -184,7 +184,7 @@ class Table
 
     public function setUniqueKey(string ...$columns): self
     {
-        array_unshift($columns, sprintf('uk_%s_%d', $this->getName(), count($this->unique_key) + 1));
+        array_unshift($columns, sprintf('unique_%s_%d', $this->getName(), count($this->unique_key) + 1));
         return call_user_func_array([$this, 'setUniqueKeyWithName'], $columns);
     }
 
@@ -200,5 +200,45 @@ class Table
     public function getUniqueKey(): array
     {
         return $this->unique_key;
+    }
+
+    public function setIndexWithName(string $name, string ...$columns): self
+    {
+        if ($this->hasIndex($name)) {
+            throw new TableException(sprintf('Index "%s" is already defined for table "%s"', $name, $this->getName()));
+        }
+
+        foreach ($columns as $column) {
+            if (! $this->hasColumn($column)) {
+                throw new TableException(sprintf('Column is not defined: "%s"', $column));
+            }
+        }
+
+        if (count($columns) !== count(array_unique($columns))) {
+            throw new TableException('Invalid index, duplicated column');
+        }
+
+        $this->index[$name] = $columns;
+        return $this;
+    }
+
+    public function setIndex(string ...$columns): self
+    {
+        array_unshift($columns, sprintf('index_%s_%d', $this->getName(), count($this->index) + 1));
+        return call_user_func_array([$this, 'setIndexWithName'], $columns);
+    }
+
+    public function hasIndex(string $name = null): bool
+    {
+        if ($name !== null) {
+            return isset($this->index[$name]);
+        }
+
+        return $this->index !== [];
+    }
+
+    public function getIndex(): array
+    {
+        return $this->index;
     }
 }
