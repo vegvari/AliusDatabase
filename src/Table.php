@@ -262,6 +262,12 @@ class Table
         }
 
         $this->foreign_key[$name] = new ForeignKey($name, $columns, $parent_table, $parent_columns, $on_update, $on_delete);
+
+        try {
+            call_user_func_array([$this, 'setIndex'], $columns);
+        } catch (TableException $e) {
+        }
+
         return $this;
     }
 
@@ -292,5 +298,49 @@ class Table
     public function getForeignKeys(): array
     {
         return $this->foreign_key;
+    }
+
+    public function buildCreate(): string
+    {
+        $create = [];
+
+        if ($this->getColumns() !== []) {
+            foreach ($this->getColumns() as $column) {
+                $create[] = $column;
+            }
+        }
+
+        if ($this->hasPrimaryKey()) {
+            $create[] = $this->getPrimaryKey()->buildCreate();
+        }
+
+        foreach ($this->getUniqueKeys() as $unique_key) {
+            $create[] = $unique_key->buildCreate();
+        }
+
+        foreach ($this->getIndexes() as $index) {
+            $create[] = $index->buildCreate();
+        }
+
+        foreach ($this->getForeignKeys() as $foreign_key) {
+            $create[] = $foreign_key->buildCreate();
+        }
+
+        $build[] = sprintf('CREATE TABLE IF NOT EXISTS `%s`', $this->getName());
+        $build[] = sprintf('(%s)', implode(', ', $create));
+        $build[] = sprintf('ENGINE=%s', $this->getEngine());
+        $build[] = sprintf('CHARSET=%s', $this->getCharset());
+        $build[] = sprintf('COLLATE=%s', $this->getCollation());
+
+        if ($this->hasComment()) {
+            $build[] = sprintf('COMMENT="%s"', $this->getComment());
+        }
+
+        return implode(' ', $build) . ';';
+    }
+
+    public function buildDrop(): string
+    {
+        return sprintf('DROP TABLE IF EXISTS `%s`;', $this->getName());
     }
 }
