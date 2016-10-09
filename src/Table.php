@@ -215,11 +215,7 @@ class Table
             }
         }
 
-        if (count($columns) !== count(array_unique($columns))) {
-            throw new TableException('Invalid index, duplicated column');
-        }
-
-        $this->index[$name] = $columns;
+        $this->index[$name] = new Index($name, $columns);
         return $this;
     }
 
@@ -238,7 +234,7 @@ class Table
         return $this->index !== [];
     }
 
-    public function getIndex(string $name): array
+    public function getIndex(string $name): Index
     {
         if (! $this->hasIndex($name)) {
             throw new TableException(sprintf('Index is not defined: "%s"', $name));

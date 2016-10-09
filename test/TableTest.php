@@ -192,13 +192,13 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setIndex('id');
         $this->assertSame(true, $table->hasIndex());
         $this->assertSame(true, $table->hasIndex('index-id'));
-        $this->assertSame(['id'], $table->getIndex('index-id'));
-        $this->assertSame(['index-id' => ['id']], $table->getIndexes());
+        $this->assertEquals(new Index('index-id', ['id']), $table->getIndex('index-id'));
+        $this->assertSame(['index-id' => $table->getIndex('index-id')], $table->getIndexes());
 
         $table->setIndexWithName('foo', 'id');
         $this->assertSame(true, $table->hasIndex('foo'));
-        $this->assertSame(['id'], $table->getIndex('foo'));
-        $this->assertSame(['index-id' => ['id'], 'foo' => ['id']], $table->getIndexes());
+        $this->assertEquals(new Index('foo', ['id']), $table->getIndex('foo'));
+        $this->assertSame(['index-id' => $table->getIndex('index-id'), 'foo' => $table->getIndex('foo')], $table->getIndexes());
 
         // composite
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
@@ -208,7 +208,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setIndex('id', 'id2');
         $this->assertSame(true, $table->hasIndex());
         $this->assertSame(true, $table->hasIndex('index-id-id2'));
-        $this->assertSame(['index-id-id2' => ['id', 'id2']], $table->getIndexes());
+        $this->assertSame(['index-id-id2' => $table->getIndex('index-id-id2')], $table->getIndexes());
     }
 
     public function testGetNotDefinedIndex()
@@ -232,14 +232,6 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectException(TableException::class);
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
         $table->setIndex('id');
-    }
-
-    public function testIndexSetSameTwice()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setColumn(Column::int('id'));
-        $table->setIndex('id', 'id');
     }
 
     public function testForeignKey()
