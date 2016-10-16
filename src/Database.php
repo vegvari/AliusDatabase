@@ -168,7 +168,7 @@ class Database
         }
 
         if ($this->tables[$table_class] === null) {
-            $this->tables[$table_class] = new $table_class($this->getEngine(), $this->getCharset(), $this->getCollation());
+            $this->tables[$table_class] = new $table_class($this->getName(), $this->getEngine(), $this->getCharset(), $this->getCollation());
             $this->table_names[$this->tables[$table_class]->getName()] = $table_class;
         }
 

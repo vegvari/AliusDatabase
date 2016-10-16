@@ -4,6 +4,7 @@ namespace Alius\Database;
 
 class Table
 {
+    protected $database_name;
     protected $name = '';
     protected $columns = [];
     protected $engine;
@@ -16,8 +17,9 @@ class Table
     protected $foreign_key = [];
     protected $index = [];
 
-    public function __construct(string $engine, string $charset, string $collation)
+    public function __construct(string $database_name, string $engine, string $charset, string $collation)
     {
+        $this->database_name = $database_name;
         $this->engine = $engine;
         $this->charset = $charset;
         $this->collation = $collation;

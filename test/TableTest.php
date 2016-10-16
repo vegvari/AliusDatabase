@@ -15,7 +15,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testName()
     {
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $this->assertSame('', $table->getName());
         $table->setName('foo');
         $this->assertSame('foo', $table->getName());
@@ -23,7 +23,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testEngine()
     {
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $this->assertSame('InnoDB', $table->getEngine());
         $table->setEngine('MyISAM');
         $this->assertSame('MyISAM', $table->getEngine());
@@ -31,7 +31,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testCharset()
     {
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $this->assertSame('utf8', $table->getCharset());
         $table->setCharset('latin1');
         $this->assertSame('latin1', $table->getCharset());
@@ -39,7 +39,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testCollation()
     {
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $this->assertSame('utf8_general_ci', $table->getCollation());
         $table->setCollation('latin1_bin');
         $this->assertSame('latin1_bin', $table->getCollation());
@@ -47,7 +47,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testComment()
     {
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $this->assertSame(false, $table->hasComment());
         $this->assertSame('', $table->getComment());
         $table->setComment('bar');
@@ -57,7 +57,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testColumns()
     {
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
 
         $this->assertSame([], $table->getColumns());
         $this->assertSame(false, $table->hasColumn('id'));
@@ -72,7 +72,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function testSetColumnFail()
     {
         $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setColumn(Column::int('id'));
         $table->setColumn(Column::int('id'));
     }
@@ -80,13 +80,13 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function testGetColumnFail()
     {
         $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->getColumn('id');
     }
 
     public function testPrimaryKey()
     {
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $this->assertSame(false, $table->hasPrimaryKey());
         $this->assertSame(false, $table->hasSimplePrimaryKey());
         $this->assertSame(false, $table->hasCompositePrimaryKey());
@@ -99,7 +99,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(false, $table->hasCompositePrimaryKey());
 
         // composite
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setColumn(Column::int('id'));
         $table->setColumn(Column::int('id2'));
         $table->setPrimaryKey('id', 'id2');
@@ -111,7 +111,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function testPrimaryKeySetTwice()
     {
         $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setColumn(Column::int('id'));
         $table->setPrimaryKey('id');
         $table->setPrimaryKey('id');
@@ -120,13 +120,13 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function testPrimaryKeySetNotDefinedColumn()
     {
         $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setPrimaryKey('id');
     }
 
     public function testPrimaryKeyAutoIncrement()
     {
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setColumn(Column::serial('id'));
         $this->assertSame(true, $table->hasPrimaryKey());
         $this->assertSame(true, $table->hasSimplePrimaryKey());
@@ -134,7 +134,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testUniqueKey()
     {
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $this->assertSame(false, $table->hasUniqueKey());
         $this->assertSame(false, $table->hasUniqueKey('unique-id'));
         $this->assertSame([], $table->getUniqueKeys());
@@ -160,14 +160,14 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function testGetNotDefinedUniqueKey()
     {
         $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->getUniqueKey('foo');
     }
 
     public function testUniqueKeySetTwice()
     {
         $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setColumn(Column::int('id'));
         $table->setUniqueKeyWithName('id', ['id']);
         $table->setUniqueKeyWithName('id', ['id']);
@@ -176,13 +176,13 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function testUniqueKeySetNotDefinedColumn()
     {
         $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setUniqueKey('id');
     }
 
     public function testIndex()
     {
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $this->assertSame(false, $table->hasIndex());
         $this->assertSame(false, $table->hasIndex('index-id'));
         $this->assertSame(false, $table->hasIndexWithColumns(['id']));
@@ -198,7 +198,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(['index-id' => $table->getIndex('index-id')], $table->getIndexes());
 
         // composite
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $table->setColumn(Column::int('id'));
         $table->setColumn(Column::int('id2'));
@@ -212,14 +212,14 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function testGetNotDefinedIndex()
     {
         $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->getIndex('foo');
     }
 
     public function testIndexSetTwice()
     {
         $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setColumn(Column::int('id'));
         $table->setIndexWithName('id', ['id']);
         $table->setIndexWithName('id', ['id']);
@@ -228,21 +228,21 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function testIndexSetNotDefinedColumn()
     {
         $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setIndex('id');
     }
 
     public function testDefineIndexWithSameColumn()
     {
         $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setIndex('id');
         $table->setIndex('id');
     }
 
     public function testForeignKey()
     {
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $this->assertSame(false, $table->hasForeignKey());
         $this->assertSame(false, $table->hasForeignKey('fk_foo_1'));
@@ -257,14 +257,14 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new ForeignKey('fk_foo_1', 'id', 'foo', 'id'), $table->getForeignKey('fk_foo_1'));
         $this->assertSame(['fk_foo_1' => $table->getForeignKey('fk_foo_1')], $table->getForeignKeys());
 
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $table->setColumn(Column::int('id'));
         $table->setForeignKey('id', 'foo');
         $this->assertSame(['fk_foo_1' => $table->getForeignKey('fk_foo_1')], $table->getForeignKeys());
 
         // composite
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $table->setColumn(Column::int('id'));
         $table->setColumn(Column::int('id2'));
@@ -277,7 +277,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testForeignKeyCatchErrorOnDuplicatedIndex()
     {
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $table->setColumn(Column::int('id'));
         $table->setIndex('id');
@@ -287,14 +287,14 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function testGetNotDefinedForeignKey()
     {
         $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->getForeignKey('foo');
     }
 
     public function testForeignKeySetTwice()
     {
         $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setColumn(Column::int('id'));
         $table->setForeignKeyWithName('bar', 'id', 'foo');
         $table->setForeignKeyWithName('bar', 'id', 'foo');
@@ -303,14 +303,14 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function testForeignKeySetNotDefinedColumn()
     {
         $this->expectException(TableException::class);
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setForeignKey('id', 'foo', 'id');
     }
 
     public function testPrimaryKeyBuildCreate()
     {
         // no primary key
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $table->setComment('no primary key'); // but there is a comment
         $table->setColumn(Column::int('id'));
@@ -319,7 +319,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->database->execute($table->buildDrop());
 
         // simple primary key
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $table->setColumn(Column::serial('id'));
         $this->assertSame('CREATE TABLE `foo` (`id` int UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
@@ -327,7 +327,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->database->execute($table->buildDrop());
 
         // composite primary key
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $table->setColumn(Column::int('id'));
         $table->setColumn(Column::int('id2'));
@@ -340,7 +340,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function testUniqueKeyBuildCreate()
     {
         // simple
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $table->setColumn(Column::int('id'));
         $table->setUniqueKey('id');
@@ -349,7 +349,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->database->execute($table->buildDrop());
 
         // composite
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $table->setColumn(Column::int('id'));
         $table->setColumn(Column::int('id2'));
@@ -362,7 +362,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function testIndexBuildCreate()
     {
         // simple
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $table->setColumn(Column::int('id'));
         $table->setIndex('id');
@@ -371,7 +371,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->database->execute($table->buildDrop());
 
         // composite
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $table->setColumn(Column::int('id'));
         $table->setColumn(Column::int('id2'));
@@ -384,13 +384,13 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function testForeignKeyBuildCreate()
     {
         // simple
-        $table_a = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table_a = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table_a->setName('a');
         $table_a->setColumn(Column::serial('a_id'));
 
         $this->assertSame('CREATE TABLE `a` (`a_id` int UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY (`a_id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_a->buildCreate());
 
-        $table_b = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table_b = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table_b->setName('b');
         $table_b->setColumn(Column::serial('b_id'));
         $table_b->setColumn(Column::int('a_id')->unsigned());
@@ -404,7 +404,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->database->execute($table_a->buildDrop());
 
         // composite
-        $table_a = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table_a = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table_a->setName('a');
         $table_a->setColumn(Column::serial('a_id'));
         $table_a->setColumn(Column::int('a_id2'));
@@ -412,7 +412,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame('CREATE TABLE `a` (`a_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id2` int NOT NULL, PRIMARY KEY (`a_id`), KEY `index-a_id-a_id2` (`a_id`, `a_id2`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_a->buildCreate());
 
-        $table_b = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table_b = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table_b->setName('b');
         $table_b->setColumn(Column::serial('b_id'));
         $table_b->setColumn(Column::int('a_id')->unsigned());
@@ -429,7 +429,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildDrop()
     {
-        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $this->assertSame('DROP TABLE `foo`;', $table->buildDrop());
     }
