@@ -13,6 +13,12 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->database = new Database(new Connection(sprintf('host=%s', $this->getHost()), $this->getUser(), $this->getPassword(), $this->getDatabase()));
     }
 
+    public function testDatabaseName()
+    {
+        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $this->assertSame('test', $table->getDatabaseName());
+    }
+
     public function testName()
     {
         $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
