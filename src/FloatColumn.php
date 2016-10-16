@@ -4,10 +4,9 @@ namespace Alius\Database;
 
 class FloatColumn extends DecimalColumn
 {
-    const TYPES = ['float'];
-
-    public function __construct(string $name, int $precision, int $scale, string $type = 'float')
+    public function __construct(string $name, int $precision, int $scale)
     {
-        parent::__construct($name, $precision, $scale, $type);
+        parent::__construct($name, $precision, $scale);
+        $this->type = 'float';
     }
 }

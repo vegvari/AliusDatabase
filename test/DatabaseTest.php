@@ -88,4 +88,68 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         $statement->setFetchMode(\PDO::FETCH_ASSOC);
         $this->assertSame([['test_id' => 1]], $statement->fetchAll());
     }
+
+    public function testTable()
+    {
+        $db = new Database($this->writer, $this->reader);
+        $db->setTable(IntColumnsFixture::class);
+        $db->getTable(IntColumnsFixture::class);
+    }
+
+    public function testSetNonExistingTableClass()
+    {
+        $this->expectException(DatabaseException::class);
+        $db = new Database($this->writer, $this->reader);
+        $db->setTable(PleaseDoNotCreateAClassLikeThisEver::class);
+    }
+
+    public function testSetTableClassTwice()
+    {
+        $this->expectException(DatabaseException::class);
+        $db = new Database($this->writer, $this->reader);
+        $db->setTable(IntColumnsFixture::class);
+        $db->setTable(IntColumnsFixture::class);
+    }
+
+    public function testSetTableNotTableInstance()
+    {
+        $this->expectException(DatabaseException::class);
+        $db = new Database($this->writer, $this->reader);
+        $db->setTable(FakeTableFixture::class);
+    }
+
+    public function testGetUndefinedTable()
+    {
+        $this->expectException(DatabaseException::class);
+        $db = new Database($this->writer, $this->reader);
+        $db->getTable(IntColumnsFixture::class);
+    }
+}
+
+class FakeTableFixture {}
+
+class IntColumnsFixture extends Table
+{
+    public function setUp()
+    {
+        $this->setName('int_columns');
+
+        $this->setColumn(Column::int('int_signed'));
+        $this->setColumn(Column::int('int_signed_nullable')->nullable());
+        $this->setColumn(Column::int('int_signed_with_default')->default(123));
+        $this->setColumn(Column::int('int_signed_nullable_with_default')->nullable()->default(123));
+        $this->setColumn(Column::int('int_signed_with_comment')->comment('comment'));
+        $this->setColumn(Column::int('int_signed_nullable_with_comment')->nullable()->comment('comment'));
+        $this->setColumn(Column::int('int_signed_with_default_and_comment')->default(123)->comment('comment'));
+        $this->setColumn(Column::int('int_signed_nullable_with_default_and_comment')->nullable()->default(123)->comment('comment'));
+
+        $this->setColumn(Column::int('int_unsigned')->unsigned());
+        $this->setColumn(Column::int('int_unsigned_nullable')->unsigned()->nullable());
+        $this->setColumn(Column::int('int_unsigned_with_default')->unsigned()->default(123));
+        $this->setColumn(Column::int('int_unsigned_nullable_with_default')->unsigned()->nullable()->default(123));
+        $this->setColumn(Column::int('int_unsigned_with_comment')->unsigned()->comment('comment'));
+        $this->setColumn(Column::int('int_unsigned_nullable_with_comment')->unsigned()->nullable()->comment('comment'));
+        $this->setColumn(Column::int('int_unsigned_with_default_and_comment')->unsigned()->default(123)->comment('comment'));
+        $this->setColumn(Column::int('int_unsigned_nullable_with_default_and_comment')->unsigned()->nullable()->default(123)->comment('comment'));
+    }
 }

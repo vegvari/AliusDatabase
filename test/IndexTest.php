@@ -24,4 +24,10 @@ class IndexTest extends \PHPUnit_Framework_TestCase
         $this->expectException(ConstraintException::class);
         new Index('foo', ['column', 'column']);
     }
+
+    public function testInvalidName()
+    {
+        $this->expectException(ConstraintException::class);
+        new Index('primary', ['column']);
+    }
 }

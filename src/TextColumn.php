@@ -4,7 +4,7 @@ namespace Alius\Database;
 
 class TextColumn extends Column
 {
-    const TYPES = [
+    protected static $types = [
         'tinytext' => 255,
         'text' => 65535,
         'mediumtext' => 16777215,
@@ -14,6 +14,17 @@ class TextColumn extends Column
     protected $binary = false;
     protected $charset = '';
     protected $collation = '';
+
+    public function __construct(string $name, string $type)
+    {
+        $this->name = $name;
+
+        if (! isset(self::$types[$type])) {
+            throw new ColumnException(sprintf('Invalid type for text column: "%s"', $type));
+        }
+
+        $this->type = $type;
+    }
 
     public function binary(): Column
     {
@@ -50,7 +61,7 @@ class TextColumn extends Column
 
     public function getLength(): int
     {
-        return static::TYPES[$this->getType()];
+        return static::$types[$this->getType()];
     }
 
     public function check($value)

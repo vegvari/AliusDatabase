@@ -4,10 +4,9 @@ namespace Alius\Database;
 
 class TimestampColumn extends DateTimeColumn
 {
-    const TYPES = ['timestamp'];
-
-    public function __construct(string $name, string $type = 'timestamp')
+    public function __construct(string $name)
     {
-        parent::__construct($name, $type);
+        $this->name = $name;
+        $this->type = 'timestamp';
     }
 }

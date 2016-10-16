@@ -195,11 +195,6 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new Index('index-id', ['id']), $table->getIndex('index-id'));
         $this->assertSame(['index-id' => $table->getIndex('index-id')], $table->getIndexes());
 
-        $table->setIndexWithName('foo', 'id');
-        $this->assertSame(true, $table->hasIndex('foo'));
-        $this->assertEquals(new Index('foo', ['id']), $table->getIndex('foo'));
-        $this->assertSame(['index-id' => $table->getIndex('index-id'), 'foo' => $table->getIndex('foo')], $table->getIndexes());
-
         // composite
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
@@ -234,6 +229,14 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setIndex('id');
     }
 
+    public function testDefineIndexWithSameColumn()
+    {
+        $this->expectException(TableException::class);
+        $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
+        $table->setIndex('id');
+        $table->setIndex('id');
+    }
+
     public function testForeignKey()
     {
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
@@ -247,7 +250,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setForeignKey('id', 'foo', 'id');
         $this->assertSame(true, $table->hasForeignKey());
         $this->assertSame(true, $table->hasForeignKey('fk_foo_1'));
-        $this->assertSame(true, $table->hasIndex('index-id'));
+        $this->assertSame(true, $table->hasIndex('fk_foo_1'));
         $this->assertEquals(new ForeignKey('fk_foo_1', 'id', 'foo', 'id'), $table->getForeignKey('fk_foo_1'));
         $this->assertSame(['fk_foo_1' => $table->getForeignKey('fk_foo_1')], $table->getForeignKeys());
 
@@ -265,7 +268,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setForeignKey(['id', 'id2'], 'foo');
         $this->assertSame(true, $table->hasForeignKey());
         $this->assertSame(true, $table->hasForeignKey('fk_foo_1'));
-        $this->assertSame(true, $table->hasIndex('index-id-id2'));
+        $this->assertSame(true, $table->hasIndex('fk_foo_1'));
         $this->assertSame(['fk_foo_1' => $table->getForeignKey('fk_foo_1')], $table->getForeignKeys());
     }
 
@@ -390,7 +393,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table_b->setColumn(Column::int('a_id')->unsigned());
         $table_b->setForeignKey('a_id', 'a');
 
-        $this->assertSame('CREATE TABLE IF NOT EXISTS `b` (`b_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id` int UNSIGNED NOT NULL, PRIMARY KEY (`b_id`), KEY `index-a_id` (`a_id`), CONSTRAINT `fk_b_1` FOREIGN KEY (`a_id`) REFERENCES `a` (`a_id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_b->buildCreate());
+        $this->assertSame('CREATE TABLE IF NOT EXISTS `b` (`b_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id` int UNSIGNED NOT NULL, PRIMARY KEY (`b_id`), KEY `fk_b_1` (`a_id`), CONSTRAINT `fk_b_1` FOREIGN KEY (`a_id`) REFERENCES `a` (`a_id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_b->buildCreate());
 
         $this->database->execute($table_a->buildCreate());
         $this->database->execute($table_b->buildCreate());
@@ -413,7 +416,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table_b->setColumn(Column::int('a_id2'));
         $table_b->setForeignKey(['a_id', 'a_id2'], 'a');
 
-        $this->assertSame('CREATE TABLE IF NOT EXISTS `b` (`b_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id` int UNSIGNED NOT NULL, `a_id2` int NOT NULL, PRIMARY KEY (`b_id`), KEY `index-a_id-a_id2` (`a_id`, `a_id2`), CONSTRAINT `fk_b_1` FOREIGN KEY (`a_id`, `a_id2`) REFERENCES `a` (`a_id`, `a_id2`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_b->buildCreate());
+        $this->assertSame('CREATE TABLE IF NOT EXISTS `b` (`b_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id` int UNSIGNED NOT NULL, `a_id2` int NOT NULL, PRIMARY KEY (`b_id`), KEY `fk_b_1` (`a_id`, `a_id2`), CONSTRAINT `fk_b_1` FOREIGN KEY (`a_id`, `a_id2`) REFERENCES `a` (`a_id`, `a_id2`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_b->buildCreate());
 
         $this->database->execute($table_a->buildCreate());
         $this->database->execute($table_b->buildCreate());

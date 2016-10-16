@@ -12,8 +12,27 @@ class IntColumn extends Column
         'bigint' => ['signed' => PHP_INT_MAX, 'unsigned' => PHP_INT_MAX],
     ];
 
+    protected static $types = [
+        'tinyint' => ['signed' => 127, 'unsigned' => 255],
+        'smallint' => ['signed' => 32767, 'unsigned' => 65535],
+        'mediumint' => ['signed' => 8388607, 'unsigned' => 16777215],
+        'int' => ['signed' => 2147483647, 'unsigned' => 4294967295],
+        'bigint' => ['signed' => PHP_INT_MAX, 'unsigned' => PHP_INT_MAX],
+    ];
+
     protected $unsigned = false;
     protected $auto_increment = false;
+
+    public function __construct(string $name, string $type)
+    {
+        $this->name = $name;
+
+        if (! isset(self::$types[$type])) {
+            throw new ColumnException(sprintf('Invalid type for int column: "%s"', $type));
+        }
+
+        $this->type = $type;
+    }
 
     public function unsigned(): Column
     {
@@ -41,8 +60,7 @@ class IntColumn extends Column
             throw new ColumnException('Auto increment column can\'t have default value');
         }
 
-        $this->default = $this->check($value);
-        return $this;
+        return parent::default($value);
     }
 
     public function autoIncrement(): Column
@@ -70,16 +88,16 @@ class IntColumn extends Column
             return 0;
         }
 
-        return ~static::TYPES[$this->getType()]['signed'];
+        return ~static::$types[$this->getType()]['signed'];
     }
 
     public function getMax(): int
     {
         if (! $this->isUnsigned()) {
-            return static::TYPES[$this->getType()]['signed'];
+            return static::$types[$this->getType()]['signed'];
         }
 
-        return static::TYPES[$this->getType()]['unsigned'];
+        return static::$types[$this->getType()]['unsigned'];
     }
 
     public function check($value)

@@ -56,20 +56,20 @@ class ForeignKeyTest extends \PHPUnit_Framework_TestCase
     public function testActions()
     {
         $constraint = new ForeignKey('name', 'column', 'parent_table', 'column', 'CASCADE', 'CASCADE');
-        $this->assertSame('CASCADE', $constraint->getOnUpdateAction());
-        $this->assertSame('CASCADE', $constraint->getOnDeleteAction());
+        $this->assertSame('CASCADE', $constraint->getUpdateRule());
+        $this->assertSame('CASCADE', $constraint->getDeleteRule());
 
         $constraint = new ForeignKey('name', 'column', 'parent_table', 'column', 'NO ACTION', 'NO ACTION');
-        $this->assertSame('RESTRICT', $constraint->getOnUpdateAction());
-        $this->assertSame('RESTRICT', $constraint->getOnDeleteAction());
+        $this->assertSame('RESTRICT', $constraint->getUpdateRule());
+        $this->assertSame('RESTRICT', $constraint->getDeleteRule());
 
         $constraint = new ForeignKey('name', 'column', 'parent_table', 'column', 'SET DEFAULT', 'SET DEFAULT');
-        $this->assertSame('SET DEFAULT', $constraint->getOnUpdateAction());
-        $this->assertSame('SET DEFAULT', $constraint->getOnDeleteAction());
+        $this->assertSame('SET DEFAULT', $constraint->getUpdateRule());
+        $this->assertSame('SET DEFAULT', $constraint->getDeleteRule());
 
         $constraint = new ForeignKey('name', 'column', 'parent_table', 'column', 'SET NULL', 'SET NULL');
-        $this->assertSame('SET NULL', $constraint->getOnUpdateAction());
-        $this->assertSame('SET NULL', $constraint->getOnDeleteAction());
+        $this->assertSame('SET NULL', $constraint->getUpdateRule());
+        $this->assertSame('SET NULL', $constraint->getDeleteRule());
     }
 
     public function testInvalidUpdate()

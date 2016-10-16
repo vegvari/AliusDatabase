@@ -209,6 +209,10 @@ class Table
             throw new TableException(sprintf('Index "%s" is already defined for table "%s"', $name, $this->getName()));
         }
 
+        if (call_user_func_array([$this, 'hasIndexWithColumns'], $columns)) {
+            throw new TableException(sprintf('Index is already defined with these columns: "%s"', implode(', ', $columns)));
+        }
+
         foreach ($columns as $column) {
             if (! $this->hasColumn($column)) {
                 throw new TableException(sprintf('Column is not defined: "%s"', $column));
@@ -232,6 +236,21 @@ class Table
         }
 
         return $this->index !== [];
+    }
+
+    public function hasIndexWithColumns(string ...$columns): bool
+    {
+        if (! $this->hasIndex()) {
+            return false;
+        }
+
+        foreach ($this->getIndexes() as $index) {
+            if ($index->getColumns() === $columns) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getIndex(string $name): Index
@@ -264,7 +283,8 @@ class Table
         $this->foreign_key[$name] = new ForeignKey($name, $columns, $parent_table, $parent_columns, $on_update, $on_delete);
 
         try {
-            call_user_func_array([$this, 'setIndex'], $columns);
+            array_unshift($columns, $name);
+            call_user_func_array([$this, 'setIndexWithName'], $columns);
         } catch (TableException $e) {
         }
 

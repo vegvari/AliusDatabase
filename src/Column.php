@@ -10,17 +10,6 @@ abstract class Column
     protected $default;
     protected $comment = '';
 
-    public function __construct(string $name, string $type)
-    {
-        $this->name = $name;
-
-        if (! isset(static::TYPES[$type]) && array_search($type, static::TYPES) === false) {
-            throw new ColumnException(sprintf('Invalid type: "%s"', $type));
-        }
-
-        $this->type = $type;
-    }
-
     public function getName(): string
     {
         return $this->name;

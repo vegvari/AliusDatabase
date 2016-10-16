@@ -9,10 +9,10 @@ class ForeignKey extends Constraint
     protected $name;
     protected $parent_table;
     protected $parent_columns;
-    protected $on_update;
-    protected $on_delete;
+    protected $update_rule;
+    protected $delete_rule;
 
-    public function __construct(string $name, $columns, string $parent_table, $parent_columns = null, string $on_update = 'RESTRICT', string $on_delete = 'RESTRICT')
+    public function __construct(string $name, $columns, string $parent_table, $parent_columns = null, string $update_rule = 'RESTRICT', string $delete_rule = 'RESTRICT')
     {
         $columns = is_array($columns) ? $columns : [$columns];
         if (count($columns) !== count(array_unique($columns))) {
@@ -35,20 +35,20 @@ class ForeignKey extends Constraint
             throw new ConstraintException('Invalid foreign key, more parent columns than child columns');
         }
 
-        if (! in_array($on_update, self::ACTIONS)) {
-            throw new ConstraintException(sprintf('Invalid foreign key, on update action is not supported: "%s"', $on_update));
+        if (! in_array($update_rule, self::ACTIONS)) {
+            throw new ConstraintException(sprintf('Invalid foreign key, on update action is not supported: "%s"', $update_rule));
         }
 
-        if (! in_array($on_delete, self::ACTIONS)) {
-            throw new ConstraintException(sprintf('Invalid foreign key, on delete action is not supported: "%s"', $on_delete));
+        if (! in_array($delete_rule, self::ACTIONS)) {
+            throw new ConstraintException(sprintf('Invalid foreign key, on delete action is not supported: "%s"', $delete_rule));
         }
 
         $this->name = $name;
         $this->columns = $columns;
         $this->parent_table = $parent_table;
         $this->parent_columns = $parent_columns;
-        $this->on_update = $on_update === 'NO ACTION' ? 'RESTRICT' : $on_update;
-        $this->on_delete = $on_delete === 'NO ACTION' ? 'RESTRICT' : $on_delete;
+        $this->update_rule = $update_rule === 'NO ACTION' ? 'RESTRICT' : $update_rule;
+        $this->delete_rule = $delete_rule === 'NO ACTION' ? 'RESTRICT' : $delete_rule;
     }
 
     public function getName(): string
@@ -66,14 +66,14 @@ class ForeignKey extends Constraint
         return $this->parent_columns;
     }
 
-    public function getOnUpdateAction(): string
+    public function getUpdateRule(): string
     {
-        return $this->on_update;
+        return $this->update_rule;
     }
 
-    public function getOnDeleteAction(): string
+    public function getDeleteRule(): string
     {
-        return $this->on_delete;
+        return $this->delete_rule;
     }
 
     public function buildCreate(): string

@@ -4,14 +4,13 @@ namespace Alius\Database;
 
 class DateTimeColumn extends Column
 {
-    const TYPES = ['datetime'];
-
     protected $default_current = false;
     protected $on_update_current = false;
 
-    public function __construct(string $name, string $type = 'datetime')
+    public function __construct(string $name)
     {
-        parent::__construct($name, $type);
+        $this->name = $name;
+        $this->type = 'datetime';
     }
 
     public function default($value): Column
@@ -20,8 +19,7 @@ class DateTimeColumn extends Column
             $this->default_current = true;
         }
 
-        $this->default = $this->check($value);
-        return $this;
+        return parent::default($value);
     }
 
     public function defaultCurrent(): Column

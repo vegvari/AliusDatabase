@@ -4,7 +4,7 @@ namespace Alius\Database;
 
 class CharColumn extends TextColumn
 {
-    const TYPES = [
+    protected static $types = [
         'char' => 255,
         'varchar' => 65535,
     ];
@@ -13,21 +13,22 @@ class CharColumn extends TextColumn
 
     public function __construct(string $name, string $type, int $length)
     {
-        parent::__construct($name, $type);
-        $this->length($length);
-    }
+        $this->name = $name;
 
-    protected function length(int $length): Column
-    {
+        if (! isset(self::$types[$type])) {
+            throw new ColumnException(sprintf('Invalid type for char column: "%s"', $type));
+        }
+
+        $this->type = $type;
+
         if ($length < 0
-            || ($this->getType() === 'char' && $length > static::TYPES['char'])
-            || ($this->getType() === 'varchar' && $length > static::TYPES['varchar'])
+            || ($this->getType() === 'char' && $length > static::$types['char'])
+            || ($this->getType() === 'varchar' && $length > static::$types['varchar'])
         ) {
             throw new ColumnException(sprintf('Invalid length for %s column: "%s"', $this->getType(), $length));
         }
 
         $this->length = $length;
-        return $this;
     }
 
     public function getLength(): int

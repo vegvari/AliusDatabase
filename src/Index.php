@@ -2,13 +2,16 @@
 
 namespace Alius\Database;
 
-class Index
+class Index extends Constraint
 {
     protected $name;
-    protected $columns;
 
     public function __construct(string $name, array $columns)
     {
+        if (strtolower($name) === 'primary') {
+            throw new ConstraintException('Invalid name for index');
+        }
+
         $this->name = $name;
 
         if (count($columns) !== count(array_unique($columns))) {
@@ -21,11 +24,6 @@ class Index
     public function getName(): string
     {
         return $this->name;
-    }
-
-    public function getColumns(): array
-    {
-        return $this->columns;
     }
 
     public function buildCreate(): string
