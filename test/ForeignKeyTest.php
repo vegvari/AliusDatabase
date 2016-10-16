@@ -7,26 +7,26 @@ class ForeignKeyTest extends \PHPUnit_Framework_TestCase
     public function test()
     {
         $constraint = new ForeignKey('name', 'column', 'parent_table');
-        $this->assertSame('CONSTRAINT `name` FOREIGN KEY (`column`) REFERENCES `parent_table` (`column`)', $constraint->buildCreate());
-        $this->assertSame('ADD CONSTRAINT `name` FOREIGN KEY (`column`) REFERENCES `parent_table` (`column`)', $constraint->buildAdd());
+        $this->assertSame('CONSTRAINT `name` FOREIGN KEY (`column`) REFERENCES `parent_table` (`column`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildCreate());
+        $this->assertSame('ADD CONSTRAINT `name` FOREIGN KEY (`column`) REFERENCES `parent_table` (`column`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildAdd());
         $this->assertSame('DROP FOREIGN KEY `name`', $constraint->buildDrop());
 
         $constraint = new ForeignKey('name', 'column', 'parent_table', 'column2');
         $this->assertSame(['column2'], $constraint->getParentColumns());
-        $this->assertSame('CONSTRAINT `name` FOREIGN KEY (`column`) REFERENCES `parent_table` (`column2`)', $constraint->buildCreate());
-        $this->assertSame('ADD CONSTRAINT `name` FOREIGN KEY (`column`) REFERENCES `parent_table` (`column2`)', $constraint->buildAdd());
+        $this->assertSame('CONSTRAINT `name` FOREIGN KEY (`column`) REFERENCES `parent_table` (`column2`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildCreate());
+        $this->assertSame('ADD CONSTRAINT `name` FOREIGN KEY (`column`) REFERENCES `parent_table` (`column2`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildAdd());
 
         $constraint = new ForeignKey('name', ['column', 'column2'], 'parent_table');
         $this->assertSame(['column', 'column2'], $constraint->getColumns());
         $this->assertSame(['column', 'column2'], $constraint->getParentColumns());
-        $this->assertSame('CONSTRAINT `name` FOREIGN KEY (`column`, `column2`) REFERENCES `parent_table` (`column`, `column2`)', $constraint->buildCreate());
-        $this->assertSame('ADD CONSTRAINT `name` FOREIGN KEY (`column`, `column2`) REFERENCES `parent_table` (`column`, `column2`)', $constraint->buildAdd());
+        $this->assertSame('CONSTRAINT `name` FOREIGN KEY (`column`, `column2`) REFERENCES `parent_table` (`column`, `column2`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildCreate());
+        $this->assertSame('ADD CONSTRAINT `name` FOREIGN KEY (`column`, `column2`) REFERENCES `parent_table` (`column`, `column2`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildAdd());
 
         $constraint = new ForeignKey('name', ['column', 'column2'], 'parent_table', ['column3', 'column4']);
         $this->assertSame(['column', 'column2'], $constraint->getColumns());
         $this->assertSame(['column3', 'column4'], $constraint->getParentColumns());
-        $this->assertSame('CONSTRAINT `name` FOREIGN KEY (`column`, `column2`) REFERENCES `parent_table` (`column3`, `column4`)', $constraint->buildCreate());
-        $this->assertSame('ADD CONSTRAINT `name` FOREIGN KEY (`column`, `column2`) REFERENCES `parent_table` (`column3`, `column4`)', $constraint->buildAdd());
+        $this->assertSame('CONSTRAINT `name` FOREIGN KEY (`column`, `column2`) REFERENCES `parent_table` (`column3`, `column4`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildCreate());
+        $this->assertSame('ADD CONSTRAINT `name` FOREIGN KEY (`column`, `column2`) REFERENCES `parent_table` (`column3`, `column4`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildAdd());
     }
 
     public function testDuplicatedChild()

@@ -78,7 +78,14 @@ class ForeignKey extends Constraint
 
     public function buildCreate(): string
     {
-        return sprintf('CONSTRAINT `%s` FOREIGN KEY (`%s`) REFERENCES `%s` (`%s`)', $this->getName(), implode('`, `', $this->getColumns()), $this->getParentTable(), implode('`, `', $this->getParentColumns()));
+        return sprintf('CONSTRAINT `%s` FOREIGN KEY (`%s`) REFERENCES `%s` (`%s`) ON UPDATE %s ON DELETE %s',
+            $this->getName(),
+            implode('`, `', $this->getColumns()),
+            $this->getParentTable(),
+            implode('`, `', $this->getParentColumns()),
+            $this->getUpdateRule(),
+            $this->getDeleteRule()
+        );
     }
 
     public function buildAdd(): string
