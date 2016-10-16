@@ -314,7 +314,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setName('foo');
         $table->setComment('no primary key'); // but there is a comment
         $table->setColumn(Column::int('id'));
-        $this->assertSame('CREATE TABLE IF NOT EXISTS `foo` (`id` int NOT NULL) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci COMMENT="no primary key";', $table->buildCreate());
+        $this->assertSame('CREATE TABLE `foo` (`id` int NOT NULL) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci COMMENT="no primary key";', $table->buildCreate());
         $this->database->execute($table->buildCreate());
         $this->database->execute($table->buildDrop());
 
@@ -322,7 +322,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $table->setColumn(Column::serial('id'));
-        $this->assertSame('CREATE TABLE IF NOT EXISTS `foo` (`id` int UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
+        $this->assertSame('CREATE TABLE `foo` (`id` int UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
         $this->database->execute($table->buildCreate());
         $this->database->execute($table->buildDrop());
 
@@ -332,7 +332,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setColumn(Column::int('id'));
         $table->setColumn(Column::int('id2'));
         $table->setPrimaryKey('id', 'id2');
-        $this->assertSame('CREATE TABLE IF NOT EXISTS `foo` (`id` int NOT NULL, `id2` int NOT NULL, PRIMARY KEY (`id`, `id2`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
+        $this->assertSame('CREATE TABLE `foo` (`id` int NOT NULL, `id2` int NOT NULL, PRIMARY KEY (`id`, `id2`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
         $this->database->execute($table->buildCreate());
         $this->database->execute($table->buildDrop());
     }
@@ -344,7 +344,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setName('foo');
         $table->setColumn(Column::int('id'));
         $table->setUniqueKey('id');
-        $this->assertSame('CREATE TABLE IF NOT EXISTS `foo` (`id` int NOT NULL, UNIQUE KEY `unique-id` (`id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
+        $this->assertSame('CREATE TABLE `foo` (`id` int NOT NULL, UNIQUE KEY `unique-id` (`id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
         $this->database->execute($table->buildCreate());
         $this->database->execute($table->buildDrop());
 
@@ -354,7 +354,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setColumn(Column::int('id'));
         $table->setColumn(Column::int('id2'));
         $table->setUniqueKey('id');
-        $this->assertSame('CREATE TABLE IF NOT EXISTS `foo` (`id` int NOT NULL, `id2` int NOT NULL, UNIQUE KEY `unique-id` (`id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
+        $this->assertSame('CREATE TABLE `foo` (`id` int NOT NULL, `id2` int NOT NULL, UNIQUE KEY `unique-id` (`id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
         $this->database->execute($table->buildCreate());
         $this->database->execute($table->buildDrop());
     }
@@ -366,7 +366,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setName('foo');
         $table->setColumn(Column::int('id'));
         $table->setIndex('id');
-        $this->assertSame('CREATE TABLE IF NOT EXISTS `foo` (`id` int NOT NULL, KEY `index-id` (`id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
+        $this->assertSame('CREATE TABLE `foo` (`id` int NOT NULL, KEY `index-id` (`id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
         $this->database->execute($table->buildCreate());
         $this->database->execute($table->buildDrop());
 
@@ -376,7 +376,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setColumn(Column::int('id'));
         $table->setColumn(Column::int('id2'));
         $table->setIndex('id');
-        $this->assertSame('CREATE TABLE IF NOT EXISTS `foo` (`id` int NOT NULL, `id2` int NOT NULL, KEY `index-id` (`id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
+        $this->assertSame('CREATE TABLE `foo` (`id` int NOT NULL, `id2` int NOT NULL, KEY `index-id` (`id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
         $this->database->execute($table->buildCreate());
         $this->database->execute($table->buildDrop());
     }
@@ -388,7 +388,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table_a->setName('a');
         $table_a->setColumn(Column::serial('a_id'));
 
-        $this->assertSame('CREATE TABLE IF NOT EXISTS `a` (`a_id` int UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY (`a_id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_a->buildCreate());
+        $this->assertSame('CREATE TABLE `a` (`a_id` int UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY (`a_id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_a->buildCreate());
 
         $table_b = new Table('InnoDB', 'utf8', 'utf8_general_ci');
         $table_b->setName('b');
@@ -396,7 +396,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table_b->setColumn(Column::int('a_id')->unsigned());
         $table_b->setForeignKey('a_id', 'a');
 
-        $this->assertSame('CREATE TABLE IF NOT EXISTS `b` (`b_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id` int UNSIGNED NOT NULL, PRIMARY KEY (`b_id`), KEY `fk_b_1` (`a_id`), CONSTRAINT `fk_b_1` FOREIGN KEY (`a_id`) REFERENCES `a` (`a_id`) ON UPDATE RESTRICT ON DELETE RESTRICT) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_b->buildCreate());
+        $this->assertSame('CREATE TABLE `b` (`b_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id` int UNSIGNED NOT NULL, PRIMARY KEY (`b_id`), KEY `fk_b_1` (`a_id`), CONSTRAINT `fk_b_1` FOREIGN KEY (`a_id`) REFERENCES `a` (`a_id`) ON UPDATE RESTRICT ON DELETE RESTRICT) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_b->buildCreate());
 
         $this->database->execute($table_a->buildCreate());
         $this->database->execute($table_b->buildCreate());
@@ -410,7 +410,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table_a->setColumn(Column::int('a_id2'));
         $table_a->setIndex('a_id', 'a_id2'); // no composite foreign key without index in parent
 
-        $this->assertSame('CREATE TABLE IF NOT EXISTS `a` (`a_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id2` int NOT NULL, PRIMARY KEY (`a_id`), KEY `index-a_id-a_id2` (`a_id`, `a_id2`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_a->buildCreate());
+        $this->assertSame('CREATE TABLE `a` (`a_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id2` int NOT NULL, PRIMARY KEY (`a_id`), KEY `index-a_id-a_id2` (`a_id`, `a_id2`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_a->buildCreate());
 
         $table_b = new Table('InnoDB', 'utf8', 'utf8_general_ci');
         $table_b->setName('b');
@@ -419,7 +419,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table_b->setColumn(Column::int('a_id2'));
         $table_b->setForeignKey(['a_id', 'a_id2'], 'a');
 
-        $this->assertSame('CREATE TABLE IF NOT EXISTS `b` (`b_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id` int UNSIGNED NOT NULL, `a_id2` int NOT NULL, PRIMARY KEY (`b_id`), KEY `fk_b_1` (`a_id`, `a_id2`), CONSTRAINT `fk_b_1` FOREIGN KEY (`a_id`, `a_id2`) REFERENCES `a` (`a_id`, `a_id2`) ON UPDATE RESTRICT ON DELETE RESTRICT) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_b->buildCreate());
+        $this->assertSame('CREATE TABLE `b` (`b_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id` int UNSIGNED NOT NULL, `a_id2` int NOT NULL, PRIMARY KEY (`b_id`), KEY `fk_b_1` (`a_id`, `a_id2`), CONSTRAINT `fk_b_1` FOREIGN KEY (`a_id`, `a_id2`) REFERENCES `a` (`a_id`, `a_id2`) ON UPDATE RESTRICT ON DELETE RESTRICT) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_b->buildCreate());
 
         $this->database->execute($table_a->buildCreate());
         $this->database->execute($table_b->buildCreate());
@@ -431,6 +431,6 @@ class TableTest extends \PHPUnit_Framework_TestCase
     {
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
-        $this->assertSame('DROP TABLE IF EXISTS `foo`;', $table->buildDrop());
+        $this->assertSame('DROP TABLE `foo`;', $table->buildDrop());
     }
 }

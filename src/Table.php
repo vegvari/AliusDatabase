@@ -342,7 +342,7 @@ class Table
             $create[] = $foreign_key->buildCreate();
         }
 
-        $build[] = sprintf('CREATE TABLE IF NOT EXISTS `%s`', $this->getName());
+        $build[] = sprintf('CREATE TABLE `%s`', $this->getName());
         $build[] = sprintf('(%s)', implode(', ', $create));
         $build[] = sprintf('ENGINE=%s', $this->getEngine());
         $build[] = sprintf('CHARSET=%s', $this->getCharset());
@@ -357,6 +357,6 @@ class Table
 
     public function buildDrop(): string
     {
-        return sprintf('DROP TABLE IF EXISTS `%s`;', $this->getName());
+        return sprintf('DROP TABLE `%s`;', $this->getName());
     }
 }
