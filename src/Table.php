@@ -30,6 +30,11 @@ class Table
     {
     }
 
+    public function getDatabaseName(): string
+    {
+        return $this->database_name;
+    }
+
     public function setName(string $name): self
     {
         $this->name = $name;
@@ -268,6 +273,10 @@ class Table
 
     public function setForeignKeyWithName(string $name, $columns, string $parent_table, $parent_columns = null, string $on_update = 'RESTRICT', string $on_delete = 'RESTRICT'): self
     {
+        if ($this->getEngine() === 'TEMPORARY') {
+            throw new TableException('Temporary tables can\'t have foreign key');
+        }
+
         if ($this->hasForeignKey($name)) {
             throw new TableException(sprintf('Foreign key is already defined: "%s"', $name));
         }

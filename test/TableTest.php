@@ -297,12 +297,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->getForeignKey('foo');
     }
 
-    public function testForeignKeySetTwice()
+    public function testForeignKeyOnTempTable()
     {
         $this->expectException(TableException::class);
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new Table('test', 'TEMPORARY', 'utf8', 'utf8_general_ci');
         $table->setColumn(Column::int('id'));
-        $table->setForeignKeyWithName('bar', 'id', 'foo');
         $table->setForeignKeyWithName('bar', 'id', 'foo');
     }
 
