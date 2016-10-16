@@ -151,7 +151,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new UniqueKey('unique-id2', ['id2']), $table->getUniqueKey('unique-id2'));
         $this->assertSame(['unique-id' => $table->getUniqueKey('unique-id'), 'unique-id2' => $table->getUniqueKey('unique-id2')], $table->getUniqueKeys());
 
-        $table->setUniqueKeyWithName('foo', 'id');
+        $table->setUniqueKeyWithName('foo', ['id']);
         $this->assertSame(true, $table->hasUniqueKey('foo'));
         $this->assertEquals(new UniqueKey('foo', ['id']), $table->getUniqueKey('foo'));
         $this->assertSame(['unique-id' => $table->getUniqueKey('unique-id'), 'unique-id2' => $table->getUniqueKey('unique-id2'), 'foo' => $table->getUniqueKey('foo')], $table->getUniqueKeys());
@@ -169,8 +169,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectException(TableException::class);
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
         $table->setColumn(Column::int('id'));
-        $table->setUniqueKeyWithName('id', 'id');
-        $table->setUniqueKeyWithName('id', 'id');
+        $table->setUniqueKeyWithName('id', ['id']);
+        $table->setUniqueKeyWithName('id', ['id']);
     }
 
     public function testUniqueKeySetNotDefinedColumn()
@@ -185,6 +185,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
         $this->assertSame(false, $table->hasIndex());
         $this->assertSame(false, $table->hasIndex('index-id'));
+        $this->assertSame(false, $table->hasIndexWithColumns(['id']));
         $this->assertSame([], $table->getIndexes());
 
         // simple
@@ -192,6 +193,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setIndex('id');
         $this->assertSame(true, $table->hasIndex());
         $this->assertSame(true, $table->hasIndex('index-id'));
+        $this->assertSame(true, $table->hasIndexWithColumns(['id']));
         $this->assertEquals(new Index('index-id', ['id']), $table->getIndex('index-id'));
         $this->assertSame(['index-id' => $table->getIndex('index-id')], $table->getIndexes());
 
@@ -203,6 +205,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setIndex('id', 'id2');
         $this->assertSame(true, $table->hasIndex());
         $this->assertSame(true, $table->hasIndex('index-id-id2'));
+        $this->assertSame(true, $table->hasIndexWithColumns(['id', 'id2']));
         $this->assertSame(['index-id-id2' => $table->getIndex('index-id-id2')], $table->getIndexes());
     }
 
@@ -218,8 +221,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectException(TableException::class);
         $table = new Table('InnoDB', 'utf8', 'utf8_general_ci');
         $table->setColumn(Column::int('id'));
-        $table->setIndexWithName('id', 'id');
-        $table->setIndexWithName('id', 'id');
+        $table->setIndexWithName('id', ['id']);
+        $table->setIndexWithName('id', ['id']);
     }
 
     public function testIndexSetNotDefinedColumn()

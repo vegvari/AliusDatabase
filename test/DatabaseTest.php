@@ -92,8 +92,15 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     public function testTable()
     {
         $db = new Database($this->writer, $this->reader);
+        $this->assertSame([], $db->getTables());
+        $this->assertSame(false, $db->hasTableByName('int_columns'));
+
         $db->setTable(IntColumnsFixture::class);
-        $db->getTable(IntColumnsFixture::class);
+        $this->assertEquals(new IntColumnsFixture($db->getEngine(), $db->getCharset(), $db->getCollation()), $db->getTable(IntColumnsFixture::class));
+        $this->assertSame(true, $db->hasTableByName('int_columns'));
+        $this->assertSame($db->getTable(IntColumnsFixture::class), $db->getTableByName('int_columns'));
+        $this->assertSame(['Alius\Database\IntColumnsFixture' => $db->getTable(IntColumnsFixture::class)], $db->getTables());
+        $this->assertSame(['int_columns' => 'Alius\Database\IntColumnsFixture'], $db->getTableNames());
     }
 
     public function testSetNonExistingTableClass()
@@ -123,6 +130,13 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         $this->expectException(DatabaseException::class);
         $db = new Database($this->writer, $this->reader);
         $db->getTable(IntColumnsFixture::class);
+    }
+
+    public function testGetUndefinedTableByName()
+    {
+        $this->expectException(DatabaseException::class);
+        $db = new Database($this->writer, $this->reader);
+        $db->getTableByName('int_columns');
     }
 }
 

@@ -158,7 +158,7 @@ class Table
         return $this->hasPrimaryKey() && $this->getPrimaryKey()->isComposite();
     }
 
-    public function setUniqueKeyWithName(string $name, string ...$columns): self
+    public function setUniqueKeyWithName(string $name, array $columns): self
     {
         if ($this->hasUniqueKey($name)) {
             throw new TableException(sprintf('Unique key "%s" is already defined for table "%s"', $name, $this->getName()));
@@ -176,17 +176,7 @@ class Table
 
     public function setUniqueKey(string ...$columns): self
     {
-        array_unshift($columns, sprintf('unique-%s', implode('-', $columns)));
-        return call_user_func_array([$this, 'setUniqueKeyWithName'], $columns);
-    }
-
-    public function hasUniqueKey(string $name = null): bool
-    {
-        if ($name !== null) {
-            return isset($this->unique_key[$name]);
-        }
-
-        return $this->unique_key !== [];
+        return $this->setUniqueKeyWithName(sprintf('unique-%s', implode('-', $columns)), $columns);
     }
 
     public function getUniqueKey(string $name): UniqueKey
@@ -203,13 +193,22 @@ class Table
         return $this->unique_key;
     }
 
-    public function setIndexWithName(string $name, string ...$columns): self
+    public function hasUniqueKey(string $name = null): bool
+    {
+        if ($name !== null) {
+            return isset($this->unique_key[$name]);
+        }
+
+        return $this->unique_key !== [];
+    }
+
+    public function setIndexWithName(string $name, array $columns): self
     {
         if ($this->hasIndex($name)) {
             throw new TableException(sprintf('Index "%s" is already defined for table "%s"', $name, $this->getName()));
         }
 
-        if (call_user_func_array([$this, 'hasIndexWithColumns'], $columns)) {
+        if ($this->hasIndexWithColumns($columns)) {
             throw new TableException(sprintf('Index is already defined with these columns: "%s"', implode(', ', $columns)));
         }
 
@@ -225,32 +224,7 @@ class Table
 
     public function setIndex(string ...$columns): self
     {
-        array_unshift($columns, sprintf('index-%s', implode('-', $columns)));
-        return call_user_func_array([$this, 'setIndexWithName'], $columns);
-    }
-
-    public function hasIndex(string $name = null): bool
-    {
-        if ($name !== null) {
-            return isset($this->index[$name]);
-        }
-
-        return $this->index !== [];
-    }
-
-    public function hasIndexWithColumns(string ...$columns): bool
-    {
-        if (! $this->hasIndex()) {
-            return false;
-        }
-
-        foreach ($this->getIndexes() as $index) {
-            if ($index->getColumns() === $columns) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->setIndexWithName(sprintf('index-%s', implode('-', $columns)), $columns);
     }
 
     public function getIndex(string $name): Index
@@ -265,6 +239,29 @@ class Table
     public function getIndexes(): array
     {
         return $this->index;
+    }
+
+    public function getIndexWithColumns(array $columns)
+    {
+        foreach ($this->getIndexes() as $index) {
+            if ($index->getColumns() === $columns) {
+                return $index;
+            }
+        }
+    }
+
+    public function hasIndex(string $name = null): bool
+    {
+        if ($name !== null) {
+            return isset($this->index[$name]);
+        }
+
+        return $this->index !== [];
+    }
+
+    public function hasIndexWithColumns(array $columns): bool
+    {
+        return $this->getIndexWithColumns($columns) !== null;
     }
 
     public function setForeignKeyWithName(string $name, $columns, string $parent_table, $parent_columns = null, string $on_update = 'RESTRICT', string $on_delete = 'RESTRICT'): self
@@ -283,8 +280,7 @@ class Table
         $this->foreign_key[$name] = new ForeignKey($name, $columns, $parent_table, $parent_columns, $on_update, $on_delete);
 
         try {
-            array_unshift($columns, $name);
-            call_user_func_array([$this, 'setIndexWithName'], $columns);
+            $this->setIndexWithName($name, $columns);
         } catch (TableException $e) {
         }
 
@@ -295,15 +291,6 @@ class Table
     {
         $name = sprintf('fk_%s_%d', $this->getName(), count($this->foreign_key) + 1);
         return $this->setForeignKeyWithName($name, $columns, $parent_table, $parent_columns, $on_update, $on_delete);
-    }
-
-    public function hasForeignKey(string $name = null): bool
-    {
-        if ($name !== null) {
-            return isset($this->foreign_key[$name]);
-        }
-
-        return $this->foreign_key !== [];
     }
 
     public function getForeignKey(string $name): ForeignKey
@@ -318,6 +305,15 @@ class Table
     public function getForeignKeys(): array
     {
         return $this->foreign_key;
+    }
+
+    public function hasForeignKey(string $name = null): bool
+    {
+        if ($name !== null) {
+            return isset($this->foreign_key[$name]);
+        }
+
+        return $this->foreign_key !== [];
     }
 
     public function buildCreate(): string

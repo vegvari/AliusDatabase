@@ -161,16 +161,6 @@ class Database
         $this->tables[$table_class] = null;
     }
 
-    public function hasTable(string $table_class): bool
-    {
-        return array_key_exists($table_class, $this->tables);
-    }
-
-    public function hasTableByName(string $table_name): bool
-    {
-        return isset($this->getTableNames()[$table_name]);
-    }
-
     public function getTable(string $table_class): Table
     {
         if (! $this->hasTable($table_class)) {
@@ -197,6 +187,16 @@ class Database
     public function getTables(): array
     {
         return $this->tables;
+    }
+
+    public function hasTable(string $table_class): bool
+    {
+        return array_key_exists($table_class, $this->tables);
+    }
+
+    public function hasTableByName(string $table_name): bool
+    {
+        return isset($this->getTableNames()[$table_name]);
     }
 
     public function getTableNames(): array
