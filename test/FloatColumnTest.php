@@ -25,80 +25,80 @@ class FloatColumnTest extends \PHPUnit_Framework_TestCase
 
         // unsigned
         $column = new FloatColumn('foo', 10, 2);
-        $column->unsigned();
+        $column->setUnsigned();
         $this->assertSame(true, $column->isUnsigned());
         $this->assertSame('`foo` float(10,2) UNSIGNED NOT NULL', $column->buildCreate());
 
         // unsigned + nullable
-        $column->nullable();
+        $column->setNullable();
         $this->assertSame('`foo` float(10,2) UNSIGNED', $column->buildCreate());
 
         // unsigned + nullable + default
-        $column->default(1);
+        $column->setDefault(1);
         $this->assertSame('`foo` float(10,2) UNSIGNED DEFAULT "1.00"', $column->buildCreate());
 
         // unsigned + nullable + default + comment
-        $column->comment('foobar');
+        $column->setComment('foobar');
         $this->assertSame('`foo` float(10,2) UNSIGNED DEFAULT "1.00" COMMENT "foobar"', $column->buildCreate());
 
         // unsigned + default
         $column = new FloatColumn('foo', 10, 2);
-        $column->unsigned()->default(1);
+        $column->setUnsigned()->setDefault(1);
         $this->assertSame('`foo` float(10,2) UNSIGNED NOT NULL DEFAULT "1.00"', $column->buildCreate());
 
         // unsigned + default + comment
-        $column->comment('foobar');
+        $column->setComment('foobar');
         $this->assertSame('`foo` float(10,2) UNSIGNED NOT NULL DEFAULT "1.00" COMMENT "foobar"', $column->buildCreate());
 
         // unsigned + comment
         $column = new FloatColumn('foo', 10, 2);
-        $column->unsigned()->comment('foobar');
+        $column->setUnsigned()->setComment('foobar');
         $this->assertSame('`foo` float(10,2) UNSIGNED NOT NULL COMMENT "foobar"', $column->buildCreate());
 
 
 
         // nullable
         $column = new FloatColumn('foo', 10, 2);
-        $column->nullable();
+        $column->setNullable();
         $this->assertSame(true, $column->isNullable());
         $this->assertSame('`foo` float(10,2)', $column->buildCreate());
 
         // nullable + default
-        $column->default(1);
+        $column->setDefault(1);
         $this->assertSame('`foo` float(10,2) DEFAULT "1.00"', $column->buildCreate());
 
         // nullable + default + comment
-        $column->comment('foobar');
+        $column->setComment('foobar');
         $this->assertSame('`foo` float(10,2) DEFAULT "1.00" COMMENT "foobar"', $column->buildCreate());
 
         // nullable + comment
         $column = new FloatColumn('foo', 10, 2);
-        $column->nullable()->comment('foobar');
+        $column->setNullable()->setComment('foobar');
         $this->assertSame('`foo` float(10,2) COMMENT "foobar"', $column->buildCreate());
 
 
 
         // default
         $column = new FloatColumn('foo', 10, 4);
-        $column->default(1.12345);
+        $column->setDefault(1.12345);
         $this->assertSame(1.12345, $column->getDefault());
         $this->assertSame('`foo` float(10,4) NOT NULL DEFAULT "1.1235"', $column->buildCreate());
 
         $column = new FloatColumn('foo', 10, 4);
-        $column->default(1);
+        $column->setDefault(1);
         $this->assertSame(true, $column->hasDefault());
         $this->assertSame(1.0, $column->getDefault());
         $this->assertSame('`foo` float(10,4) NOT NULL DEFAULT "1.0000"', $column->buildCreate());
 
         // default + comment
-        $column->comment('foobar');
+        $column->setComment('foobar');
         $this->assertSame('`foo` float(10,4) NOT NULL DEFAULT "1.0000" COMMENT "foobar"', $column->buildCreate());
 
 
 
         // comment
         $column = new FloatColumn('foo', 10, 2);
-        $column->comment('foobar');
+        $column->setComment('foobar');
         $this->assertSame(true, $column->hasComment());
         $this->assertSame('foobar', $column->getComment());
         $this->assertSame('`foo` float(10,2) NOT NULL COMMENT "foobar"', $column->buildCreate());
@@ -187,20 +187,20 @@ class FloatColumnTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException(ColumnException::class);
         $column = new FloatColumn('foo', 10, 2);
-        $column->default(-100000000);
+        $column->setDefault(-100000000);
     }
 
     public function testDefaultSignedMax()
     {
         $this->expectException(ColumnException::class);
         $column = new FloatColumn('foo', 10, 2);
-        $column->default(100000000);
+        $column->setDefault(100000000);
     }
 
     public function testDefaultNotFloat()
     {
         $this->expectException(ColumnException::class);
         $column = new FloatColumn('foo', 10, 2);
-        $column->default('bar');
+        $column->setDefault('bar');
     }
 }

@@ -215,10 +215,6 @@ class Table
             throw new TableException(sprintf('Index "%s" is already defined for table "%s"', $name, $this->getName()));
         }
 
-        if ($this->hasIndexWithColumns($columns)) {
-            throw new TableException(sprintf('Index is already defined with these columns: "%s"', implode(', ', $columns)));
-        }
-
         foreach ($columns as $column) {
             if (! $this->hasColumn($column)) {
                 throw new TableException(sprintf('Column is not defined: "%s"', $column));
@@ -300,7 +296,7 @@ class Table
 
     public function setForeignKey($columns, string $parent_table, $parent_columns = null, string $on_update = 'RESTRICT', string $on_delete = 'RESTRICT'): self
     {
-        $name = sprintf('fk_%s_%d', $this->getName(), count($this->foreign_key) + 1);
+        $name = sprintf('%s_ibfk_%d', $this->getName(), count($this->foreign_key) + 1);
         return $this->setForeignKeyWithName($name, $columns, $parent_table, $parent_columns, $on_update, $on_delete);
     }
 

@@ -149,21 +149,21 @@ class IntColumnsFixture extends Table
         $this->setName('int_columns');
 
         $this->setColumn(Column::int('int_signed'));
-        $this->setColumn(Column::int('int_signed_nullable')->nullable());
-        $this->setColumn(Column::int('int_signed_with_default')->default(123));
-        $this->setColumn(Column::int('int_signed_nullable_with_default')->nullable()->default(123));
-        $this->setColumn(Column::int('int_signed_with_comment')->comment('comment'));
-        $this->setColumn(Column::int('int_signed_nullable_with_comment')->nullable()->comment('comment'));
-        $this->setColumn(Column::int('int_signed_with_default_and_comment')->default(123)->comment('comment'));
-        $this->setColumn(Column::int('int_signed_nullable_with_default_and_comment')->nullable()->default(123)->comment('comment'));
+        $this->setColumn(Column::int('int_signed_nullable')->setNullable());
+        $this->setColumn(Column::int('int_signed_with_default')->setDefault(123));
+        $this->setColumn(Column::int('int_signed_nullable_with_default')->setNullable()->setDefault(123));
+        $this->setColumn(Column::int('int_signed_with_comment')->setComment('comment'));
+        $this->setColumn(Column::int('int_signed_nullable_with_comment')->setNullable()->setComment('comment'));
+        $this->setColumn(Column::int('int_signed_with_default_and_comment')->setDefault(123)->setComment('comment'));
+        $this->setColumn(Column::int('int_signed_nullable_with_default_and_comment')->setNullable()->setDefault(123)->setComment('comment'));
 
-        $this->setColumn(Column::int('int_unsigned')->unsigned());
-        $this->setColumn(Column::int('int_unsigned_nullable')->unsigned()->nullable());
-        $this->setColumn(Column::int('int_unsigned_with_default')->unsigned()->default(123));
-        $this->setColumn(Column::int('int_unsigned_nullable_with_default')->unsigned()->nullable()->default(123));
-        $this->setColumn(Column::int('int_unsigned_with_comment')->unsigned()->comment('comment'));
-        $this->setColumn(Column::int('int_unsigned_nullable_with_comment')->unsigned()->nullable()->comment('comment'));
-        $this->setColumn(Column::int('int_unsigned_with_default_and_comment')->unsigned()->default(123)->comment('comment'));
-        $this->setColumn(Column::int('int_unsigned_nullable_with_default_and_comment')->unsigned()->nullable()->default(123)->comment('comment'));
+        $this->setColumn(Column::int('int_unsigned')->setUnsigned());
+        $this->setColumn(Column::int('int_unsigned_nullable')->setUnsigned()->setNullable());
+        $this->setColumn(Column::int('int_unsigned_with_default')->setUnsigned()->setDefault(123));
+        $this->setColumn(Column::int('int_unsigned_nullable_with_default')->setUnsigned()->setNullable()->setDefault(123));
+        $this->setColumn(Column::int('int_unsigned_with_comment')->setUnsigned()->setComment('comment'));
+        $this->setColumn(Column::int('int_unsigned_nullable_with_comment')->setUnsigned()->setNullable()->setComment('comment'));
+        $this->setColumn(Column::int('int_unsigned_with_default_and_comment')->setUnsigned()->setDefault(123)->setComment('comment'));
+        $this->setColumn(Column::int('int_unsigned_nullable_with_default_and_comment')->setUnsigned()->setNullable()->setDefault(123)->setComment('comment'));
     }
 }

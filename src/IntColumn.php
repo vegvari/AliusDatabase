@@ -34,7 +34,7 @@ class IntColumn extends Column
         $this->type = $type;
     }
 
-    public function unsigned(): Column
+    public function setUnsigned(): Column
     {
         $this->unsigned = true;
         return $this;
@@ -45,25 +45,25 @@ class IntColumn extends Column
         return $this->unsigned;
     }
 
-    public function nullable(): Column
+    public function setNullable(): Column
     {
         if ($this->isAutoIncrement()) {
             throw new ColumnException('Auto increment column can\'t be nullable');
         }
 
-        return parent::nullable();
+        return parent::setNullable();
     }
 
-    public function default($value): Column
+    public function setDefault($value): Column
     {
         if ($this->isAutoIncrement()) {
             throw new ColumnException('Auto increment column can\'t have default value');
         }
 
-        return parent::default($value);
+        return parent::setDefault($value);
     }
 
-    public function autoIncrement(): Column
+    public function setAutoIncrement(): Column
     {
         if ($this->hasDefault()) {
             throw new ColumnException('Auto increment column can\'t have default value');

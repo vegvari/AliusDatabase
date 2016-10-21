@@ -26,11 +26,11 @@ class ColumnTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new IntColumn('foo', 'mediumint'), Column::mediumint('foo'));
         $this->assertEquals(new IntColumn('foo', 'bigint'), Column::bigint('foo'));
 
-        $this->assertEquals((new IntColumn('foo', 'tinyint'))->unsigned()->autoIncrement(), Column::tinyserial('foo'));
-        $this->assertEquals((new IntColumn('foo', 'smallint'))->unsigned()->autoIncrement(), Column::smallserial('foo'));
-        $this->assertEquals((new IntColumn('foo', 'int'))->unsigned()->autoIncrement(), Column::serial('foo'));
-        $this->assertEquals((new IntColumn('foo', 'mediumint'))->unsigned()->autoIncrement(), Column::mediumserial('foo'));
-        $this->assertEquals((new IntColumn('foo', 'bigint'))->unsigned()->autoIncrement(), Column::bigserial('foo'));
+        $this->assertEquals((new IntColumn('foo', 'tinyint'))->setUnsigned()->setAutoIncrement(), Column::tinyserial('foo'));
+        $this->assertEquals((new IntColumn('foo', 'smallint'))->setUnsigned()->setAutoIncrement(), Column::smallserial('foo'));
+        $this->assertEquals((new IntColumn('foo', 'int'))->setUnsigned()->setAutoIncrement(), Column::serial('foo'));
+        $this->assertEquals((new IntColumn('foo', 'mediumint'))->setUnsigned()->setAutoIncrement(), Column::mediumserial('foo'));
+        $this->assertEquals((new IntColumn('foo', 'bigint'))->setUnsigned()->setAutoIncrement(), Column::bigserial('foo'));
 
         // text
         $this->assertEquals(new TextColumn('foo', 'tinytext'), Column::tinytext('foo'));

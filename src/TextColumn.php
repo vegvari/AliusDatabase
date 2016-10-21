@@ -26,7 +26,7 @@ class TextColumn extends Column
         $this->type = $type;
     }
 
-    public function binary(): Column
+    public function setBinary(): Column
     {
         $this->binary = true;
         return $this;
@@ -37,7 +37,7 @@ class TextColumn extends Column
         return $this->binary;
     }
 
-    public function charset(string $charset): Column
+    public function setCharset(string $charset): Column
     {
         $this->charset = $charset;
         return $this;
@@ -48,7 +48,7 @@ class TextColumn extends Column
         return $this->charset;
     }
 
-    public function collation(string $collation): Column
+    public function setCollation(string $collation): Column
     {
         $this->collation = $collation;
         return $this;

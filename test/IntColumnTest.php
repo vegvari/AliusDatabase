@@ -29,98 +29,98 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
 
         // unsigned
         $column = new IntColumn('foo', $type);
-        $column->unsigned();
+        $column->setUnsigned();
         $this->assertSame(true, $column->isUnsigned());
         $this->assertSame(0, $column->getMin());
         $this->assertSame($unsigned_max, $column->getMax());
         $this->assertSame(sprintf('`foo` %s UNSIGNED NOT NULL', $type), $column->buildCreate());
 
         // unsigned + auto_increment
-        $column->autoIncrement();
+        $column->setAutoIncrement();
         $this->assertSame(sprintf('`foo` %s UNSIGNED NOT NULL AUTO_INCREMENT', $type), $column->buildCreate());
 
         // unsigned + auto_increment + comment
-        $column->comment('foobar');
+        $column->setComment('foobar');
         $this->assertSame(sprintf('`foo` %s UNSIGNED NOT NULL AUTO_INCREMENT COMMENT "foobar"', $type), $column->buildCreate());
 
         // unsigned + nullable
         $column = new IntColumn('foo', $type);
-        $column->unsigned()->nullable();
+        $column->setUnsigned()->setNullable();
         $this->assertSame(sprintf('`foo` %s UNSIGNED', $type), $column->buildCreate());
 
         // unsigned + nullable + default
-        $column->default(1);
+        $column->setDefault(1);
         $this->assertSame(sprintf('`foo` %s UNSIGNED DEFAULT "1"', $type), $column->buildCreate());
 
         // unsigned + nullable + default + comment
-        $column->comment('foobar');
+        $column->setComment('foobar');
         $this->assertSame(sprintf('`foo` %s UNSIGNED DEFAULT "1" COMMENT "foobar"', $type), $column->buildCreate());
 
         // unsigned + default
         $column = new IntColumn('foo', $type);
-        $column->unsigned()->default(1);
+        $column->setUnsigned()->setDefault(1);
         $this->assertSame(sprintf('`foo` %s UNSIGNED NOT NULL DEFAULT "1"', $type), $column->buildCreate());
 
         // unsigned + default + comment
-        $column->comment('foobar');
+        $column->setComment('foobar');
         $this->assertSame(sprintf('`foo` %s UNSIGNED NOT NULL DEFAULT "1" COMMENT "foobar"', $type), $column->buildCreate());
 
         // unsigned + comment
         $column = new IntColumn('foo', $type);
-        $column->unsigned()->comment('foobar');
+        $column->setUnsigned()->setComment('foobar');
         $this->assertSame(sprintf('`foo` %s UNSIGNED NOT NULL COMMENT "foobar"', $type), $column->buildCreate());
 
 
 
         // nullable
         $column = new IntColumn('foo', $type);
-        $column->nullable();
+        $column->setNullable();
         $this->assertSame(true, $column->isNullable());
         $this->assertSame(sprintf('`foo` %s', $type), $column->buildCreate());
 
         // nullable + default
-        $column->default(1);
+        $column->setDefault(1);
         $this->assertSame(sprintf('`foo` %s DEFAULT "1"', $type), $column->buildCreate());
 
         // nullable + default + comment
-        $column->comment('foobar');
+        $column->setComment('foobar');
         $this->assertSame(sprintf('`foo` %s DEFAULT "1" COMMENT "foobar"', $type), $column->buildCreate());
 
         // nullable + comment
         $column = new IntColumn('foo', $type);
-        $column->nullable()->comment('foobar');
+        $column->setNullable()->setComment('foobar');
         $this->assertSame(sprintf('`foo` %s COMMENT "foobar"', $type), $column->buildCreate());
 
 
 
         // auto_increment
         $column = new IntColumn('foo', $type);
-        $column->autoIncrement();
+        $column->setAutoIncrement();
         $this->assertSame(true, $column->isAutoIncrement());
         $this->assertSame(sprintf('`foo` %s NOT NULL AUTO_INCREMENT', $type), $column->buildCreate());
 
         // auto_increment + comment
-        $column->comment('foobar');
+        $column->setComment('foobar');
         $this->assertSame(sprintf('`foo` %s NOT NULL AUTO_INCREMENT COMMENT "foobar"', $type), $column->buildCreate());
 
 
 
         // default
         $column = new IntColumn('foo', $type);
-        $column->default(1);
+        $column->setDefault(1);
         $this->assertSame(true, $column->hasDefault());
         $this->assertSame(1, $column->getDefault());
         $this->assertSame(sprintf('`foo` %s NOT NULL DEFAULT "1"', $type), $column->buildCreate());
 
         // default + comment
-        $column->comment('foobar');
+        $column->setComment('foobar');
         $this->assertSame(sprintf('`foo` %s NOT NULL DEFAULT "1" COMMENT "foobar"', $type), $column->buildCreate());
 
 
 
         // comment
         $column = new IntColumn('foo', $type);
-        $column->comment('foobar');
+        $column->setComment('foobar');
         $this->assertSame(true, $column->hasComment());
         $this->assertSame('foobar', $column->getComment());
         $this->assertSame(sprintf('`foo` %s NOT NULL COMMENT "foobar"', $type), $column->buildCreate());
@@ -162,28 +162,28 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException(ColumnException::class);
         $column = new IntColumn('foo', 'int');
-        $column->autoIncrement()->nullable();
+        $column->setAutoIncrement()->setNullable();
     }
 
     public function testNullableAndAutoIncrement()
     {
         $this->expectException(ColumnException::class);
         $column = new IntColumn('foo', 'int');
-        $column->nullable()->autoIncrement();
+        $column->setNullable()->setAutoIncrement();
     }
 
     public function testAutoIncrementAndDefault()
     {
         $this->expectException(ColumnException::class);
         $column = new IntColumn('foo', 'int');
-        $column->autoIncrement()->default(1);
+        $column->setAutoIncrement()->setDefault(1);
     }
 
     public function testDefaultAndAutoIncrement()
     {
         $this->expectException(ColumnException::class);
         $column = new IntColumn('foo', 'int');
-        $column->default(1)->autoIncrement();
+        $column->setDefault(1)->setAutoIncrement();
     }
 
     /**
@@ -213,7 +213,7 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException(ColumnException::class);
         $column = new IntColumn('foo', $type);
-        $column->unsigned();
+        $column->setUnsigned();
         $column->check(-1);
     }
 
@@ -224,7 +224,7 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException(ColumnException::class);
         $column = new IntColumn('foo', $type);
-        $column->unsigned();
+        $column->setUnsigned();
         $column->check($unsigned_max + 1);
     }
 
@@ -235,7 +235,7 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException(ColumnException::class);
         $column = new IntColumn('foo', $type);
-        $column->default($signed_min - 1);
+        $column->setDefault($signed_min - 1);
     }
 
     /**
@@ -245,7 +245,7 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException(ColumnException::class);
         $column = new IntColumn('foo', $type);
-        $column->default($signed_max + 1);
+        $column->setDefault($signed_max + 1);
     }
 
     /**
@@ -255,8 +255,8 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException(ColumnException::class);
         $column = new IntColumn('foo', $type);
-        $column->unsigned();
-        $column->default(-1);
+        $column->setUnsigned();
+        $column->setDefault(-1);
     }
 
     /**
@@ -266,7 +266,7 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException(ColumnException::class);
         $column = new IntColumn('foo', $type);
-        $column->unsigned();
-        $column->default($unsigned_max + 1);
+        $column->setUnsigned();
+        $column->setDefault($unsigned_max + 1);
     }
 }

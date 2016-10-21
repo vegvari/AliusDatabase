@@ -39,7 +39,7 @@ class DecimalColumn extends Column
         return $this->scale;
     }
 
-    public function unsigned(): Column
+    public function setUnsigned(): Column
     {
         $this->unsigned = true;
         return $this;

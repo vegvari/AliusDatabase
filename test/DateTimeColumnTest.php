@@ -22,66 +22,66 @@ class DateTimeColumnTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('CHANGE COLUMN `bar` `foo` datetime NOT NULL', $column->buildChange(Column::int('bar')));
 
         // nullable
-        $column->nullable();
+        $column->setNullable();
         $this->assertSame(true, $column->isNullable());
         $this->assertSame('`foo` datetime', $column->buildCreate());
 
         // nullable + default
-        $column->default('2016-01-01');
+        $column->setDefault('2016-01-01');
         $this->assertSame('`foo` datetime DEFAULT "2016-01-01 00:00:00"', $column->buildCreate());
 
         // nullable + default + on update current
-        $column->onUpdateCurrent();
+        $column->setOnUpdateCurrent();
         $this->assertSame('`foo` datetime DEFAULT "2016-01-01 00:00:00" ON UPDATE CURRENT_TIMESTAMP', $column->buildCreate());
 
         // nullable + default + on update current + comment
-        $column->comment('foobar');
+        $column->setComment('foobar');
         $this->assertSame('`foo` datetime DEFAULT "2016-01-01 00:00:00" ON UPDATE CURRENT_TIMESTAMP COMMENT "foobar"', $column->buildCreate());
 
 
 
         // default
         $column = new DateTimeColumn('foo');
-        $column->default(new \DateTime('2016-01-01 11:00:00', new \DateTimeZone('Asia/Tokyo')));
+        $column->setDefault(new \DateTime('2016-01-01 11:00:00', new \DateTimeZone('Asia/Tokyo')));
         $this->assertSame('`foo` datetime NOT NULL DEFAULT "2016-01-01 02:00:00"', $column->buildCreate());
 
         $column = new DateTimeColumn('foo');
-        $column->default(null);
+        $column->setDefault(null);
         $this->assertSame(false, $column->hasDefault());
-        $column->default('');
+        $column->setDefault('');
         $this->assertSame(false, $column->hasDefault());
         $this->assertSame('`foo` datetime NOT NULL', $column->buildCreate());
 
         $column = new DateTimeColumn('foo');
-        $column->default('2016-01-01');
+        $column->setDefault('2016-01-01');
         $this->assertSame(true, $column->hasDefault());
         $this->assertSame('`foo` datetime NOT NULL DEFAULT "2016-01-01 00:00:00"', $column->buildCreate());
 
         // default + on update current
-        $column->onUpdateCurrent();
+        $column->setOnUpdateCurrent();
         $this->assertSame('`foo` datetime NOT NULL DEFAULT "2016-01-01 00:00:00" ON UPDATE CURRENT_TIMESTAMP', $column->buildCreate());
 
         // default + on update current + comment
-        $column->comment('foobar');
+        $column->setComment('foobar');
         $this->assertSame('`foo` datetime NOT NULL DEFAULT "2016-01-01 00:00:00" ON UPDATE CURRENT_TIMESTAMP COMMENT "foobar"', $column->buildCreate());
 
 
 
         // on update current
         $column = new DateTimeColumn('foo');
-        $column->onUpdateCurrent();
+        $column->setOnUpdateCurrent();
         $this->assertSame(true, $column->isOnUpdateCurrent());
         $this->assertSame('`foo` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP', $column->buildCreate());
 
         // on update current + comment
-        $column->comment('foobar');
+        $column->setComment('foobar');
         $this->assertSame('`foo` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT "foobar"', $column->buildCreate());
 
 
 
         // comment
         $column = new DateTimeColumn('foo');
-        $column->comment('foobar');
+        $column->setComment('foobar');
         $this->assertSame(true, $column->hasComment());
         $this->assertSame('foobar', $column->getComment());
         $this->assertSame('`foo` datetime NOT NULL COMMENT "foobar"', $column->buildCreate());
@@ -90,13 +90,13 @@ class DateTimeColumnTest extends \PHPUnit_Framework_TestCase
 
         // default current
         $column = new DateTimeColumn('foo');
-        $column->defaultCurrent();
+        $column->setDefaultCurrent();
         $this->assertSame(true, $column->hasDefault());
         $this->assertSame(true, $column->isDefaultCurrent());
         $this->assertSame('`foo` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP', $column->buildCreate());
 
         $column = new DateTimeColumn('foo');
-        $column->default('CURRENT_TIMESTAMP');
+        $column->setDefault('CURRENT_TIMESTAMP');
         $this->assertSame(true, $column->hasDefault());
         $this->assertSame(true, $column->isDefaultCurrent());
         $this->assertSame('`foo` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP', $column->buildCreate());

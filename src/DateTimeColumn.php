@@ -13,18 +13,18 @@ class DateTimeColumn extends Column
         $this->type = 'datetime';
     }
 
-    public function default($value): Column
+    public function setDefault($value): Column
     {
         if ($value === 'CURRENT_TIMESTAMP') {
             $this->default_current = true;
         }
 
-        return parent::default($value);
+        return parent::setDefault($value);
     }
 
-    public function defaultCurrent(): Column
+    public function setDefaultCurrent(): Column
     {
-        return $this->default('CURRENT_TIMESTAMP');
+        return $this->setDefault('CURRENT_TIMESTAMP');
     }
 
     public function isDefaultCurrent(): bool
@@ -32,7 +32,7 @@ class DateTimeColumn extends Column
         return $this->default_current;
     }
 
-    public function onUpdateCurrent(): Column
+    public function setOnUpdateCurrent(): Column
     {
         $this->on_update_current = true;
         return $this;

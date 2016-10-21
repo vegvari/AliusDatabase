@@ -20,7 +20,7 @@ abstract class Column
         return $this->type;
     }
 
-    public function nullable(): Column
+    public function setNullable(): Column
     {
         $this->nullable = true;
         return $this;
@@ -31,15 +31,10 @@ abstract class Column
         return $this->nullable;
     }
 
-    public function default($value): Column
+    public function setDefault($value): Column
     {
         $this->default = $this->check($value);
         return $this;
-    }
-
-    public function hasDefault(): bool
-    {
-        return $this->default !== null;
     }
 
     public function getDefault()
@@ -47,20 +42,25 @@ abstract class Column
         return $this->default;
     }
 
-    public function comment(string $comment): Column
+    public function hasDefault(): bool
+    {
+        return $this->getDefault() !== null;
+    }
+
+    public function setComment(string $comment): Column
     {
         $this->comment = $comment;
         return $this;
     }
 
-    public function hasComment(): bool
-    {
-        return $this->getComment() !== '';
-    }
-
     public function getComment(): string
     {
         return $this->comment;
+    }
+
+    public function hasComment(): bool
+    {
+        return $this->getComment() !== '';
     }
 
     abstract public function check($value);
@@ -98,102 +98,102 @@ abstract class Column
         return sprintf('CHANGE COLUMN `%s` %s', $column->getName(), $this->buildCreate());
     }
 
-    public static function char(string $name, int $length): Column
+    public static function char(string $name, int $length): CharColumn
     {
         return new CharColumn($name, 'char', $length);
     }
 
-    public static function varchar(string $name, int $length): Column
+    public static function varchar(string $name, int $length): CharColumn
     {
         return new CharColumn($name, 'varchar', $length);
     }
 
-    public static function datetime(string $name): Column
+    public static function datetime(string $name): DateTimeColumn
     {
         return new DateTimeColumn($name);
     }
 
-    public static function decimal(string $name, int $precision, int $scale): Column
+    public static function decimal(string $name, int $precision, int $scale): DecimalColumn
     {
         return new DecimalColumn($name, $precision, $scale);
     }
 
-    public static function float(string $name, int $precision, int $scale): Column
+    public static function float(string $name, int $precision, int $scale = null): FloatColumn
     {
         return new FloatColumn($name, $precision, $scale);
     }
 
-    public static function tinyint(string $name): Column
+    public static function tinyint(string $name): IntColumn
     {
         return new IntColumn($name, 'tinyint');
     }
 
-    public static function smallint(string $name): Column
+    public static function smallint(string $name): IntColumn
     {
         return new IntColumn($name, 'smallint');
     }
 
-    public static function mediumint(string $name): Column
+    public static function mediumint(string $name): IntColumn
     {
         return new IntColumn($name, 'mediumint');
     }
 
-    public static function int(string $name): Column
+    public static function int(string $name): IntColumn
     {
         return new IntColumn($name, 'int');
     }
 
-    public static function bigint(string $name): Column
+    public static function bigint(string $name): IntColumn
     {
         return new IntColumn($name, 'bigint');
     }
 
-    public static function tinyserial(string $name): Column
+    public static function tinyserial(string $name): IntColumn
     {
-        return static::tinyint($name)->unsigned()->autoIncrement();
+        return static::tinyint($name)->setUnsigned()->setAutoIncrement();
     }
 
-    public static function smallserial(string $name): Column
+    public static function smallserial(string $name): IntColumn
     {
-        return static::smallint($name)->unsigned()->autoIncrement();
+        return static::smallint($name)->setUnsigned()->setAutoIncrement();
     }
 
-    public static function mediumserial(string $name): Column
+    public static function mediumserial(string $name): IntColumn
     {
-        return static::mediumint($name)->unsigned()->autoIncrement();
+        return static::mediumint($name)->setUnsigned()->setAutoIncrement();
     }
 
-    public static function serial(string $name): Column
+    public static function serial(string $name): IntColumn
     {
-        return static::int($name)->unsigned()->autoIncrement();
+        return static::int($name)->setUnsigned()->setAutoIncrement();
     }
 
-    public static function bigserial(string $name): Column
+    public static function bigserial(string $name): IntColumn
     {
-        return static::bigint($name)->unsigned()->autoIncrement();
+        return static::bigint($name)->setUnsigned()->setAutoIncrement();
     }
 
-    public static function tinytext(string $name): Column
+    public static function tinytext(string $name): TextColumn
     {
         return new TextColumn($name, 'tinytext');
     }
 
-    public static function text(string $name): Column
+    public static function text(string $name): TextColumn
     {
         return new TextColumn($name, 'text');
     }
 
-    public static function mediumtext(string $name): Column
+    public static function mediumtext(string $name): TextColumn
     {
         return new TextColumn($name, 'mediumtext');
     }
 
-    public static function longtext(string $name): Column
+    public static function longtext(string $name): TextColumn
     {
         return new TextColumn($name, 'longtext');
     }
 
-    public static function timestamp(string $name): Column
+    public static function timestamp(string $name): TimestampColumn
     {
         return new TimestampColumn($name);
     }

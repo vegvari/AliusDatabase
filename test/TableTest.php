@@ -251,23 +251,23 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $this->assertSame(false, $table->hasForeignKey());
-        $this->assertSame(false, $table->hasForeignKey('fk_foo_1'));
+        $this->assertSame(false, $table->hasForeignKey('foo_ibfk_1'));
         $this->assertSame([], $table->getForeignKeys());
 
         // simple
         $table->setColumn(Column::int('id'));
         $table->setForeignKey('id', 'foo', 'id');
         $this->assertSame(true, $table->hasForeignKey());
-        $this->assertSame(true, $table->hasForeignKey('fk_foo_1'));
-        $this->assertSame(true, $table->hasIndex('fk_foo_1'));
-        $this->assertEquals(new ForeignKey('fk_foo_1', 'id', 'foo', 'id'), $table->getForeignKey('fk_foo_1'));
-        $this->assertSame(['fk_foo_1' => $table->getForeignKey('fk_foo_1')], $table->getForeignKeys());
+        $this->assertSame(true, $table->hasForeignKey('foo_ibfk_1'));
+        $this->assertSame(true, $table->hasIndex('foo_ibfk_1'));
+        $this->assertEquals(new ForeignKey('foo_ibfk_1', 'id', 'foo', 'id'), $table->getForeignKey('foo_ibfk_1'));
+        $this->assertSame(['foo_ibfk_1' => $table->getForeignKey('foo_ibfk_1')], $table->getForeignKeys());
 
         $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $table->setColumn(Column::int('id'));
         $table->setForeignKey('id', 'foo');
-        $this->assertSame(['fk_foo_1' => $table->getForeignKey('fk_foo_1')], $table->getForeignKeys());
+        $this->assertSame(['foo_ibfk_1' => $table->getForeignKey('foo_ibfk_1')], $table->getForeignKeys());
 
         // composite
         $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
@@ -276,9 +276,9 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setColumn(Column::int('id2'));
         $table->setForeignKey(['id', 'id2'], 'foo');
         $this->assertSame(true, $table->hasForeignKey());
-        $this->assertSame(true, $table->hasForeignKey('fk_foo_1'));
-        $this->assertSame(true, $table->hasIndex('fk_foo_1'));
-        $this->assertSame(['fk_foo_1' => $table->getForeignKey('fk_foo_1')], $table->getForeignKeys());
+        $this->assertSame(true, $table->hasForeignKey('foo_ibfk_1'));
+        $this->assertSame(true, $table->hasIndex('foo_ibfk_1'));
+        $this->assertSame(['foo_ibfk_1' => $table->getForeignKey('foo_ibfk_1')], $table->getForeignKeys());
     }
 
     public function testForeignKeyCatchErrorOnDuplicatedIndex()
@@ -407,10 +407,10 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table_b = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table_b->setName('b');
         $table_b->setColumn(Column::serial('b_id'));
-        $table_b->setColumn(Column::int('a_id')->unsigned());
+        $table_b->setColumn(Column::int('a_id')->setUnsigned());
         $table_b->setForeignKey('a_id', 'a');
 
-        $this->assertSame('CREATE TABLE `b` (`b_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id` int UNSIGNED NOT NULL, PRIMARY KEY (`b_id`), KEY `fk_b_1` (`a_id`), CONSTRAINT `fk_b_1` FOREIGN KEY (`a_id`) REFERENCES `a` (`a_id`) ON UPDATE RESTRICT ON DELETE RESTRICT) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_b->buildCreate());
+        $this->assertSame('CREATE TABLE `b` (`b_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id` int UNSIGNED NOT NULL, PRIMARY KEY (`b_id`), KEY `b_ibfk_1` (`a_id`), CONSTRAINT `b_ibfk_1` FOREIGN KEY (`a_id`) REFERENCES `a` (`a_id`) ON UPDATE RESTRICT ON DELETE RESTRICT) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_b->buildCreate());
 
         $this->database->execute($table_a->buildCreate());
         $this->database->execute($table_b->buildCreate());
@@ -429,11 +429,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table_b = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table_b->setName('b');
         $table_b->setColumn(Column::serial('b_id'));
-        $table_b->setColumn(Column::int('a_id')->unsigned());
+        $table_b->setColumn(Column::int('a_id')->setUnsigned());
         $table_b->setColumn(Column::int('a_id2'));
         $table_b->setForeignKey(['a_id', 'a_id2'], 'a');
 
-        $this->assertSame('CREATE TABLE `b` (`b_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id` int UNSIGNED NOT NULL, `a_id2` int NOT NULL, PRIMARY KEY (`b_id`), KEY `fk_b_1` (`a_id`, `a_id2`), CONSTRAINT `fk_b_1` FOREIGN KEY (`a_id`, `a_id2`) REFERENCES `a` (`a_id`, `a_id2`) ON UPDATE RESTRICT ON DELETE RESTRICT) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_b->buildCreate());
+        $this->assertSame('CREATE TABLE `b` (`b_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id` int UNSIGNED NOT NULL, `a_id2` int NOT NULL, PRIMARY KEY (`b_id`), KEY `b_ibfk_1` (`a_id`, `a_id2`), CONSTRAINT `b_ibfk_1` FOREIGN KEY (`a_id`, `a_id2`) REFERENCES `a` (`a_id`, `a_id2`) ON UPDATE RESTRICT ON DELETE RESTRICT) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_b->buildCreate());
 
         $this->database->execute($table_a->buildCreate());
         $this->database->execute($table_b->buildCreate());

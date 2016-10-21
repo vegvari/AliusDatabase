@@ -4,18 +4,20 @@ namespace Alius\Database;
 
 class Connection
 {
-    protected $dsn;
-    protected $user;
-    protected $password;
-    protected $database;
-    protected $charset;
-    protected $options = [
+    const DEFAULT_OPTIONS = [
         \PDO::ATTR_EMULATE_PREPARES   => false,
         \PDO::ATTR_ORACLE_NULLS       => \PDO::NULL_EMPTY_STRING,
         \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
         \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET GLOBAL time_zone="UTC", time_zone="UTC"',
 
     ];
+
+    protected $dsn;
+    protected $user;
+    protected $password;
+    protected $database;
+    protected $charset;
+    protected $options;
     protected $pdo;
 
     public function __construct(string $dsn, string $user, string $password, string $database, string $charset = 'utf8', array $options = null)
@@ -25,10 +27,7 @@ class Connection
         $this->password = $password;
         $this->database = $database;
         $this->charset = $charset;
-
-        if ($options !== null) {
-            $this->options = $options;
-        }
+        $this->options = $options === null ? static::DEFAULT_OPTIONS : $options;
     }
 
     public function getCharset(): string

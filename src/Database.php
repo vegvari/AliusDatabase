@@ -40,11 +40,6 @@ class Database
         return $this->writer;
     }
 
-    public function hasReader(): bool
-    {
-        return $this->reader !== null;
-    }
-
     public function getReader(): \PDO
     {
         if (! $this->hasReader() || $this->inTransaction()) {
@@ -52,6 +47,11 @@ class Database
         }
 
         return $this->reader;
+    }
+
+    public function hasReader(): bool
+    {
+        return $this->reader !== null;
     }
 
     public function getName(): string
@@ -175,13 +175,9 @@ class Database
         return $this->tables[$table_class];
     }
 
-    public function getTableByName(string $table_name): Table
+    public function hasTable(string $table_class): bool
     {
-        if (! $this->hasTableByName($table_name)) {
-            throw new DatabaseException(sprintf('Table class is not set with this table name: "%s"', $table_name));
-        }
-
-        return $this->getTable($this->getTableNames()[$table_name]);
+        return array_key_exists($table_class, $this->tables);
     }
 
     public function getTables(): array
@@ -189,9 +185,13 @@ class Database
         return $this->tables;
     }
 
-    public function hasTable(string $table_class): bool
+    public function getTableByName(string $table_name): Table
     {
-        return array_key_exists($table_class, $this->tables);
+        if (! $this->hasTableByName($table_name)) {
+            throw new DatabaseException(sprintf('Table class is not set with this table name: "%s"', $table_name));
+        }
+
+        return $this->getTable($this->getTableNames()[$table_name]);
     }
 
     public function hasTableByName(string $table_name): bool
