@@ -165,7 +165,7 @@ class Table
         return $this->hasPrimaryKey() && $this->getPrimaryKey()->isComposite();
     }
 
-    public function setUniqueKeyWithName(string $name, array $columns): self
+    public function setUniqueKeyWithName(string $name, string ...$columns): self
     {
         if ($this->hasUniqueKey($name)) {
             throw new TableException(sprintf('Unique key "%s" is already defined for table "%s"', $name, $this->getName()));
@@ -183,7 +183,7 @@ class Table
 
     public function setUniqueKey(string ...$columns): self
     {
-        return $this->setUniqueKeyWithName(sprintf('unique-%s', implode('-', $columns)), $columns);
+        return $this->setUniqueKeyWithName(sprintf('unique-%s', implode('-', $columns)), ...$columns);
     }
 
     public function getUniqueKey(string $name): UniqueKey
@@ -209,7 +209,7 @@ class Table
         return $this->unique_key !== [];
     }
 
-    public function setIndexWithName(string $name, array $columns): self
+    public function setIndexWithName(string $name, string ...$columns): self
     {
         if ($this->hasIndex($name)) {
             throw new TableException(sprintf('Index "%s" is already defined for table "%s"', $name, $this->getName()));
@@ -227,7 +227,7 @@ class Table
 
     public function setIndex(string ...$columns): self
     {
-        return $this->setIndexWithName(sprintf('index-%s', implode('-', $columns)), $columns);
+        return $this->setIndexWithName(sprintf('index-%s', implode('-', $columns)), ...$columns);
     }
 
     public function getIndex(string $name): Index
@@ -244,7 +244,7 @@ class Table
         return $this->index;
     }
 
-    public function getIndexWithColumns(array $columns)
+    public function getIndexWithColumns(string ...$columns)
     {
         foreach ($this->getIndexes() as $index) {
             if ($index->getColumns() === $columns) {
@@ -262,9 +262,9 @@ class Table
         return $this->index !== [];
     }
 
-    public function hasIndexWithColumns(array $columns): bool
+    public function hasIndexWithColumns(string ...$columns): bool
     {
-        return $this->getIndexWithColumns($columns) !== null;
+        return $this->getIndexWithColumns(...$columns) !== null;
     }
 
     public function setForeignKeyWithName(string $name, $columns, string $parent_table, $parent_columns = null, string $on_update = 'RESTRICT', string $on_delete = 'RESTRICT'): self
@@ -285,11 +285,7 @@ class Table
         }
 
         $this->foreign_key[$name] = new ForeignKey($name, $columns, $parent_table, $parent_columns, $on_update, $on_delete);
-
-        try {
-            $this->setIndexWithName($name, $columns);
-        } catch (TableException $e) {
-        }
+        $this->setIndexWithName($name, ...$columns);
 
         return $this;
     }
@@ -365,5 +361,153 @@ class Table
     public function buildDrop(): string
     {
         return sprintf('DROP TABLE `%s`;', $this->getName());
+    }
+
+    public function buildAlterColumns(Table $table): array
+    {
+        $build = [];
+
+        foreach ($this->getColumns() as $column) {
+            if (! $table->hasColumn($column->getName())) {
+                $build[] = $column->buildDrop();
+            }
+        }
+
+        $after = null;
+        foreach ($table->getColumns() as $column) {
+            if (! $this->hasColumn($column->getName())) {
+                $build[] = $column->buildAdd($after);
+            } elseif ($column != $this->getColumn($column->getName())) {
+                $build[] = $column->buildChange($this->getColumn($column->getName()));
+            }
+
+            $after = $column;
+        }
+
+        return $build;
+    }
+
+    public function buildAlterPrimaryKeys(Table $table): array
+    {
+        $build = [];
+
+        if ($this->hasPrimaryKey()) {
+            if (! $table->hasPrimaryKey()) {
+                $build[] = $this->getPrimaryKey()->buildDrop();
+            } elseif ($this->getPrimaryKey() != $table->getPrimaryKey()) {
+                $build[] = $this->getPrimaryKey()->buildDrop();
+                $build[] = $table->getPrimaryKey()->buildAdd();
+            }
+        } elseif ($table->hasPrimaryKey()) {
+            $build[] = $table->getPrimaryKey()->buildAdd();
+        }
+
+        return $build;
+    }
+
+    public function buildAlterUniqueKeys(Table $table): array
+    {
+        $build = [];
+
+        foreach ($this->getUniqueKeys() as $name => $unique_key) {
+            if (! $table->hasUniqueKey($name) || $table->getUniqueKey($name) != $unique_key) {
+                $build[] = $unique_key->buildDrop();
+            }
+        }
+
+        foreach ($table->getUniqueKeys() as $name => $unique_key) {
+            if (! $this->hasUniqueKey($name) || $this->getUniqueKey($name) != $unique_key) {
+                $build[] = $unique_key->buildAdd();
+            }
+        }
+
+        return $build;
+    }
+
+    public function buildAlterIndexes(Table $table): array
+    {
+        $build = [];
+
+        foreach ($this->getIndexes() as $name => $index) {
+            if (! $table->hasIndex($name) || $table->getIndex($name) != $index) {
+                $build[] = $index->buildDrop();
+            }
+        }
+
+        foreach ($table->getIndexes() as $name => $index) {
+            if (! $this->hasIndex($name) || $this->getIndex($name) != $index) {
+                $build[] = $index->buildAdd();
+            }
+        }
+
+        return $build;
+    }
+
+    public function buildAlterDropForeignKeys(Table $table): array
+    {
+        $build = [];
+
+        foreach ($this->getForeignKeys() as $name => $fk) {
+            if (! $table->hasForeignKey($name) || $table->getForeignKey($name) != $fk) {
+                $build[] = $fk->buildDrop();
+            }
+        }
+
+        return $build;
+    }
+
+    public function buildAlterAddForeignKeys(Table $table): array
+    {
+        $build = [];
+
+        foreach ($table->getForeignKeys() as $name => $fk) {
+            if (! $this->hasForeignKey($name) || $this->getForeignKey($name) != $fk) {
+                $build[] = $fk->buildAdd();
+            }
+        }
+
+        return $build;
+    }
+
+    public function buildAlter(Table $table): array
+    {
+        $build = [];
+
+        // column
+        if (($columns = $this->buildAlterColumns($table)) !== []) {
+            $build = array_merge($build, $columns);
+        }
+
+        // primary key
+        if (($primary_keys = $this->buildAlterPrimaryKeys($table)) !== []) {
+            $build = array_merge($build, $primary_keys);
+        }
+
+        // unique key
+        if (($unique_keys = $this->buildAlterUniqueKeys($table)) !== []) {
+            $build = array_merge($build, $unique_keys);
+        }
+
+        // indexes
+        if (($indexes = $this->buildAlterIndexes($table)) !== []) {
+            $build = array_merge($build, $indexes);
+        }
+
+        // foreign key
+        $drop_foreign_key = $this->buildAlterDropForeignKeys($table);
+        $add_foreign_key = $this->buildAlterAddForeignKeys($table);
+
+        if ($build !== []) {
+            if ($drop_foreign_key !== [] && $add_foreign_key !== []) {
+                $alter[] = sprintf('ALTER TABLE `%s` %s;', $this->getName(), implode(', ', array_merge($build, $drop_foreign_key)));
+                $alter[] = sprintf('ALTER TABLE `%s` %s;', $this->getName(), implode(', ', $add_foreign_key));
+
+                return $alter;
+            }
+
+            return [sprintf('ALTER TABLE `%s` %s;', $this->getName(), implode(', ', array_merge($build, $drop_foreign_key, $add_foreign_key)))];
+        }
+
+        return [];
     }
 }

@@ -157,7 +157,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new UniqueKey('unique-id2', ['id2']), $table->getUniqueKey('unique-id2'));
         $this->assertSame(['unique-id' => $table->getUniqueKey('unique-id'), 'unique-id2' => $table->getUniqueKey('unique-id2')], $table->getUniqueKeys());
 
-        $table->setUniqueKeyWithName('foo', ['id']);
+        $table->setUniqueKeyWithName('foo', 'id');
         $this->assertSame(true, $table->hasUniqueKey('foo'));
         $this->assertEquals(new UniqueKey('foo', ['id']), $table->getUniqueKey('foo'));
         $this->assertSame(['unique-id' => $table->getUniqueKey('unique-id'), 'unique-id2' => $table->getUniqueKey('unique-id2'), 'foo' => $table->getUniqueKey('foo')], $table->getUniqueKeys());
@@ -175,8 +175,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectException(TableException::class);
         $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setColumn(Column::int('id'));
-        $table->setUniqueKeyWithName('id', ['id']);
-        $table->setUniqueKeyWithName('id', ['id']);
+        $table->setUniqueKeyWithName('id', 'id');
+        $table->setUniqueKeyWithName('id', 'id');
     }
 
     public function testUniqueKeySetNotDefinedColumn()
@@ -191,7 +191,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $this->assertSame(false, $table->hasIndex());
         $this->assertSame(false, $table->hasIndex('index-id'));
-        $this->assertSame(false, $table->hasIndexWithColumns(['id']));
+        $this->assertSame(false, $table->hasIndexWithColumns('id'));
         $this->assertSame([], $table->getIndexes());
 
         // simple
@@ -199,7 +199,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setIndex('id');
         $this->assertSame(true, $table->hasIndex());
         $this->assertSame(true, $table->hasIndex('index-id'));
-        $this->assertSame(true, $table->hasIndexWithColumns(['id']));
+        $this->assertSame(true, $table->hasIndexWithColumns('id'));
         $this->assertEquals(new Index('index-id', ['id']), $table->getIndex('index-id'));
         $this->assertSame(['index-id' => $table->getIndex('index-id')], $table->getIndexes());
 
@@ -211,7 +211,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table->setIndex('id', 'id2');
         $this->assertSame(true, $table->hasIndex());
         $this->assertSame(true, $table->hasIndex('index-id-id2'));
-        $this->assertSame(true, $table->hasIndexWithColumns(['id', 'id2']));
+        $this->assertSame(true, $table->hasIndexWithColumns('id', 'id2'));
         $this->assertSame(['index-id-id2' => $table->getIndex('index-id-id2')], $table->getIndexes());
     }
 
@@ -227,8 +227,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectException(TableException::class);
         $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setColumn(Column::int('id'));
-        $table->setIndexWithName('id', ['id']);
-        $table->setIndexWithName('id', ['id']);
+        $table->setIndexWithName('id', 'id');
+        $table->setIndexWithName('id', 'id');
     }
 
     public function testIndexSetNotDefinedColumn()
@@ -446,5 +446,279 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $table->setName('foo');
         $this->assertSame('DROP TABLE `foo`;', $table->buildDrop());
+    }
+
+    public function testBuildAlterColumns()
+    {
+        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table1->setName('foo');
+
+        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table2->setName('foo');
+
+        // no change
+        $this->assertSame([], $table2->buildAlter($table1));
+
+        // drop, add
+        $table1->setColumn(Column::int('id'));
+        $this->assertSame(['ALTER TABLE `foo` DROP COLUMN `id`;'], $table1->buildAlter($table2));
+        $this->assertSame(['ALTER TABLE `foo` ADD COLUMN `id` int NOT NULL;'], $table2->buildAlter($table1));
+
+        // no change again
+        $table2->setColumn(Column::int('id'));
+        $this->assertSame([], $table1->buildAlter($table2));
+        $this->assertSame([], $table2->buildAlter($table1));
+
+        // change
+        $table1->setColumn(Column::int('id3')->setUnsigned());
+        $table2->setColumn(Column::int('id3'));
+        $this->assertSame(['ALTER TABLE `foo` CHANGE COLUMN `id3` `id3` int UNSIGNED NOT NULL;'], $table2->buildAlter($table1));
+        $this->assertSame(['ALTER TABLE `foo` CHANGE COLUMN `id3` `id3` int NOT NULL;'], $table1->buildAlter($table2));
+
+        // multiple
+        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table1->setName('foo');
+        $table1->setColumn(Column::int('id1'));
+        $table1->setColumn(Column::int('id2'));
+        $table1->setColumn(Column::int('id3'));
+
+        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table2->setName('foo');
+
+        $this->assertSame(['ALTER TABLE `foo` DROP COLUMN `id1`, DROP COLUMN `id2`, DROP COLUMN `id3`;'], $table1->buildAlter($table2));
+        $this->assertSame(['ALTER TABLE `foo` ADD COLUMN `id1` int NOT NULL, ADD COLUMN `id2` int NOT NULL AFTER `id1`, ADD COLUMN `id3` int NOT NULL AFTER `id2`;'], $table2->buildAlter($table1));
+    }
+
+    public function testBuildAlterPrimaryKeys()
+    {
+        // drop, add
+        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table1->setName('foo');
+        $table1->setColumn(Column::serial('id'));
+
+        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table2->setName('foo');
+        $table2->setColumn(Column::int('id'));
+
+        $this->assertSame(['ALTER TABLE `foo` CHANGE COLUMN `id` `id` int NOT NULL, DROP PRIMARY KEY;'], $table1->buildAlter($table2));
+        $this->assertSame(['ALTER TABLE `foo` CHANGE COLUMN `id` `id` int UNSIGNED NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (`id`);'], $table2->buildAlter($table1));
+
+        $this->database->execute($table1->buildCreate());
+        foreach ($table1->buildAlter($table2) as $query) {
+            $this->database->execute($query);
+        }
+        $this->database->execute($table1->buildDrop());
+
+        $this->database->execute($table2->buildCreate());
+        foreach ($table2->buildAlter($table1) as $query) {
+            $this->database->execute($query);
+        }
+        $this->database->execute($table2->buildDrop());
+
+        // change
+        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table1->setName('foo');
+        $table1->setColumn(Column::serial('id'));
+
+        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table2->setName('foo');
+        $table2->setColumn(Column::serial('id2'));
+
+        $this->assertSame(['ALTER TABLE `foo` DROP COLUMN `id`, ADD COLUMN `id2` int UNSIGNED NOT NULL AUTO_INCREMENT, DROP PRIMARY KEY, ADD PRIMARY KEY (`id2`);'], $table1->buildAlter($table2));
+        $this->assertSame(['ALTER TABLE `foo` DROP COLUMN `id2`, ADD COLUMN `id` int UNSIGNED NOT NULL AUTO_INCREMENT, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);'], $table2->buildAlter($table1));
+
+        $this->database->execute($table1->buildCreate());
+        foreach ($table1->buildAlter($table2) as $query) {
+            $this->database->execute($query);
+        }
+        $this->database->execute($table1->buildDrop());
+
+        $this->database->execute($table2->buildCreate());
+        foreach ($table2->buildAlter($table1) as $query) {
+            $this->database->execute($query);
+        }
+        $this->database->execute($table2->buildDrop());
+    }
+
+    public function testBuildAlterUniqueKeys()
+    {
+        // drop, add
+        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table1->setName('foo');
+        $table1->setColumn(Column::int('id'));
+        $table1->setColumn(Column::int('id2'));
+        $table1->setUniqueKey('id', 'id2');
+
+        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table2->setName('foo');
+        $table2->setColumn(Column::int('id'));
+        $table2->setColumn(Column::int('id2'));
+
+        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `unique-id-id2`;'], $table1->buildAlter($table2));
+        $this->assertSame(['ALTER TABLE `foo` ADD CONSTRAINT `unique-id-id2` UNIQUE (`id`, `id2`);'], $table2->buildAlter($table1));
+
+        $this->database->execute($table1->buildCreate());
+        foreach ($table1->buildAlter($table2) as $query) {
+            $this->database->execute($query);
+        }
+        $this->database->execute($table1->buildDrop());
+
+        $this->database->execute($table2->buildCreate());
+        foreach ($table2->buildAlter($table1) as $query) {
+            $this->database->execute($query);
+        }
+        $this->database->execute($table2->buildDrop());
+
+        // change
+        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table1->setName('foo');
+        $table1->setColumn(Column::int('id'));
+        $table1->setColumn(Column::int('id2'));
+        $table1->setUniqueKey('id', 'id2');
+
+        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table2->setName('foo');
+        $table2->setColumn(Column::int('id'));
+        $table2->setColumn(Column::int('id2'));
+        $table2->setUniqueKeyWithName('unique-id-id2', 'id');
+
+        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `unique-id-id2`, ADD CONSTRAINT `unique-id-id2` UNIQUE (`id`);'], $table1->buildAlter($table2));
+        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `unique-id-id2`, ADD CONSTRAINT `unique-id-id2` UNIQUE (`id`, `id2`);'], $table2->buildAlter($table1));
+
+        $this->database->execute($table1->buildCreate());
+        foreach ($table1->buildAlter($table2) as $query) {
+            $this->database->execute($query);
+        }
+        $this->database->execute($table1->buildDrop());
+
+        $this->database->execute($table2->buildCreate());
+        foreach ($table2->buildAlter($table1) as $query) {
+            $this->database->execute($query);
+        }
+        $this->database->execute($table2->buildDrop());
+    }
+
+    public function testBuildAlterIndexes()
+    {
+        // drop, add
+        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table1->setName('foo');
+        $table1->setColumn(Column::int('id'));
+        $table1->setColumn(Column::int('id2'));
+        $table1->setIndex('id', 'id2');
+
+        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table2->setName('foo');
+        $table2->setColumn(Column::int('id'));
+        $table2->setColumn(Column::int('id2'));
+
+        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `index-id-id2`;'], $table1->buildAlter($table2));
+        $this->assertSame(['ALTER TABLE `foo` ADD INDEX `index-id-id2` (`id`, `id2`);'], $table2->buildAlter($table1));
+
+        $this->database->execute($table1->buildCreate());
+        foreach ($table1->buildAlter($table2) as $query) {
+            $this->database->execute($query);
+        }
+        $this->database->execute($table1->buildDrop());
+
+        $this->database->execute($table2->buildCreate());
+        foreach ($table2->buildAlter($table1) as $query) {
+            $this->database->execute($query);
+        }
+        $this->database->execute($table2->buildDrop());
+
+        // change
+        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table1->setName('foo');
+        $table1->setColumn(Column::int('id'));
+        $table1->setColumn(Column::int('id2'));
+        $table1->setIndex('id', 'id2');
+
+        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table2->setName('foo');
+        $table2->setColumn(Column::int('id'));
+        $table2->setColumn(Column::int('id2'));
+        $table2->setIndexWithName('index-id-id2', 'id');
+
+        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `index-id-id2`, ADD INDEX `index-id-id2` (`id`);'], $table1->buildAlter($table2));
+        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `index-id-id2`, ADD INDEX `index-id-id2` (`id`, `id2`);'], $table2->buildAlter($table1));
+
+        $this->database->execute($table1->buildCreate());
+        foreach ($table1->buildAlter($table2) as $query) {
+            $this->database->execute($query);
+        }
+        $this->database->execute($table1->buildDrop());
+
+        $this->database->execute($table2->buildCreate());
+        foreach ($table2->buildAlter($table1) as $query) {
+            $this->database->execute($query);
+        }
+        $this->database->execute($table2->buildDrop());
+    }
+
+    public function testBuildAlterForeignKeys()
+    {
+        // drop, add
+        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table1->setName('foo');
+        $table1->setColumn(Column::int('id')->setUnsigned());
+        $table1->setColumn(Column::int('id2'));
+        $table1->setForeignKey('id', 'bar');
+
+        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table2->setName('foo');
+        $table2->setColumn(Column::int('id')->setUnsigned());
+        $table2->setColumn(Column::int('id2'));
+
+        $bar = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $bar->setName('bar');
+        $bar->setColumn(Column::serial('id'));
+
+        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `foo_ibfk_1`, DROP FOREIGN KEY `foo_ibfk_1`;'], $table1->buildAlter($table2));
+        $this->assertSame(['ALTER TABLE `foo` ADD INDEX `foo_ibfk_1` (`id`), ADD CONSTRAINT `foo_ibfk_1` FOREIGN KEY (`id`) REFERENCES `bar` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT;'], $table2->buildAlter($table1));
+
+        $this->database->execute($bar->buildCreate());
+
+        $this->database->execute($table1->buildCreate());
+        foreach ($table1->buildAlter($table2) as $query) {
+            $this->database->execute($query);
+        }
+        $this->database->execute($table1->buildDrop());
+
+        $this->database->execute($table2->buildCreate());
+        foreach ($table2->buildAlter($table1) as $query) {
+            $this->database->execute($query);
+        }
+        $this->database->execute($table2->buildDrop());
+
+        // change
+        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table1->setName('foo');
+        $table1->setColumn(Column::int('id')->setUnsigned());
+        $table1->setColumn(Column::int('id2')->setUnsigned());
+        $table1->setForeignKey('id', 'bar');
+
+        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table2->setName('foo');
+        $table2->setColumn(Column::int('id')->setUnsigned());
+        $table2->setColumn(Column::int('id2')->setUnsigned());
+        $table2->setForeignKey('id2', 'bar', 'id');
+
+        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `foo_ibfk_1`, ADD INDEX `foo_ibfk_1` (`id2`), DROP FOREIGN KEY `foo_ibfk_1`;', 'ALTER TABLE `foo` ADD CONSTRAINT `foo_ibfk_1` FOREIGN KEY (`id2`) REFERENCES `bar` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT;'], $table1->buildAlter($table2));
+        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `foo_ibfk_1`, ADD INDEX `foo_ibfk_1` (`id`), DROP FOREIGN KEY `foo_ibfk_1`;', 'ALTER TABLE `foo` ADD CONSTRAINT `foo_ibfk_1` FOREIGN KEY (`id`) REFERENCES `bar` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT;'], $table2->buildAlter($table1));
+
+        $this->database->execute($table1->buildCreate());
+        foreach ($table1->buildAlter($table2) as $query) {
+            $this->database->execute($query);
+        }
+        $this->database->execute($table1->buildDrop());
+
+        $this->database->execute($table2->buildCreate());
+        foreach ($table2->buildAlter($table1) as $query) {
+            $this->database->execute($query);
+        }
+        $this->database->execute($table2->buildDrop());
+
+        $this->database->execute($bar->buildDrop());
     }
 }

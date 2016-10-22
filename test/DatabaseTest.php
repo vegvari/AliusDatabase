@@ -78,7 +78,6 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     public function testExecute()
     {
         $db = new Database($this->writer, $this->reader);
-        $db->execute('DROP TABLE IF EXISTS test');
         $db->execute('CREATE TABLE test (test_id INT UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY (test_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8');
 
         $db->execute('INSERT INTO test (test_id) VALUES (NULL)');
@@ -87,6 +86,8 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         $statement = $db->execute('SELECT test_id FROM test');
         $statement->setFetchMode(\PDO::FETCH_ASSOC);
         $this->assertSame([['test_id' => 1]], $statement->fetchAll());
+
+        $db->execute('DROP TABLE test');
     }
 
     public function testTable()
