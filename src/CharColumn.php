@@ -1,6 +1,6 @@
 <?php
 
-namespace Alius\Database;
+namespace Alius\Database\MySQL;
 
 class CharColumn extends TextColumn
 {
