@@ -9,7 +9,6 @@ class Connection
         \PDO::ATTR_ORACLE_NULLS       => \PDO::NULL_EMPTY_STRING,
         \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
         \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET GLOBAL time_zone="UTC", time_zone="UTC"',
-
     ];
 
     protected $dsn;

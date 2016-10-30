@@ -704,8 +704,14 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $table2->setColumn(Column::int('id2')->setUnsigned());
         $table2->setForeignKey('id2', 'bar', 'id');
 
-        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `foo_ibfk_1`, ADD INDEX `foo_ibfk_1` (`id2`), DROP FOREIGN KEY `foo_ibfk_1`;', 'ALTER TABLE `foo` ADD CONSTRAINT `foo_ibfk_1` FOREIGN KEY (`id2`) REFERENCES `bar` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT;'], $table1->buildAlter($table2));
-        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `foo_ibfk_1`, ADD INDEX `foo_ibfk_1` (`id`), DROP FOREIGN KEY `foo_ibfk_1`;', 'ALTER TABLE `foo` ADD CONSTRAINT `foo_ibfk_1` FOREIGN KEY (`id`) REFERENCES `bar` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT;'], $table2->buildAlter($table1));
+        $this->assertSame([
+            'ALTER TABLE `foo` DROP INDEX `foo_ibfk_1`, ADD INDEX `foo_ibfk_1` (`id2`), DROP FOREIGN KEY `foo_ibfk_1`;',
+            'ALTER TABLE `foo` ADD CONSTRAINT `foo_ibfk_1` FOREIGN KEY (`id2`) REFERENCES `bar` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT;'
+        ], $table1->buildAlter($table2));
+        $this->assertSame([
+            'ALTER TABLE `foo` DROP INDEX `foo_ibfk_1`, ADD INDEX `foo_ibfk_1` (`id`), DROP FOREIGN KEY `foo_ibfk_1`;',
+            'ALTER TABLE `foo` ADD CONSTRAINT `foo_ibfk_1` FOREIGN KEY (`id`) REFERENCES `bar` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT;'
+        ], $table2->buildAlter($table1));
 
         $this->database->execute($table1->buildCreate());
         foreach ($table1->buildAlter($table2) as $query) {

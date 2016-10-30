@@ -185,6 +185,17 @@ class Database
         return $this->tables;
     }
 
+    public function getAllTables(): array
+    {
+        foreach ($this->tables as $table_class => $table) {
+            if ($table === null) {
+                $this->getTable($table_class);
+            }
+        }
+
+        return $this->getTables();
+    }
+
     public function getTableByName(string $table_name): Table
     {
         if (! $this->hasTableByName($table_name)) {
@@ -201,12 +212,7 @@ class Database
 
     public function getTableNames(): array
     {
-        foreach ($this->tables as $table_class => $table) {
-            if ($table === null) {
-                $this->getTable($table_class);
-            }
-        }
-
+        $this->getAllTables();
         return $this->table_names;
     }
 }

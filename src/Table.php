@@ -129,20 +129,25 @@ class Table
         return isset($this->getColumns()[$name]);
     }
 
-    public function setPrimaryKey(string ...$columns): self
+    public function setPrimaryKeyObject(PrimaryKey $primary_key): self
     {
         if ($this->hasPrimaryKey()) {
             throw new TableException(sprintf('Primary key is already defined for table "%s"', $this->getName()));
         }
 
-        foreach ($columns as $column) {
+        foreach ($primary_key->getColumns() as $column) {
             if (! $this->hasColumn($column)) {
                 throw new TableException(sprintf('Column is not defined: "%s"', $column));
             }
         }
 
-        $this->primary_key = new PrimaryKey($columns);
+        $this->primary_key = $primary_key;
         return $this;
+    }
+
+    public function setPrimaryKey(string ...$columns): self
+    {
+        return $this->setPrimaryKeyObject(new PrimaryKey($columns));
     }
 
     public function getPrimaryKey(): PrimaryKey
@@ -165,20 +170,25 @@ class Table
         return $this->hasPrimaryKey() && $this->getPrimaryKey()->isComposite();
     }
 
-    public function setUniqueKeyWithName(string $name, string ...$columns): self
+    public function setUniqueKeyObject(UniqueKey $unique_key): self
     {
-        if ($this->hasUniqueKey($name)) {
-            throw new TableException(sprintf('Unique key "%s" is already defined for table "%s"', $name, $this->getName()));
+        if ($this->hasUniqueKey($unique_key->getName())) {
+            throw new TableException(sprintf('Unique key "%s" is already defined for table "%s"', $unique_key->getName(), $this->getName()));
         }
 
-        foreach ($columns as $column) {
+        foreach ($unique_key->getColumns() as $column) {
             if (! $this->hasColumn($column)) {
                 throw new TableException(sprintf('Column is not defined: "%s"', $column));
             }
         }
 
-        $this->unique_key[$name] = new UniqueKey($name, $columns);
+        $this->unique_key[$unique_key->getName()] = $unique_key;
         return $this;
+    }
+
+    public function setUniqueKeyWithName(string $name, string ...$columns): self
+    {
+        return $this->setUniqueKeyObject(new UniqueKey($name, $columns));
     }
 
     public function setUniqueKey(string ...$columns): self
@@ -209,20 +219,25 @@ class Table
         return $this->unique_key !== [];
     }
 
-    public function setIndexWithName(string $name, string ...$columns): self
+    public function setIndexObject(Index $index): self
     {
-        if ($this->hasIndex($name)) {
-            throw new TableException(sprintf('Index "%s" is already defined for table "%s"', $name, $this->getName()));
+        if ($this->hasIndex($index->getName())) {
+            throw new TableException(sprintf('Index "%s" is already defined for table "%s"', $index->getName(), $this->getName()));
         }
 
-        foreach ($columns as $column) {
+        foreach ($index->getColumns() as $column) {
             if (! $this->hasColumn($column)) {
                 throw new TableException(sprintf('Column is not defined: "%s"', $column));
             }
         }
 
-        $this->index[$name] = new Index($name, $columns);
+        $this->index[$index->getName()] = $index;
         return $this;
+    }
+
+    public function setIndexWithName(string $name, string ...$columns): self
+    {
+        return $this->setIndexObject(new Index($name, $columns));
     }
 
     public function setIndex(string ...$columns): self
@@ -267,27 +282,31 @@ class Table
         return $this->getIndexWithColumns(...$columns) !== null;
     }
 
-    public function setForeignKeyWithName(string $name, $columns, string $parent_table, $parent_columns = null, string $on_update = 'RESTRICT', string $on_delete = 'RESTRICT'): self
+    public function setForeignKeyObject(ForeignKey $foreign_key): self
     {
         if ($this->getEngine() === 'TEMPORARY') {
             throw new TableException('Temporary tables can\'t have foreign key');
         }
 
-        if ($this->hasForeignKey($name)) {
-            throw new TableException(sprintf('Foreign key is already defined: "%s"', $name));
+        if ($this->hasForeignKey($foreign_key->getName())) {
+            throw new TableException(sprintf('Foreign key is already defined: "%s"', $foreign_key->getName()));
         }
 
-        $columns = is_array($columns) ? $columns : [$columns];
-        foreach ($columns as $column) {
+        foreach ($foreign_key->getColumns() as $column) {
             if (! $this->hasColumn($column)) {
                 throw new TableException(sprintf('Column is not defined: "%s"', $column));
             }
         }
 
-        $this->foreign_key[$name] = new ForeignKey($name, $columns, $parent_table, $parent_columns, $on_update, $on_delete);
-        $this->setIndexWithName($name, ...$columns);
+        $this->foreign_key[$foreign_key->getName()] = $foreign_key;
+        $this->setIndexWithName($foreign_key->getName(), ...$foreign_key->getColumns());
 
         return $this;
+    }
+
+    public function setForeignKeyWithName(string $name, $columns, string $parent_table, $parent_columns = null, string $on_update = 'RESTRICT', string $on_delete = 'RESTRICT'): self
+    {
+        return $this->setForeignKeyObject(new ForeignKey($name, $columns, $parent_table, $parent_columns, $on_update, $on_delete));
     }
 
     public function setForeignKey($columns, string $parent_table, $parent_columns = null, string $on_update = 'RESTRICT', string $on_delete = 'RESTRICT'): self
@@ -508,6 +527,6 @@ class Table
             return [sprintf('ALTER TABLE `%s` %s;', $this->getName(), implode(', ', array_merge($build, $drop_foreign_key, $add_foreign_key)))];
         }
 
-        return [];
+        return $build;
     }
 }
