@@ -100,8 +100,8 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new IntColumnsFixture($db->getName(), $db->getEngine(), $db->getCharset(), $db->getCollation()), $db->getTable(IntColumnsFixture::class));
         $this->assertSame(true, $db->hasTableByName('int_columns'));
         $this->assertSame($db->getTable(IntColumnsFixture::class), $db->getTableByName('int_columns'));
-        $this->assertSame(['Alius\Database\IntColumnsFixture' => $db->getTable(IntColumnsFixture::class)], $db->getTables());
-        $this->assertSame(['int_columns' => 'Alius\Database\IntColumnsFixture'], $db->getTableNames());
+        $this->assertSame(['Alius\Database\MySQL\IntColumnsFixture' => $db->getTable(IntColumnsFixture::class)], $db->getTables());
+        $this->assertSame(['int_columns' => 'Alius\Database\MySQL\IntColumnsFixture'], $db->getTableNames());
     }
 
     public function testSetNonExistingTableClass()
