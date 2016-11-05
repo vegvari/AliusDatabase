@@ -2,729 +2,514 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\TableException;
+use Alius\Database\SchemaException;
+
+class TableTestTableFixtureInvalidName extends Table
+{
+}
+
 class TableTest extends \PHPUnit_Framework_TestCase
 {
-    use ConnectionTrait;
-
-    protected $database;
-
-    public function setUp()
+    public function testDefaults()
     {
-        $this->database = new Database(new Connection(sprintf('host=%s', $this->getHost()), $this->getUser(), $this->getPassword(), $this->getDatabase()));
-    }
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
 
-    public function testDatabaseName()
-    {
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $this->assertSame('test', $table->getDatabaseName());
-    }
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
 
-    public function testName()
-    {
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $this->assertSame('', $table->getName());
-        $table->setName('foo');
-        $this->assertSame('foo', $table->getName());
-    }
-
-    public function testEngine()
-    {
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $this->assertSame('bar', $table::getName());
+        $this->assertSame('foo', $table->getDatabaseName());
         $this->assertSame('InnoDB', $table->getEngine());
-        $table->setEngine('MyISAM');
-        $this->assertSame('MyISAM', $table->getEngine());
-    }
-
-    public function testCharset()
-    {
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $this->assertSame('utf8', $table->getCharset());
-        $table->setCharset('latin1');
-        $this->assertSame('latin1', $table->getCharset());
-    }
-
-    public function testCollation()
-    {
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
         $this->assertSame('utf8_general_ci', $table->getCollation());
-        $table->setCollation('latin1_bin');
+        $this->assertSame(false, $table->hasColumn());
+        $this->assertSame(false, $table->hasColumn('foobar'));
+        $this->assertSame([], $table->getColumns());
+        $this->assertSame(false, $table->hasPrimaryKey());
+        $this->assertSame(false, $table->hasCompositePrimaryKey());
+        $this->assertSame(false, $table->hasUniqueKey());
+        $this->assertSame(false, $table->hasUniqueKey('foobar'));
+        $this->assertSame([], $table->getUniqueKeys());
+        $this->assertSame(false, $table->hasIndex());
+        $this->assertSame(false, $table->hasIndex('foobar'));
+        $this->assertSame(false, $table->hasIndexWithColumns('foobar'));
+        $this->assertSame([], $table->getIndexes());
+        $this->assertSame(false, $table->hasForeignKey());
+        $this->assertSame(false, $table->hasForeignKey('foobar'));
+        $this->assertSame([], $table->getForeignKeys());
+
+        $database = new class() extends Database {
+            const NAME = 'foo';
+
+            protected function setUp()
+            {
+                $this->setEngine('MyISAM');
+                $this->setCharset('latin1');
+                $this->setCollation('latin1_bin');
+            }
+        };
+
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
+
+        $this->assertSame('bar', $table::getName());
+        $this->assertSame('MyISAM', $table->getEngine());
+        $this->assertSame('latin1', $table->getCharset());
         $this->assertSame('latin1_bin', $table->getCollation());
     }
 
-    public function testComment()
+    public function testSetters()
     {
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $this->assertSame(false, $table->hasComment());
-        $this->assertSame('', $table->getComment());
-        $table->setComment('bar');
-        $this->assertSame(true, $table->hasComment());
-        $this->assertSame('bar', $table->getComment());
-    }
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
 
-    public function testColumns()
-    {
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
 
-        $this->assertSame([], $table->getColumns());
-        $this->assertSame(false, $table->hasColumn('id'));
+        $table->setEngine('MyISAM');
+        $this->assertSame('MyISAM', $table->getEngine());
 
-        $column = Column::int('id');
+        $table->setCharset('latin1');
+        $this->assertSame('latin1', $table->getCharset());
+
+        $table->setCollation('latin1_bin');
+        $this->assertSame('latin1_bin', $table->getCollation());
+
+        $column = Column::int('foobar');
         $table->setColumn($column);
-        $this->assertSame(['id' => $column], $table->getColumns());
-        $this->assertSame(true, $table->hasColumn('id'));
-        $this->assertSame($column, $table->getColumn('id'));
-    }
+        $this->assertSame(true, $table->hasColumn());
+        $this->assertSame(true, $table->hasColumn('foobar'));
+        $this->assertSame($column, $table->getColumn('foobar'));
+        $this->assertSame(['foobar' => $column], $table->getColumns());
 
-    public function testSetColumnFail()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setColumn(Column::int('id'));
-        $table->setColumn(Column::int('id'));
-    }
-
-    public function testGetColumnFail()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->getColumn('id');
-    }
-
-    public function testPrimaryKey()
-    {
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $this->assertSame(false, $table->hasPrimaryKey());
-        $this->assertSame(false, $table->hasSimplePrimaryKey());
+        $table->setPrimaryKey('foobar');
+        $this->assertSame(true, $table->hasPrimaryKey());
         $this->assertSame(false, $table->hasCompositePrimaryKey());
+        $this->assertEquals(new PrimaryKey('foobar'), $table->getPrimaryKey());
 
-        // simple
-        $table->setColumn(Column::int('id'));
-        $table->setPrimaryKey('id');
-        $this->assertSame(true, $table->hasPrimaryKey());
-        $this->assertSame(true, $table->hasSimplePrimaryKey());
-        $this->assertSame(false, $table->hasCompositePrimaryKey());
-
-        // composite
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setColumn(Column::int('id'));
-        $table->setColumn(Column::int('id2'));
-        $table->setPrimaryKey('id', 'id2');
-        $this->assertSame(true, $table->hasPrimaryKey());
-        $this->assertSame(false, $table->hasSimplePrimaryKey());
-        $this->assertSame(true, $table->hasCompositePrimaryKey());
-    }
-
-    public function testPrimaryKeySetTwice()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setColumn(Column::int('id'));
-        $table->setPrimaryKey('id');
-        $table->setPrimaryKey('id');
-    }
-
-    public function testPrimaryKeySetNotDefinedColumn()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setPrimaryKey('id');
-    }
-
-    public function testPrimaryKeyAutoIncrement()
-    {
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setColumn(Column::serial('id'));
-        $this->assertSame(true, $table->hasPrimaryKey());
-        $this->assertSame(true, $table->hasSimplePrimaryKey());
-    }
-
-    public function testUniqueKey()
-    {
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $this->assertSame(false, $table->hasUniqueKey());
-        $this->assertSame(false, $table->hasUniqueKey('unique-id'));
-        $this->assertSame([], $table->getUniqueKeys());
-
-        $table->setColumn(Column::int('id'));
-        $table->setUniqueKey('id');
-        $table->setColumn(Column::int('id2'));
+        $table->setUniqueKey('foobar');
         $this->assertSame(true, $table->hasUniqueKey());
-        $this->assertSame(true, $table->hasUniqueKey('unique-id'));
-        $this->assertEquals(new UniqueKey('unique-id', ['id']), $table->getUniqueKey('unique-id'));
+        $this->assertSame(true, $table->hasUniqueKey('unique-foobar'));
+        $this->assertEquals(new UniqueKey('unique-foobar', 'foobar'), $table->getUniqueKey('unique-foobar'));
+        $this->assertEquals(['unique-foobar' => new UniqueKey('unique-foobar', 'foobar')], $table->getUniqueKeys());
 
-        $table->setUniqueKey('id2');
-        $this->assertSame(true, $table->hasUniqueKey('unique-id2'));
-        $this->assertEquals(new UniqueKey('unique-id2', ['id2']), $table->getUniqueKey('unique-id2'));
-        $this->assertSame(['unique-id' => $table->getUniqueKey('unique-id'), 'unique-id2' => $table->getUniqueKey('unique-id2')], $table->getUniqueKeys());
-
-        $table->setUniqueKeyWithName('foo', 'id');
-        $this->assertSame(true, $table->hasUniqueKey('foo'));
-        $this->assertEquals(new UniqueKey('foo', ['id']), $table->getUniqueKey('foo'));
-        $this->assertSame(['unique-id' => $table->getUniqueKey('unique-id'), 'unique-id2' => $table->getUniqueKey('unique-id2'), 'foo' => $table->getUniqueKey('foo')], $table->getUniqueKeys());
-    }
-
-    public function testGetNotDefinedUniqueKey()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->getUniqueKey('foo');
-    }
-
-    public function testUniqueKeySetTwice()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setColumn(Column::int('id'));
-        $table->setUniqueKeyWithName('id', 'id');
-        $table->setUniqueKeyWithName('id', 'id');
-    }
-
-    public function testUniqueKeySetNotDefinedColumn()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setUniqueKey('id');
-    }
-
-    public function testIndex()
-    {
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $this->assertSame(false, $table->hasIndex());
-        $this->assertSame(false, $table->hasIndex('index-id'));
-        $this->assertSame(false, $table->hasIndexWithColumns('id'));
-        $this->assertSame([], $table->getIndexes());
-
-        // simple
-        $table->setColumn(Column::int('id'));
-        $table->setIndex('id');
+        $table->setIndex('foobar');
         $this->assertSame(true, $table->hasIndex());
-        $this->assertSame(true, $table->hasIndex('index-id'));
-        $this->assertSame(true, $table->hasIndexWithColumns('id'));
-        $this->assertEquals(new Index('index-id', ['id']), $table->getIndex('index-id'));
-        $this->assertSame(['index-id' => $table->getIndex('index-id')], $table->getIndexes());
+        $this->assertSame(true, $table->hasIndex('index-foobar'));
+        $this->assertSame(true, $table->hasIndexWithColumns('foobar'));
+        $this->assertEquals(new Index('index-foobar', 'foobar'), $table->getIndex('index-foobar'));
+        $this->assertEquals(['index-foobar' => new Index('index-foobar', 'foobar')], $table->getIndexes());
 
-        // composite
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setName('foo');
-        $table->setColumn(Column::int('id'));
-        $table->setColumn(Column::int('id2'));
-        $table->setIndex('id', 'id2');
-        $this->assertSame(true, $table->hasIndex());
-        $this->assertSame(true, $table->hasIndex('index-id-id2'));
-        $this->assertSame(true, $table->hasIndexWithColumns('id', 'id2'));
-        $this->assertSame(['index-id-id2' => $table->getIndex('index-id-id2')], $table->getIndexes());
-    }
-
-    public function testGetNotDefinedIndex()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->getIndex('foo');
-    }
-
-    public function testIndexSetTwice()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setColumn(Column::int('id'));
-        $table->setIndexWithName('id', 'id');
-        $table->setIndexWithName('id', 'id');
-    }
-
-    public function testIndexSetNotDefinedColumn()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setIndex('id');
-    }
-
-    public function testDefineIndexWithSameColumn()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setIndex('id');
-        $table->setIndex('id');
-    }
-
-    public function testForeignKey()
-    {
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setName('foo');
-        $this->assertSame(false, $table->hasForeignKey());
-        $this->assertSame(false, $table->hasForeignKey('foo_ibfk_1'));
-        $this->assertSame([], $table->getForeignKeys());
-
-        // simple
-        $table->setColumn(Column::int('id'));
-        $table->setForeignKey('id', 'foo', 'id');
+        $table->setForeignKey('foobar', 'parent');
         $this->assertSame(true, $table->hasForeignKey());
-        $this->assertSame(true, $table->hasForeignKey('foo_ibfk_1'));
-        $this->assertSame(true, $table->hasIndex('foo_ibfk_1'));
-        $this->assertEquals(new ForeignKey('foo_ibfk_1', 'id', 'foo', 'id'), $table->getForeignKey('foo_ibfk_1'));
-        $this->assertSame(['foo_ibfk_1' => $table->getForeignKey('foo_ibfk_1')], $table->getForeignKeys());
+        $this->assertSame(true, $table->hasForeignKey('bar_ibfk_1'));
+        $this->assertEquals(new ForeignKey('bar_ibfk_1', 'foobar', 'parent'), $table->getForeignKey('bar_ibfk_1'));
+        $this->assertEquals(['bar_ibfk_1' => new ForeignKey('bar_ibfk_1', 'foobar', 'parent')], $table->getForeignKeys());
 
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setName('foo');
-        $table->setColumn(Column::int('id'));
-        $table->setForeignKey('id', 'foo');
-        $this->assertSame(['foo_ibfk_1' => $table->getForeignKey('foo_ibfk_1')], $table->getForeignKeys());
+        // foreign key adds a new index if there is no index with the same columns
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
 
-        // composite
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setName('foo');
-        $table->setColumn(Column::int('id'));
-        $table->setColumn(Column::int('id2'));
-        $table->setForeignKey(['id', 'id2'], 'foo');
-        $this->assertSame(true, $table->hasForeignKey());
-        $this->assertSame(true, $table->hasForeignKey('foo_ibfk_1'));
-        $this->assertSame(true, $table->hasIndex('foo_ibfk_1'));
-        $this->assertSame(['foo_ibfk_1' => $table->getForeignKey('foo_ibfk_1')], $table->getForeignKeys());
+        $table->setColumn(Column::int('foobar'));
+        $table->setForeignKey('foobar', 'parent');
+        $this->assertSame(true, $table->hasIndex('bar_ibfk_1'));
     }
 
-    public function testForeignKeyCatchErrorOnDuplicatedIndex()
+    public function testInvalidNameConstructor()
     {
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setName('foo');
-        $table->setColumn(Column::int('id'));
-        $table->setIndex('id');
-        $table->setForeignKey('id', 'foo', 'id');
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::TABLE_INVALID_NAME);
+
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
+
+        $test = new class($database) extends Table {
+        };
     }
 
-    public function testGetNotDefinedForeignKey()
+    public function testInvalidNameGetName()
     {
-        $this->expectException(TableException::class);
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->getForeignKey('foo');
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::TABLE_INVALID_NAME);
+
+        TableTestTableFixtureInvalidName::getName();
     }
 
-    public function testSetForeignKeyTwice()
+    public function testSetColumnAlreadySet()
     {
-        $this->expectException(TableException::class);
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setColumn(Column::int('id'));
-        $table->setForeignKeyWithName('bar', 'id', 'foo');
-        $table->setForeignKeyWithName('bar', 'id', 'foo');
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::TABLE_COLUMN_ALREADY_SET);
+
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
+
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
+
+        $table->setColumn(Column::int('foobar'));
+        $table->setColumn(Column::int('foobar'));
     }
 
-    public function testForeignKeyOnTempTable()
-    {
-        $this->expectException(TableException::class);
-        $table = new Table('test', 'TEMPORARY', 'utf8', 'utf8_general_ci');
-        $table->setColumn(Column::int('id'));
-        $table->setForeignKeyWithName('bar', 'id', 'foo');
-    }
-
-    public function testForeignKeySetNotDefinedColumn()
+    public function testGetColumnNotSet()
     {
         $this->expectException(TableException::class);
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setForeignKey('id', 'foo', 'id');
+        $this->expectExceptionCode(TableException::TABLE_COLUMN_NOT_SET);
+
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
+
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
+
+        $table->getColumn('foobar');
     }
 
-    public function testPrimaryKeyBuildCreate()
+    public function testSetPrimaryKeyAlradySet()
     {
-        // no primary key
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setName('foo');
-        $table->setComment('no primary key'); // but there is a comment
-        $table->setColumn(Column::int('id'));
-        $this->assertSame('CREATE TABLE `foo` (`id` int NOT NULL) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci COMMENT="no primary key";', $table->buildCreate());
-        $this->database->execute($table->buildCreate());
-        $this->database->execute($table->buildDrop());
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::TABLE_PRIMARY_KEY_ALREADY_SET);
 
-        // simple primary key
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setName('foo');
-        $table->setColumn(Column::serial('id'));
-        $this->assertSame('CREATE TABLE `foo` (`id` int UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
-        $this->database->execute($table->buildCreate());
-        $this->database->execute($table->buildDrop());
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
 
-        // composite primary key
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setName('foo');
-        $table->setColumn(Column::int('id'));
-        $table->setColumn(Column::int('id2'));
-        $table->setPrimaryKey('id', 'id2');
-        $this->assertSame('CREATE TABLE `foo` (`id` int NOT NULL, `id2` int NOT NULL, PRIMARY KEY (`id`, `id2`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
-        $this->database->execute($table->buildCreate());
-        $this->database->execute($table->buildDrop());
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
+
+        $table->setColumn(Column::int('foobar'));
+        $table->setPrimaryKey('foobar');
+        $table->setPrimaryKey('foobar');
     }
 
-    public function testUniqueKeyBuildCreate()
+    public function testSetPrimaryKeyColumnNotSet()
     {
-        // simple
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setName('foo');
-        $table->setColumn(Column::int('id'));
-        $table->setUniqueKey('id');
-        $this->assertSame('CREATE TABLE `foo` (`id` int NOT NULL, UNIQUE KEY `unique-id` (`id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
-        $this->database->execute($table->buildCreate());
-        $this->database->execute($table->buildDrop());
+        $this->expectException(TableException::class);
+        $this->expectExceptionCode(TableException::TABLE_COLUMN_NOT_SET);
 
-        // composite
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setName('foo');
-        $table->setColumn(Column::int('id'));
-        $table->setColumn(Column::int('id2'));
-        $table->setUniqueKey('id');
-        $this->assertSame('CREATE TABLE `foo` (`id` int NOT NULL, `id2` int NOT NULL, UNIQUE KEY `unique-id` (`id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
-        $this->database->execute($table->buildCreate());
-        $this->database->execute($table->buildDrop());
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
+
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
+
+        $table->setPrimaryKey('foobar');
     }
 
-    public function testIndexBuildCreate()
+    public function testGetPrimaryKeyNotSet()
     {
-        // simple
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setName('foo');
-        $table->setColumn(Column::int('id'));
-        $table->setIndex('id');
-        $this->assertSame('CREATE TABLE `foo` (`id` int NOT NULL, KEY `index-id` (`id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
-        $this->database->execute($table->buildCreate());
-        $this->database->execute($table->buildDrop());
+        $this->expectException(TableException::class);
+        $this->expectExceptionCode(TableException::TABLE_PRIMARY_KEY_NOT_SET);
 
-        // composite
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setName('foo');
-        $table->setColumn(Column::int('id'));
-        $table->setColumn(Column::int('id2'));
-        $table->setIndex('id');
-        $this->assertSame('CREATE TABLE `foo` (`id` int NOT NULL, `id2` int NOT NULL, KEY `index-id` (`id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table->buildCreate());
-        $this->database->execute($table->buildCreate());
-        $this->database->execute($table->buildDrop());
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
+
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
+
+        $table->getPrimaryKey();
     }
 
-    public function testForeignKeyBuildCreate()
+    public function testSetUniqueKeyAlradySet()
     {
-        // simple
-        $table_a = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table_a->setName('a');
-        $table_a->setColumn(Column::serial('a_id'));
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::TABLE_UNIQUE_KEY_ALREADY_SET);
 
-        $this->assertSame('CREATE TABLE `a` (`a_id` int UNSIGNED NOT NULL AUTO_INCREMENT, PRIMARY KEY (`a_id`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_a->buildCreate());
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
 
-        $table_b = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table_b->setName('b');
-        $table_b->setColumn(Column::serial('b_id'));
-        $table_b->setColumn(Column::int('a_id')->setUnsigned());
-        $table_b->setForeignKey('a_id', 'a');
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
 
-        $this->assertSame('CREATE TABLE `b` (`b_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id` int UNSIGNED NOT NULL, PRIMARY KEY (`b_id`), KEY `b_ibfk_1` (`a_id`), CONSTRAINT `b_ibfk_1` FOREIGN KEY (`a_id`) REFERENCES `a` (`a_id`) ON UPDATE RESTRICT ON DELETE RESTRICT) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_b->buildCreate());
-
-        $this->database->execute($table_a->buildCreate());
-        $this->database->execute($table_b->buildCreate());
-        $this->database->execute($table_b->buildDrop());
-        $this->database->execute($table_a->buildDrop());
-
-        // composite
-        $table_a = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table_a->setName('a');
-        $table_a->setColumn(Column::serial('a_id'));
-        $table_a->setColumn(Column::int('a_id2'));
-        $table_a->setIndex('a_id', 'a_id2'); // no composite foreign key without index in parent
-
-        $this->assertSame('CREATE TABLE `a` (`a_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id2` int NOT NULL, PRIMARY KEY (`a_id`), KEY `index-a_id-a_id2` (`a_id`, `a_id2`)) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_a->buildCreate());
-
-        $table_b = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table_b->setName('b');
-        $table_b->setColumn(Column::serial('b_id'));
-        $table_b->setColumn(Column::int('a_id')->setUnsigned());
-        $table_b->setColumn(Column::int('a_id2'));
-        $table_b->setForeignKey(['a_id', 'a_id2'], 'a');
-
-        $this->assertSame('CREATE TABLE `b` (`b_id` int UNSIGNED NOT NULL AUTO_INCREMENT, `a_id` int UNSIGNED NOT NULL, `a_id2` int NOT NULL, PRIMARY KEY (`b_id`), KEY `b_ibfk_1` (`a_id`, `a_id2`), CONSTRAINT `b_ibfk_1` FOREIGN KEY (`a_id`, `a_id2`) REFERENCES `a` (`a_id`, `a_id2`) ON UPDATE RESTRICT ON DELETE RESTRICT) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_general_ci;', $table_b->buildCreate());
-
-        $this->database->execute($table_a->buildCreate());
-        $this->database->execute($table_b->buildCreate());
-        $this->database->execute($table_b->buildDrop());
-        $this->database->execute($table_a->buildDrop());
+        $table->setColumn(Column::int('foobar'));
+        $table->setUniqueKey('foobar');
+        $table->setUniqueKey('foobar');
     }
 
-    public function testBuildDrop()
+    public function testSetUniqueKeyColumnNotSet()
     {
-        $table = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table->setName('foo');
-        $this->assertSame('DROP TABLE `foo`;', $table->buildDrop());
+        $this->expectException(TableException::class);
+        $this->expectExceptionCode(TableException::TABLE_COLUMN_NOT_SET);
+
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
+
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
+
+        $table->setUniqueKey('foobar');
     }
 
-    public function testBuildAlterColumns()
+    public function testGetUniqueKeyNotSet()
     {
-        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table1->setName('foo');
+        $this->expectException(TableException::class);
+        $this->expectExceptionCode(TableException::TABLE_UNIQUE_KEY_NOT_SET);
 
-        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table2->setName('foo');
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
 
-        // no change
-        $this->assertSame([], $table2->buildAlter($table1));
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
 
-        // drop, add
-        $table1->setColumn(Column::int('id'));
-        $this->assertSame(['ALTER TABLE `foo` DROP COLUMN `id`;'], $table1->buildAlter($table2));
-        $this->assertSame(['ALTER TABLE `foo` ADD COLUMN `id` int NOT NULL;'], $table2->buildAlter($table1));
-
-        // no change again
-        $table2->setColumn(Column::int('id'));
-        $this->assertSame([], $table1->buildAlter($table2));
-        $this->assertSame([], $table2->buildAlter($table1));
-
-        // change
-        $table1->setColumn(Column::int('id3')->setUnsigned());
-        $table2->setColumn(Column::int('id3'));
-        $this->assertSame(['ALTER TABLE `foo` CHANGE COLUMN `id3` `id3` int UNSIGNED NOT NULL;'], $table2->buildAlter($table1));
-        $this->assertSame(['ALTER TABLE `foo` CHANGE COLUMN `id3` `id3` int NOT NULL;'], $table1->buildAlter($table2));
-
-        // multiple
-        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table1->setName('foo');
-        $table1->setColumn(Column::int('id1'));
-        $table1->setColumn(Column::int('id2'));
-        $table1->setColumn(Column::int('id3'));
-
-        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table2->setName('foo');
-
-        $this->assertSame(['ALTER TABLE `foo` DROP COLUMN `id1`, DROP COLUMN `id2`, DROP COLUMN `id3`;'], $table1->buildAlter($table2));
-        $this->assertSame(['ALTER TABLE `foo` ADD COLUMN `id1` int NOT NULL, ADD COLUMN `id2` int NOT NULL AFTER `id1`, ADD COLUMN `id3` int NOT NULL AFTER `id2`;'], $table2->buildAlter($table1));
+        $table->getUniqueKey('foobar');
     }
 
-    public function testBuildAlterPrimaryKeys()
+    public function testSetIndexAlradySet()
     {
-        // drop, add
-        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table1->setName('foo');
-        $table1->setColumn(Column::serial('id'));
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::TABLE_INDEX_ALREADY_SET);
 
-        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table2->setName('foo');
-        $table2->setColumn(Column::int('id'));
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
 
-        $this->assertSame(['ALTER TABLE `foo` CHANGE COLUMN `id` `id` int NOT NULL, DROP PRIMARY KEY;'], $table1->buildAlter($table2));
-        $this->assertSame(['ALTER TABLE `foo` CHANGE COLUMN `id` `id` int UNSIGNED NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (`id`);'], $table2->buildAlter($table1));
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
 
-        $this->database->execute($table1->buildCreate());
-        foreach ($table1->buildAlter($table2) as $query) {
-            $this->database->execute($query);
-        }
-        $this->database->execute($table1->buildDrop());
-
-        $this->database->execute($table2->buildCreate());
-        foreach ($table2->buildAlter($table1) as $query) {
-            $this->database->execute($query);
-        }
-        $this->database->execute($table2->buildDrop());
-
-        // change
-        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table1->setName('foo');
-        $table1->setColumn(Column::serial('id'));
-
-        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table2->setName('foo');
-        $table2->setColumn(Column::serial('id2'));
-
-        $this->assertSame(['ALTER TABLE `foo` DROP COLUMN `id`, ADD COLUMN `id2` int UNSIGNED NOT NULL AUTO_INCREMENT, DROP PRIMARY KEY, ADD PRIMARY KEY (`id2`);'], $table1->buildAlter($table2));
-        $this->assertSame(['ALTER TABLE `foo` DROP COLUMN `id2`, ADD COLUMN `id` int UNSIGNED NOT NULL AUTO_INCREMENT, DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);'], $table2->buildAlter($table1));
-
-        $this->database->execute($table1->buildCreate());
-        foreach ($table1->buildAlter($table2) as $query) {
-            $this->database->execute($query);
-        }
-        $this->database->execute($table1->buildDrop());
-
-        $this->database->execute($table2->buildCreate());
-        foreach ($table2->buildAlter($table1) as $query) {
-            $this->database->execute($query);
-        }
-        $this->database->execute($table2->buildDrop());
+        $table->setColumn(Column::int('foobar'));
+        $table->setIndex('foobar');
+        $table->setIndex('foobar');
     }
 
-    public function testBuildAlterUniqueKeys()
+    public function testSetIndexColumnNotSet()
     {
-        // drop, add
-        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table1->setName('foo');
-        $table1->setColumn(Column::int('id'));
-        $table1->setColumn(Column::int('id2'));
-        $table1->setUniqueKey('id', 'id2');
+        $this->expectException(TableException::class);
+        $this->expectExceptionCode(TableException::TABLE_COLUMN_NOT_SET);
 
-        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table2->setName('foo');
-        $table2->setColumn(Column::int('id'));
-        $table2->setColumn(Column::int('id2'));
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
 
-        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `unique-id-id2`;'], $table1->buildAlter($table2));
-        $this->assertSame(['ALTER TABLE `foo` ADD CONSTRAINT `unique-id-id2` UNIQUE (`id`, `id2`);'], $table2->buildAlter($table1));
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
 
-        $this->database->execute($table1->buildCreate());
-        foreach ($table1->buildAlter($table2) as $query) {
-            $this->database->execute($query);
-        }
-        $this->database->execute($table1->buildDrop());
-
-        $this->database->execute($table2->buildCreate());
-        foreach ($table2->buildAlter($table1) as $query) {
-            $this->database->execute($query);
-        }
-        $this->database->execute($table2->buildDrop());
-
-        // change
-        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table1->setName('foo');
-        $table1->setColumn(Column::int('id'));
-        $table1->setColumn(Column::int('id2'));
-        $table1->setUniqueKey('id', 'id2');
-
-        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table2->setName('foo');
-        $table2->setColumn(Column::int('id'));
-        $table2->setColumn(Column::int('id2'));
-        $table2->setUniqueKeyWithName('unique-id-id2', 'id');
-
-        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `unique-id-id2`, ADD CONSTRAINT `unique-id-id2` UNIQUE (`id`);'], $table1->buildAlter($table2));
-        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `unique-id-id2`, ADD CONSTRAINT `unique-id-id2` UNIQUE (`id`, `id2`);'], $table2->buildAlter($table1));
-
-        $this->database->execute($table1->buildCreate());
-        foreach ($table1->buildAlter($table2) as $query) {
-            $this->database->execute($query);
-        }
-        $this->database->execute($table1->buildDrop());
-
-        $this->database->execute($table2->buildCreate());
-        foreach ($table2->buildAlter($table1) as $query) {
-            $this->database->execute($query);
-        }
-        $this->database->execute($table2->buildDrop());
+        $table->setIndex('foobar');
     }
 
-    public function testBuildAlterIndexes()
+    public function testGetIndexKeyNotSet()
     {
-        // drop, add
-        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table1->setName('foo');
-        $table1->setColumn(Column::int('id'));
-        $table1->setColumn(Column::int('id2'));
-        $table1->setIndex('id', 'id2');
+        $this->expectException(TableException::class);
+        $this->expectExceptionCode(TableException::TABLE_INDEX_NOT_SET);
 
-        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table2->setName('foo');
-        $table2->setColumn(Column::int('id'));
-        $table2->setColumn(Column::int('id2'));
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
 
-        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `index-id-id2`;'], $table1->buildAlter($table2));
-        $this->assertSame(['ALTER TABLE `foo` ADD INDEX `index-id-id2` (`id`, `id2`);'], $table2->buildAlter($table1));
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
 
-        $this->database->execute($table1->buildCreate());
-        foreach ($table1->buildAlter($table2) as $query) {
-            $this->database->execute($query);
-        }
-        $this->database->execute($table1->buildDrop());
-
-        $this->database->execute($table2->buildCreate());
-        foreach ($table2->buildAlter($table1) as $query) {
-            $this->database->execute($query);
-        }
-        $this->database->execute($table2->buildDrop());
-
-        // change
-        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table1->setName('foo');
-        $table1->setColumn(Column::int('id'));
-        $table1->setColumn(Column::int('id2'));
-        $table1->setIndex('id', 'id2');
-
-        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table2->setName('foo');
-        $table2->setColumn(Column::int('id'));
-        $table2->setColumn(Column::int('id2'));
-        $table2->setIndexWithName('index-id-id2', 'id');
-
-        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `index-id-id2`, ADD INDEX `index-id-id2` (`id`);'], $table1->buildAlter($table2));
-        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `index-id-id2`, ADD INDEX `index-id-id2` (`id`, `id2`);'], $table2->buildAlter($table1));
-
-        $this->database->execute($table1->buildCreate());
-        foreach ($table1->buildAlter($table2) as $query) {
-            $this->database->execute($query);
-        }
-        $this->database->execute($table1->buildDrop());
-
-        $this->database->execute($table2->buildCreate());
-        foreach ($table2->buildAlter($table1) as $query) {
-            $this->database->execute($query);
-        }
-        $this->database->execute($table2->buildDrop());
+        $table->getIndex('foobar');
     }
 
-    public function testBuildAlterForeignKeys()
+    public function testSetForeignKeyAlradySet()
     {
-        // drop, add
-        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table1->setName('foo');
-        $table1->setColumn(Column::int('id')->setUnsigned());
-        $table1->setColumn(Column::int('id2'));
-        $table1->setForeignKey('id', 'bar');
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::TABLE_FOREIGN_KEY_ALREADY_SET);
 
-        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table2->setName('foo');
-        $table2->setColumn(Column::int('id')->setUnsigned());
-        $table2->setColumn(Column::int('id2'));
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
 
-        $bar = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $bar->setName('bar');
-        $bar->setColumn(Column::serial('id'));
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
 
-        $this->assertSame(['ALTER TABLE `foo` DROP INDEX `foo_ibfk_1`, DROP FOREIGN KEY `foo_ibfk_1`;'], $table1->buildAlter($table2));
-        $this->assertSame(['ALTER TABLE `foo` ADD INDEX `foo_ibfk_1` (`id`), ADD CONSTRAINT `foo_ibfk_1` FOREIGN KEY (`id`) REFERENCES `bar` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT;'], $table2->buildAlter($table1));
+        $table->setColumn(Column::int('foobar'));
+        $table->setForeignKeyObject(new ForeignKey('fk', 'foobar', 'parent'));
+        $table->setForeignKeyObject(new ForeignKey('fk', 'foobar', 'parent'));
+    }
 
-        $this->database->execute($bar->buildCreate());
+    public function testSetForeignKeyColumnNotSet()
+    {
+        $this->expectException(TableException::class);
+        $this->expectExceptionCode(TableException::TABLE_COLUMN_NOT_SET);
 
-        $this->database->execute($table1->buildCreate());
-        foreach ($table1->buildAlter($table2) as $query) {
-            $this->database->execute($query);
-        }
-        $this->database->execute($table1->buildDrop());
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
 
-        $this->database->execute($table2->buildCreate());
-        foreach ($table2->buildAlter($table1) as $query) {
-            $this->database->execute($query);
-        }
-        $this->database->execute($table2->buildDrop());
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
 
-        // change
-        $table1 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table1->setName('foo');
-        $table1->setColumn(Column::int('id')->setUnsigned());
-        $table1->setColumn(Column::int('id2')->setUnsigned());
-        $table1->setForeignKey('id', 'bar');
+        $table->setForeignKey('foobar', 'parent');
+    }
 
-        $table2 = new Table('test', 'InnoDB', 'utf8', 'utf8_general_ci');
-        $table2->setName('foo');
-        $table2->setColumn(Column::int('id')->setUnsigned());
-        $table2->setColumn(Column::int('id2')->setUnsigned());
-        $table2->setForeignKey('id2', 'bar', 'id');
+    public function testGetForeignKeyNotSet()
+    {
+        $this->expectException(TableException::class);
+        $this->expectExceptionCode(TableException::TABLE_FOREIGN_KEY_NOT_SET);
 
-        $this->assertSame([
-            'ALTER TABLE `foo` DROP INDEX `foo_ibfk_1`, ADD INDEX `foo_ibfk_1` (`id2`), DROP FOREIGN KEY `foo_ibfk_1`;',
-            'ALTER TABLE `foo` ADD CONSTRAINT `foo_ibfk_1` FOREIGN KEY (`id2`) REFERENCES `bar` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT;'
-        ], $table1->buildAlter($table2));
-        $this->assertSame([
-            'ALTER TABLE `foo` DROP INDEX `foo_ibfk_1`, ADD INDEX `foo_ibfk_1` (`id`), DROP FOREIGN KEY `foo_ibfk_1`;',
-            'ALTER TABLE `foo` ADD CONSTRAINT `foo_ibfk_1` FOREIGN KEY (`id`) REFERENCES `bar` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT;'
-        ], $table2->buildAlter($table1));
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
 
-        $this->database->execute($table1->buildCreate());
-        foreach ($table1->buildAlter($table2) as $query) {
-            $this->database->execute($query);
-        }
-        $this->database->execute($table1->buildDrop());
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
 
-        $this->database->execute($table2->buildCreate());
-        foreach ($table2->buildAlter($table1) as $query) {
-            $this->database->execute($query);
-        }
-        $this->database->execute($table2->buildDrop());
+        $table->getForeignKey('foobar');
+    }
 
-        $this->database->execute($bar->buildDrop());
+    public function testImmutableSetEngine()
+    {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
+
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
+
+        $table->setImmutable();
+        $table->setEngine('MyISAM');
+    }
+
+    public function testImmutableSetCharset()
+    {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
+
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
+
+        $table->setImmutable();
+        $table->setCharset('latin1');
+    }
+
+    public function testImmutableSetCollation()
+    {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
+
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
+
+        $table->setImmutable();
+        $table->setCollation('latin1');
+    }
+
+    public function testImmutableSetColumn()
+    {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
+
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
+
+        $table->setImmutable();
+        $table->setColumn(Column::int('foobar'));
+    }
+
+    public function testImmutableSetPrimaryKey()
+    {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
+
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
+
+        $table->setImmutable();
+        $table->setPrimaryKey('foobar');
+    }
+
+    public function testImmutableSetUniqueKey()
+    {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
+
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
+
+        $table->setImmutable();
+        $table->setUniqueKey('foobar');
+    }
+
+    public function testImmutableSetIndex()
+    {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
+
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
+
+        $table->setImmutable();
+        $table->setIndex('foobar');
+    }
+
+    public function testImmutableSetForeignKey()
+    {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+
+        $database = new class() extends Database {
+            const NAME = 'foo';
+        };
+
+        $table = new class($database) extends Table {
+            const NAME = 'bar';
+        };
+
+        $table->setImmutable();
+        $table->setForeignKey('foobar', 'parent');
     }
 }

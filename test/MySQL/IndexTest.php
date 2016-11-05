@@ -2,32 +2,46 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\SchemaException;
+
 class IndexTest extends \PHPUnit_Framework_TestCase
 {
     public function test()
     {
-        $constraint = new Index('foo', ['column']);
+        $constraint = new Index('foo', 'column');
         $this->assertSame('foo', $constraint->getName());
         $this->assertSame('KEY `foo` (`column`)', $constraint->buildCreate());
         $this->assertSame('ADD INDEX `foo` (`column`)', $constraint->buildAdd());
         $this->assertSame('DROP INDEX `foo`', $constraint->buildDrop());
 
-        $constraint = new Index('foo', ['column', 'column2']);
+        $constraint = new Index('foo', 'column', 'column2');
         $this->assertSame('foo', $constraint->getName());
         $this->assertSame('KEY `foo` (`column`, `column2`)', $constraint->buildCreate());
         $this->assertSame('ADD INDEX `foo` (`column`, `column2`)', $constraint->buildAdd());
         $this->assertSame('DROP INDEX `foo`', $constraint->buildDrop());
     }
 
-    public function testDuplicated()
+    public function testEmptyName()
     {
-        $this->expectException(ConstraintException::class);
-        new Index('foo', ['column', 'column']);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::INDEX_INVALID_NAME);
+
+        new Index('', 'column');
     }
 
     public function testInvalidName()
     {
-        $this->expectException(ConstraintException::class);
-        new Index('primary', ['column']);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::INDEX_INVALID_NAME);
+
+        new Index('primary', 'column');
+    }
+
+    public function testDuplicatedColumn()
+    {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::INDEX_DUPLICATED_COLUMN);
+
+        new Index('foo', 'column', 'column');
     }
 }

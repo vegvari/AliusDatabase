@@ -2,7 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
-abstract class Column
+abstract class Column implements ColumnInterface
 {
     protected $name;
     protected $type;

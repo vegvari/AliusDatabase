@@ -2,9 +2,11 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\SchemaException;
+
 class ForeignKey extends Constraint
 {
-    const ACTIONS = ['CASCADE', 'NO ACTION', 'RESTRICT', 'SET DEFAULT', 'SET NULL'];
+    const RULES = ['CASCADE', 'NO ACTION', 'RESTRICT', 'SET DEFAULT', 'SET NULL'];
 
     protected $name;
     protected $parent_table;
@@ -15,8 +17,10 @@ class ForeignKey extends Constraint
     public function __construct(string $name, $columns, string $parent_table, $parent_columns = null, string $update_rule = 'RESTRICT', string $delete_rule = 'RESTRICT')
     {
         $columns = is_array($columns) ? $columns : [$columns];
-        if (count($columns) !== count(array_unique($columns))) {
-            throw new ConstraintException('Invalid foreign key, duplicated child column');
+
+        $duplicated = array_unique(array_diff_key($columns, array_unique($columns)));
+        if ($duplicated !== []) {
+            throw SchemaException::foreignKeyDuplicatedChildColumn($name, ...$duplicated);
         }
 
         if ($parent_columns === null) {
@@ -25,22 +29,23 @@ class ForeignKey extends Constraint
             $parent_columns = [$parent_columns];
         }
 
-        if (count($parent_columns) !== count(array_unique($parent_columns))) {
-            throw new ConstraintException('Invalid foreign key, duplicated parent column');
+        $duplicated = array_unique(array_diff_key($parent_columns, array_unique($parent_columns)));
+        if ($duplicated !== []) {
+            throw SchemaException::foreignKeyDuplicatedParentColumn($name, ...$duplicated);
         }
 
         if (count($columns) > count($parent_columns)) {
-            throw new ConstraintException('Invalid foreign key, more child columns than parent columns');
+            throw SchemaException::foreignKeyMoreChildColumn($name);
         } elseif (count($columns) < count($parent_columns)) {
-            throw new ConstraintException('Invalid foreign key, more parent columns than child columns');
+            throw SchemaException::foreignKeyMoreParentColumn($name);
         }
 
-        if (! in_array($update_rule, self::ACTIONS)) {
-            throw new ConstraintException(sprintf('Invalid foreign key, on update action is not supported: "%s"', $update_rule));
+        if (! in_array($update_rule, self::RULES)) {
+            throw SchemaException::foreignKeyInvalidUpdateRule($name, $update_rule);
         }
 
-        if (! in_array($delete_rule, self::ACTIONS)) {
-            throw new ConstraintException(sprintf('Invalid foreign key, on delete action is not supported: "%s"', $delete_rule));
+        if (! in_array($delete_rule, self::RULES)) {
+            throw SchemaException::foreignKeyInvalidDeleteRule($name, $delete_rule);
         }
 
         $this->name = $name;

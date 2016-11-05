@@ -2,6 +2,8 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\SchemaException;
+
 class ForeignKeyTest extends \PHPUnit_Framework_TestCase
 {
     public function test()
@@ -31,25 +33,33 @@ class ForeignKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testDuplicatedChild()
     {
-        $this->expectException(ConstraintException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_DUPLICATED_CHILD_COLUMN);
+
         new ForeignKey('name', ['column', 'column'], 'parent_table');
     }
 
     public function testDuplicatedParent()
     {
-        $this->expectException(ConstraintException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_DUPLICATED_PARENT_COLUMN);
+
         new ForeignKey('name', ['column', 'column2'], 'parent_table', ['column', 'column']);
     }
 
     public function testDuplicatedMoreChild()
     {
-        $this->expectException(ConstraintException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_MORE_CHILD_COLUMN);
+
         new ForeignKey('name', ['column', 'column2'], 'parent_table', 'column');
     }
 
     public function testDuplicatedMoreParent()
     {
-        $this->expectException(ConstraintException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_MORE_PARENT_COLUMN);
+
         new ForeignKey('name', 'column', 'parent_table', ['column', 'column2']);
     }
 
@@ -74,13 +84,17 @@ class ForeignKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidUpdate()
     {
-        $this->expectException(ConstraintException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_INVALID_UPDATE_RULE);
+
         new ForeignKey('name', 'column', 'parent_table', 'column', 'foo');
     }
 
     public function testInvalidDelete()
     {
-        $this->expectException(ConstraintException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_INVALID_DELETE_RULE);
+
         new ForeignKey('name', 'column', 'parent_table', 'column', 'CASCADE', 'foo');
     }
 }

@@ -2,12 +2,15 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\SchemaException;
+
 class PrimaryKey extends Constraint
 {
-    public function __construct(array $columns)
+    public function __construct(string ...$columns)
     {
-        if (count($columns) !== count(array_unique($columns))) {
-            throw new ConstraintException('Invalid primary key, duplicated column');
+        $duplicated = array_unique(array_diff_key($columns, array_unique($columns)));
+        if ($duplicated !== []) {
+            throw SchemaException::primaryKeyDuplicatedColumn(...$duplicated);
         }
 
         $this->columns = $columns;

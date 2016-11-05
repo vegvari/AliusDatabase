@@ -2,16 +2,19 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\SchemaException;
+
 class UniqueKey extends Constraint
 {
     protected $name;
 
-    public function __construct(string $name, array $columns)
+    public function __construct(string $name, string ...$columns)
     {
         $this->name = $name;
 
-        if (count($columns) !== count(array_unique($columns))) {
-            throw new ConstraintException('Invalid unique key, duplicated column');
+        $duplicated = array_unique(array_diff_key($columns, array_unique($columns)));
+        if ($duplicated !== []) {
+            throw SchemaException::uniqueKeyDuplicatedColumn($name, ...$duplicated);
         }
 
         $this->columns = $columns;

@@ -2,20 +2,23 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\SchemaException;
+
 class Index extends Constraint
 {
     protected $name;
 
-    public function __construct(string $name, array $columns)
+    public function __construct(string $name, string ...$columns)
     {
-        if (strtolower($name) === 'primary') {
-            throw new ConstraintException('Invalid name for index');
+        if ($name === '' || strtolower($name) === 'primary') {
+            throw SchemaException::indexInvalidName($name);
         }
 
         $this->name = $name;
 
-        if (count($columns) !== count(array_unique($columns))) {
-            throw new ConstraintException('Invalid index, duplicated column');
+        $duplicated = array_unique(array_diff_key($columns, array_unique($columns)));
+        if ($duplicated !== []) {
+            throw SchemaException::indexDuplicatedColumn($name, ...$duplicated);
         }
 
         $this->columns = $columns;
