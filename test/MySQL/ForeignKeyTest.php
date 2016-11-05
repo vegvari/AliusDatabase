@@ -31,6 +31,30 @@ class ForeignKeyTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('ADD CONSTRAINT `name` FOREIGN KEY (`column`, `column2`) REFERENCES `parent_table` (`column3`, `column4`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildAdd());
     }
 
+    public function testEmptyName()
+    {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_INVALID_NAME);
+
+        new ForeignKey('', 'column', 'parent');
+    }
+
+    public function testInvalidName()
+    {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_INVALID_NAME);
+
+        new ForeignKey('primary', 'column', 'parent');
+    }
+
+    public function testNoColumn()
+    {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_NO_COLUMN);
+
+        new ForeignKey('name', [], 'parent_table');
+    }
+
     public function testDuplicatedChild()
     {
         $this->expectException(SchemaException::class);

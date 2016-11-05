@@ -10,13 +10,20 @@ class UniqueKey extends Constraint
 
     public function __construct(string $name, string ...$columns)
     {
-        $this->name = $name;
+        if ($name === '' || strtolower($name) === 'primary') {
+            throw SchemaException::uniqueKeyInvalidName($name);
+        }
+
+        if ($columns === []) {
+            throw SchemaException::uniqueKeyNoColumn($name);
+        }
 
         $duplicated = array_unique(array_diff_key($columns, array_unique($columns)));
         if ($duplicated !== []) {
             throw SchemaException::uniqueKeyDuplicatedColumn($name, ...$duplicated);
         }
 
+        $this->name = $name;
         $this->columns = $columns;
     }
 

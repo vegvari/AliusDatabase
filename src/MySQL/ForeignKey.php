@@ -16,7 +16,15 @@ class ForeignKey extends Constraint
 
     public function __construct(string $name, $columns, string $parent_table, $parent_columns = null, string $update_rule = 'RESTRICT', string $delete_rule = 'RESTRICT')
     {
+        if ($name === '' || strtolower($name) === 'primary') {
+            throw SchemaException::foreignKeyInvalidName($name);
+        }
+
         $columns = is_array($columns) ? $columns : [$columns];
+
+        if ($columns === []) {
+            throw SchemaException::foreignKeyNoColumn($name);
+        }
 
         $duplicated = array_unique(array_diff_key($columns, array_unique($columns)));
         if ($duplicated !== []) {

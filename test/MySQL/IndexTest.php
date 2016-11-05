@@ -37,6 +37,14 @@ class IndexTest extends \PHPUnit_Framework_TestCase
         new Index('primary', 'column');
     }
 
+    public function testNoColumn()
+    {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::INDEX_NO_COLUMN);
+
+        new Index('foo');
+    }
+
     public function testDuplicatedColumn()
     {
         $this->expectException(SchemaException::class);

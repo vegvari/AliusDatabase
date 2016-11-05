@@ -21,6 +21,30 @@ class UniqueKeyTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('DROP INDEX `foo`', $constraint->buildDrop());
     }
 
+    public function testEmptyName()
+    {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::UNIQUE_KEY_INVALID_NAME);
+
+        new UniqueKey('', 'column');
+    }
+
+    public function testInvalidName()
+    {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::UNIQUE_KEY_INVALID_NAME);
+
+        new UniqueKey('primary', 'column');
+    }
+
+    public function testNoColumn()
+    {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::UNIQUE_KEY_NO_COLUMN);
+
+        new UniqueKey('foo');
+    }
+
     public function testDuplicated()
     {
         $this->expectException(SchemaException::class);

@@ -14,13 +14,16 @@ class Index extends Constraint
             throw SchemaException::indexInvalidName($name);
         }
 
-        $this->name = $name;
+        if ($columns === []) {
+            throw SchemaException::indexNoColumn($name);
+        }
 
         $duplicated = array_unique(array_diff_key($columns, array_unique($columns)));
         if ($duplicated !== []) {
             throw SchemaException::indexDuplicatedColumn($name, ...$duplicated);
         }
 
+        $this->name = $name;
         $this->columns = $columns;
     }
 

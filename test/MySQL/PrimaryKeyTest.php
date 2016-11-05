@@ -21,6 +21,14 @@ class PrimaryKeyTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('DROP PRIMARY KEY', $constraint->buildDrop());
     }
 
+    public function testNoColumn()
+    {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::PRIMARY_KEY_NO_COLUMN);
+
+        new PrimaryKey();
+    }
+
     public function testDuplicated()
     {
         $this->expectException(SchemaException::class);

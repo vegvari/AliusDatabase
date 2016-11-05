@@ -8,6 +8,10 @@ class PrimaryKey extends Constraint
 {
     public function __construct(string ...$columns)
     {
+        if ($columns === []) {
+            throw SchemaException::primaryKeyNoColumn();
+        }
+
         $duplicated = array_unique(array_diff_key($columns, array_unique($columns)));
         if ($duplicated !== []) {
             throw SchemaException::primaryKeyDuplicatedColumn(...$duplicated);
