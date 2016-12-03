@@ -2,7 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
-class Connection implements ConnectionInterface
+class Connection implements ConnectionInterface, \Serializable
 {
     const DEFAULT_OPTIONS = [
         \PDO::ATTR_EMULATE_PREPARES   => false,
@@ -11,11 +11,11 @@ class Connection implements ConnectionInterface
         \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET GLOBAL time_zone="UTC", time_zone="UTC", NAMES utf8',
     ];
 
-    private $dsn;
-    private $user;
-    private $password;
-    private $options;
-    private $pdo;
+    protected $dsn;
+    protected $user;
+    protected $password;
+    protected $options;
+    protected $pdo;
 
     final public function __construct(string $dsn, string $user, string $password, array $options = null)
     {
@@ -37,5 +37,25 @@ class Connection implements ConnectionInterface
         }
 
         return $this->pdo;
+    }
+
+    final public function serialize()
+    {
+        return serialize([
+            'dsn' => $this->dsn,
+            'user' => $this->user,
+            'password' => $this->password,
+            'options' => $this->options,
+        ]);
+    }
+
+    final public function unserialize($serialized)
+    {
+        $data = unserialize($serialized);
+
+        $this->dsn = $data['dsn'];
+        $this->user = $data['user'];
+        $this->password = $data['password'];
+        $this->options = $data['options'];
     }
 }

@@ -21,4 +21,16 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(true, $connection->getPDO() instanceof \PDO);
         $this->assertSame($connection->getPDO(), $connection->getPDO());
     }
+
+    public function testSerialize()
+    {
+        $connection = $this->getConnection();
+        $connection_pdo = $connection->getPDO();
+
+        $connection2 = unserialize(serialize($connection));
+        $connection2->getPDO();
+
+        $this->assertSame($connection_pdo, $connection->getPDO());
+        $this->assertEquals($connection, $connection2);
+    }
 }
