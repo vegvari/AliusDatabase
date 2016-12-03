@@ -49,7 +49,7 @@ final class SchemaException extends LogicException implements ExceptionInterface
 
     public static function databaseAlreadySet(string $server_class, string $database_class): ExceptionInterface
     {
-        throw new static(sprintf('Table is already set in server "%s": "%s"', $server_class, $database_class), self::SERVER_DATABASE_ALREADY_SET);
+        throw new static(sprintf('Database is already set in server "%s": "%s"', $server_class, $database_class), self::SERVER_DATABASE_ALREADY_SET);
     }
 
     public static function databaseNotSet(string $server_class, string $database_name): ExceptionInterface
@@ -59,7 +59,7 @@ final class SchemaException extends LogicException implements ExceptionInterface
 
     public static function invalidDatabaseName(string $class): ExceptionInterface
     {
-        return new static(sprintf('Invalid name, set the NAME constant in class: "%s"', $class), self::DATABASE_INVALID_NAME);
+        return new static(sprintf('Invalid database name, set the NAME constant in class: "%s"', $class), self::DATABASE_INVALID_NAME);
     }
 
     public static function tableAlreadySet(string $database_class, string $table_class): ExceptionInterface

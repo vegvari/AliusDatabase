@@ -4,7 +4,7 @@ namespace Alius\Database;
 
 class DatabaseException extends RuntimeException
 {
-    const DATABASE_TABLE_NOT_SET = 1;
+    const DATABASE_TABLE_NOT_SET = 2301;
 
     public static function tableNotSet(string $database_class, string $table_name): ExceptionInterface
     {

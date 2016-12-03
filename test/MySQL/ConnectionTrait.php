@@ -35,4 +35,9 @@ trait ConnectionTrait
     {
         return 'test';
     }
+
+    public function getConnection()
+    {
+        return new Connection(sprintf('host=%s', $this->getHost()), $this->getUser(), $this->getPassword());
+    }
 }
