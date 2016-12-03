@@ -54,6 +54,19 @@ abstract class Server implements ServerInterface
         return $this->readers !== [];
     }
 
+    final public function execute(string $query, array $data = []): \PDOStatement
+    {
+        $pdo = $this->getWriter()->getPDO();
+
+        if (stripos($query, 'select') !== false) {
+            $pdo = $this->getReader()->getPDO();
+        }
+
+        $statement = $pdo->prepare($query);
+        $statement->execute($data);
+        return $statement;
+    }
+
     final public function startTransaction(): bool
     {
         return $this->getWriter()->getPDO()->beginTransaction();

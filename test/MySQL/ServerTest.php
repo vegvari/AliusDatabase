@@ -91,6 +91,14 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($server->getDatabase('test'), $server->getDatabase('test'));
     }
 
+    public function testExecute()
+    {
+        $server = new class($this->getConnection()) extends Server {
+        };
+
+        $server->execute('SELECT 1=1');
+    }
+
     public function testSetDatabaseImmutable()
     {
         $this->expectException(SchemaException::class);
