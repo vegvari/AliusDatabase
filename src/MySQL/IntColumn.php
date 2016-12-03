@@ -2,6 +2,8 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\SchemaException;
+
 class IntColumn extends Column
 {
     const TYPES = [
@@ -28,7 +30,7 @@ class IntColumn extends Column
         $this->name = $name;
 
         if (! isset(self::$types[$type])) {
-            throw new ColumnException(sprintf('Invalid type for int column: "%s"', $type));
+            throw SchemaException::invalidColumnType($type);
         }
 
         $this->type = $type;
@@ -48,7 +50,7 @@ class IntColumn extends Column
     public function setNullable(): Column
     {
         if ($this->isAutoIncrement()) {
-            throw new ColumnException('Auto increment column can\'t be nullable');
+            throw SchemaException::invalidColumnIntAutoIncrementNullable();
         }
 
         return parent::setNullable();
@@ -57,7 +59,7 @@ class IntColumn extends Column
     public function setDefault($value): Column
     {
         if ($this->isAutoIncrement()) {
-            throw new ColumnException('Auto increment column can\'t have default value');
+            throw SchemaException::invalidColumnIntAutoIncrementDefault();
         }
 
         return parent::setDefault($value);
@@ -65,12 +67,12 @@ class IntColumn extends Column
 
     public function setAutoIncrement(): Column
     {
-        if ($this->hasDefault()) {
-            throw new ColumnException('Auto increment column can\'t have default value');
+        if ($this->isNullable()) {
+            throw SchemaException::invalidColumnIntAutoIncrementNullable();
         }
 
-        if ($this->isNullable()) {
-            throw new ColumnException('Auto increment column can\'t be nullable');
+        if ($this->hasDefault()) {
+            throw SchemaException::invalidColumnIntAutoIncrementDefault();
         }
 
         $this->auto_increment = true;
@@ -106,19 +108,15 @@ class IntColumn extends Column
             return;
         }
 
-        if (($value = filter_var($value, FILTER_VALIDATE_INT)) === false) {
-            throw new ColumnException('Value must be integer');
+        if (bccomp($value, $this->getMin()) === -1) {
+            throw SchemaException::invalidColumnIntValueMin($this->getMin());
         }
 
-        if ($value < $this->getMin()) {
-            throw new ColumnException(sprintf('Value must be greater than %d', $this->getMin()));
+        if (bccomp($value, $this->getMax()) === 1) {
+            throw SchemaException::invalidColumnIntValueMax($this->getMax());
         }
 
-        if ($value > $this->getMax()) {
-            throw new ColumnException(sprintf('Value must be less than %d', $this->getMax()));
-        }
-
-        return $value;
+        return (int) $value;
     }
 
     public function buildCreate(): string

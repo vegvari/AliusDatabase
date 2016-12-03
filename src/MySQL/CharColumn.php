@@ -2,6 +2,8 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\SchemaException;
+
 class CharColumn extends TextColumn
 {
     protected static $types = [
@@ -16,7 +18,7 @@ class CharColumn extends TextColumn
         $this->name = $name;
 
         if (! isset(self::$types[$type])) {
-            throw new ColumnException(sprintf('Invalid type for char column: "%s"', $type));
+            throw SchemaException::invalidColumnType($type);
         }
 
         $this->type = $type;
@@ -25,7 +27,7 @@ class CharColumn extends TextColumn
             || ($this->getType() === 'char' && $length > static::$types['char'])
             || ($this->getType() === 'varchar' && $length > static::$types['varchar'])
         ) {
-            throw new ColumnException(sprintf('Invalid length for %s column: "%s"', $this->getType(), $length));
+            throw SchemaException::invalidColumnStringLength($type);
         }
 
         $this->length = $length;

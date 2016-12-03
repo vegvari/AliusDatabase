@@ -2,6 +2,8 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\SchemaException;
+
 class TextColumn extends Column
 {
     protected static $types = [
@@ -20,7 +22,7 @@ class TextColumn extends Column
         $this->name = $name;
 
         if (! isset(self::$types[$type])) {
-            throw new ColumnException(sprintf('Invalid type for text column: "%s"', $type));
+            throw SchemaException::invalidColumnType($type);
         }
 
         $this->type = $type;
@@ -73,7 +75,7 @@ class TextColumn extends Column
         $value = (string) $value;
 
         if (mb_strlen($value) > $this->getLength()) {
-            throw new ColumnException(sprintf('Value is too long for %s', $this->getType()));
+            throw SchemaException::invalidColumnStringLength($this->getType());
         }
 
         return $value;

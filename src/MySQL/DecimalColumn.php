@@ -2,6 +2,8 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\SchemaException;
+
 class DecimalColumn extends Column
 {
     protected $precision;
@@ -14,15 +16,15 @@ class DecimalColumn extends Column
         $this->type = 'decimal';
 
         if ($precision < 1 || $precision > 65) {
-            throw new ColumnException(sprintf('Invalid precision: "%s", it must be 1-65', $precision));
+            throw SchemaException::invalidColumnFloatPrecision($precision);
         }
 
         if ($scale < 0 || $scale > 30) {
-            throw new ColumnException(sprintf('Invalid scale: "%s", it must be 0-30', $scale));
+            throw SchemaException::invalidColumnFloatScale($scale);
         }
 
         if ($scale > $precision) {
-            throw new ColumnException(sprintf('Invalid scale: "%s", it must be less than precision: "%s"', $scale, $precision));
+            throw SchemaException::invalidColumnFloatScaleMax($scale, $precision);
         }
 
         $this->precision = $precision;
@@ -71,15 +73,15 @@ class DecimalColumn extends Column
         }
 
         if (($value = filter_var($value, FILTER_VALIDATE_FLOAT)) === false) {
-            throw new ColumnException('Value must be float');
+            throw SchemaException::invalidColumnFloatValue();
         }
 
         if ($value <= $this->getMin()) {
-            throw new ColumnException(sprintf('Value must be greater than %d', $this->getMin()));
+            throw SchemaException::invalidColumnFloatValueMin($this->getMin());
         }
 
         if ($value >= $this->getMax()) {
-            throw new ColumnException(sprintf('Value must be less than %d', $this->getMax()));
+            throw SchemaException::invalidColumnFloatValueMax($this->getMax());
         }
 
         return $value;

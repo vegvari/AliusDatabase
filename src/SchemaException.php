@@ -5,56 +5,68 @@ namespace Alius\Database;
 final class SchemaException extends LogicException implements ExceptionInterface
 {
     // server
-    const SERVER_DATABASE_ALREADY_SET          = 1000;
-    const SERVER_DATABASE_NOT_SET              = 1200;
+    const SERVER_DATABASE_ALREADY_SET                = 1000;
+    const SERVER_DATABASE_NOT_SET                    = 1200;
 
     // db
-    const DATABASE_INVALID_NAME                = 2000;
-    const DATABASE_TABLE_ALREADY_SET           = 2300;
+    const DATABASE_INVALID_NAME                      = 2000;
+    const DATABASE_TABLE_ALREADY_SET                 = 2300;
 
     // table
-    const TABLE_INVALID_NAME                   = 3000;
-    const TABLE_COLUMN_ALREADY_SET             = 3400;
-    const TABLE_PRIMARY_KEY_ALREADY_SET        = 3500;
-    const TABLE_UNIQUE_KEY_ALREADY_SET         = 3600;
-    const TABLE_INDEX_ALREADY_SET              = 3700;
-    const TABLE_FOREIGN_KEY_ALREADY_SET        = 3800;
-
-    // column
-    const COLUMN_INVALID_NAME                  = 4000;
+    const TABLE_INVALID_NAME                         = 3000;
+    const TABLE_COLUMN_ALREADY_SET                   = 3400;
+    const TABLE_PRIMARY_KEY_ALREADY_SET              = 3500;
+    const TABLE_UNIQUE_KEY_ALREADY_SET               = 3600;
+    const TABLE_INDEX_ALREADY_SET                    = 3700;
+    const TABLE_FOREIGN_KEY_ALREADY_SET              = 3800;
 
     // primary key
-    const PRIMARY_KEY_NO_COLUMN                = 5000;
-    const PRIMARY_KEY_DUPLICATED_COLUMN        = 5001;
+    const PRIMARY_KEY_NO_COLUMN                      = 4000;
+    const PRIMARY_KEY_DUPLICATED_COLUMN              = 4001;
 
     // unique key
-    const UNIQUE_KEY_INVALID_NAME              = 6000;
-    const UNIQUE_KEY_NO_COLUMN                 = 6001;
-    const UNIQUE_KEY_DUPLICATED_COLUMN         = 6002;
+    const UNIQUE_KEY_INVALID_NAME                    = 5000;
+    const UNIQUE_KEY_NO_COLUMN                       = 5001;
+    const UNIQUE_KEY_DUPLICATED_COLUMN               = 5002;
 
     // index
-    const INDEX_INVALID_NAME                   = 7000;
-    const INDEX_NO_COLUMN                      = 7001;
-    const INDEX_DUPLICATED_COLUMN              = 7002;
+    const INDEX_INVALID_NAME                         = 6000;
+    const INDEX_NO_COLUMN                            = 6001;
+    const INDEX_DUPLICATED_COLUMN                    = 6002;
 
     // foreign key
-    const FOREIGN_KEY_INVALID_NAME             = 8000;
-    const FOREIGN_KEY_NO_COLUMN                = 8001;
-    const FOREIGN_KEY_DUPLICATED_CHILD_COLUMN  = 8002;
-    const FOREIGN_KEY_DUPLICATED_PARENT_COLUMN = 8003;
-    const FOREIGN_KEY_MORE_CHILD_COLUMN        = 8004;
-    const FOREIGN_KEY_MORE_PARENT_COLUMN       = 8005;
-    const FOREIGN_KEY_INVALID_UPDATE_RULE      = 8006;
-    const FOREIGN_KEY_INVALID_DELETE_RULE      = 8007;
+    const FOREIGN_KEY_INVALID_NAME                   = 7000;
+    const FOREIGN_KEY_NO_COLUMN                      = 7001;
+    const FOREIGN_KEY_DUPLICATED_CHILD_COLUMN        = 7002;
+    const FOREIGN_KEY_DUPLICATED_PARENT_COLUMN       = 7003;
+    const FOREIGN_KEY_MORE_CHILD_COLUMN              = 7004;
+    const FOREIGN_KEY_MORE_PARENT_COLUMN             = 7005;
+    const FOREIGN_KEY_INVALID_UPDATE_RULE            = 7006;
+    const FOREIGN_KEY_INVALID_DELETE_RULE            = 7007;
+
+    // column
+    const COLUMN_INVALID_TYPE                        = 8000;
+
+    // int column
+    const COLUMN_INT_INVALID_AUTO_INCREMENT_NULLABLE = 8101;
+    const COLUMN_INT_INVALID_AUTO_INCREMENT_DEFAULT  = 8102;
+    const COLUMN_INT_INVALID_VALUE_MIN               = 8103;
+    const COLUMN_INT_INVALID_VALUE_MAX               = 8104;
+
+    // float column
+    const COLUMN_FLOAT_INVALID_PRECISION             = 8201;
+    const COLUMN_FLOAT_INVALID_SCALE                 = 8202;
+    const COLUMN_FLOAT_INVALID_SCALE_MAX             = 8203;
+    const COLUMN_FLOAT_INVALID_VALUE                 = 8204;
+    const COLUMN_FLOAT_INVALID_VALUE_MIN             = 8205;
+    const COLUMN_FLOAT_INVALID_VALUE_MAX             = 8206;
+
+    // string column
+    const COLUMN_STRING_INVALID_LENGTH               = 8301;
 
     public static function databaseAlreadySet(string $server_class, string $database_class): ExceptionInterface
     {
         throw new static(sprintf('Database is already set in server "%s": "%s"', $server_class, $database_class), self::SERVER_DATABASE_ALREADY_SET);
-    }
-
-    public static function databaseNotSet(string $server_class, string $database_name): ExceptionInterface
-    {
-        throw new static(sprintf('Database is not set in server "%s": "%s"', $server_class, $database_name), self::SERVER_DATABASE_NOT_SET);
     }
 
     public static function invalidDatabaseName(string $class): ExceptionInterface
@@ -175,5 +187,65 @@ final class SchemaException extends LogicException implements ExceptionInterface
     public static function foreignKeyInvalidDeleteRule(string $name, string $delete_rule): ExceptionInterface
     {
         return new static(sprintf('Invalid delete action in foreign key "%s": %s', $name, $delete_rule), self::FOREIGN_KEY_INVALID_DELETE_RULE);
+    }
+
+    public static function invalidColumnType(string $type)
+    {
+        return new static(sprintf('Invalid type: "%s"', $type), self::COLUMN_INVALID_TYPE);
+    }
+
+    public static function invalidColumnIntAutoIncrementNullable()
+    {
+        return new static('Auto increment column can\'t be nullable', self::COLUMN_INT_INVALID_AUTO_INCREMENT_NULLABLE);
+    }
+
+    public static function invalidColumnIntAutoIncrementDefault()
+    {
+        return new static('Auto increment column can\'t have default value', self::COLUMN_INT_INVALID_AUTO_INCREMENT_DEFAULT);
+    }
+
+    public static function invalidColumnIntValueMin(int $min)
+    {
+        return new static(sprintf('Value must be greater than %d', $min), self::COLUMN_INT_INVALID_VALUE_MIN);
+    }
+
+    public static function invalidColumnIntValueMax(int $max)
+    {
+        return new static(sprintf('Value must be less than %d', $max), self::COLUMN_INT_INVALID_VALUE_MAX);
+    }
+
+    public static function invalidColumnFloatPrecision(int $precision)
+    {
+        return new static(sprintf('Invalid precision: "%s", it must be 1-65', $precision), self::COLUMN_FLOAT_INVALID_PRECISION);
+    }
+
+    public static function invalidColumnFloatScale(int $scale)
+    {
+        return new static(sprintf('Invalid scale: "%s", it must be 0-30', $scale), self::COLUMN_FLOAT_INVALID_SCALE);
+    }
+
+    public static function invalidColumnFloatScaleMax(int $scale, int $precision)
+    {
+        return new static(sprintf('Invalid scale: "%s", it must be less than precision: "%s"', $scale, $precision), self::COLUMN_FLOAT_INVALID_SCALE_MAX);
+    }
+
+    public static function invalidColumnFloatValue()
+    {
+        return new static('Invalid float value', self::COLUMN_FLOAT_INVALID_VALUE);
+    }
+
+    public static function invalidColumnFloatValueMin(int $min)
+    {
+        return new static(sprintf('Value must be greater than %d', $min), self::COLUMN_FLOAT_INVALID_VALUE_MIN);
+    }
+
+    public static function invalidColumnFloatValueMax(int $max)
+    {
+        return new static(sprintf('Value must be less than %d', $max), self::COLUMN_FLOAT_INVALID_VALUE_MAX);
+    }
+
+    public static function invalidColumnStringLength(string $type)
+    {
+        return new static(sprintf('Value is too long for %s', $type), self::COLUMN_STRING_INVALID_LENGTH);
     }
 }

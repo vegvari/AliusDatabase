@@ -2,6 +2,8 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\SchemaException;
+
 class FloatColumnTest extends \PHPUnit_Framework_TestCase
 {
     public function testDecimal()
@@ -132,37 +134,49 @@ class FloatColumnTest extends \PHPUnit_Framework_TestCase
 
     public function testPrecisionMin()
     {
-        $this->expectException(ColumnException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::COLUMN_FLOAT_INVALID_PRECISION);
+
         $column = new FloatColumn('foo', 0, 0);
     }
 
     public function testPrecisionMax()
     {
-        $this->expectException(ColumnException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::COLUMN_FLOAT_INVALID_PRECISION);
+
         $column = new FloatColumn('foo', 66, 0);
     }
 
     public function testScaleMin()
     {
-        $this->expectException(ColumnException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::COLUMN_FLOAT_INVALID_SCALE);
+
         $column = new FloatColumn('foo', 65, -1);
     }
 
     public function testScaleMax()
     {
-        $this->expectException(ColumnException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::COLUMN_FLOAT_INVALID_SCALE);
+
         $column = new FloatColumn('foo', 65, 31);
     }
 
     public function testScaleLargerThanPrecision()
     {
-        $this->expectException(ColumnException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::COLUMN_FLOAT_INVALID_SCALE_MAX);
+
         $column = new FloatColumn('foo', 10, 11);
     }
 
     public function testCheckSignedMin()
     {
-        $this->expectException(ColumnException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::COLUMN_FLOAT_INVALID_VALUE_MIN);
+
         $column = new FloatColumn('foo', 10, 2);
         $this->assertSame(-100000000.0, $column->getMin());
         $column->check(-100000000);
@@ -170,7 +184,9 @@ class FloatColumnTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckSignedMax()
     {
-        $this->expectException(ColumnException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::COLUMN_FLOAT_INVALID_VALUE_MAX);
+
         $column = new FloatColumn('foo', 10, 2);
         $this->assertSame(100000000.0, $column->getMax());
         $column->check(100000000);
@@ -178,28 +194,36 @@ class FloatColumnTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckNotFloat()
     {
-        $this->expectException(ColumnException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::COLUMN_FLOAT_INVALID_VALUE);
+
         $column = new FloatColumn('foo', 10, 2);
         $column->check('bar');
     }
 
     public function testDefaultSignedMin()
     {
-        $this->expectException(ColumnException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::COLUMN_FLOAT_INVALID_VALUE_MIN);
+
         $column = new FloatColumn('foo', 10, 2);
         $column->setDefault(-100000000);
     }
 
     public function testDefaultSignedMax()
     {
-        $this->expectException(ColumnException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::COLUMN_FLOAT_INVALID_VALUE_MAX);
+
         $column = new FloatColumn('foo', 10, 2);
         $column->setDefault(100000000);
     }
 
     public function testDefaultNotFloat()
     {
-        $this->expectException(ColumnException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::COLUMN_FLOAT_INVALID_VALUE);
+
         $column = new FloatColumn('foo', 10, 2);
         $column->setDefault('bar');
     }

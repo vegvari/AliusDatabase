@@ -2,6 +2,8 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\SchemaException;
+
 class TextColumnTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -131,13 +133,17 @@ class TextColumnTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidType()
     {
-        $this->expectException(ColumnException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::COLUMN_INVALID_TYPE);
+
         $column = new TextColumn('foo', 'bar');
     }
 
     public function testTooLong()
     {
-        $this->expectException(ColumnException::class);
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionCode(SchemaException::COLUMN_STRING_INVALID_LENGTH);
+
         $column = new TextColumn('foo', 'text');
         $column->check(str_repeat('a', 65536));
     }
