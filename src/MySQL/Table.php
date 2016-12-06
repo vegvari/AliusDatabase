@@ -7,7 +7,7 @@ use Alius\Database\SchemaException;
 
 abstract class Table implements TableInterface
 {
-    const NAME = null;
+    protected static $name;
 
     private $immutable = false;
     private $database_name;
@@ -23,7 +23,7 @@ abstract class Table implements TableInterface
 
     final public function __construct(DatabaseInterface $database)
     {
-        static::getName();
+        $this->getName();
 
         $this->database_name = $database::getName();
         $this->engine = $database->getEngine();
@@ -46,11 +46,11 @@ abstract class Table implements TableInterface
 
     final public static function getName(): string
     {
-        if (! is_string(static::NAME) || static::NAME === '') {
+        if (! is_string(static::$name) || static::$name === '') {
             throw SchemaException::invalidTableName(static::class);
         }
 
-        return static::NAME;
+        return static::$name;
     }
 
     protected function setUp()

@@ -7,7 +7,7 @@ use Alius\Database\DatabaseException;
 
 abstract class Database implements DatabaseInterface
 {
-    const NAME = null;
+    protected static $name;
 
     private $immutable = false;
     private $engine = 'InnoDB';
@@ -34,11 +34,11 @@ abstract class Database implements DatabaseInterface
 
     final public static function getName(): string
     {
-        if (! is_string(static::NAME) || static::NAME === '') {
+        if (! is_string(static::$name) || static::$name === '') {
             throw SchemaException::invalidDatabaseName(static::class);
         }
 
-        return static::NAME;
+        return static::$name;
     }
 
     protected function setUp()

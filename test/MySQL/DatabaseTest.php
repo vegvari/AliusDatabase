@@ -7,7 +7,7 @@ use Alius\Database\DatabaseException;
 
 class DatabaseTestTableFixture extends Table
 {
-    const NAME = 'foo';
+    protected static $name = 'foo';
 }
 
 class DatabaseTestInvalidTableFixture
@@ -23,7 +23,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     public function testSetters()
     {
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $this->assertSame('foo', $database::getName());
@@ -78,7 +78,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::INVALID_TABLE);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $database->setTable(DatabaseTestInvalidTableFixture::class);
@@ -90,7 +90,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::DATABASE_TABLE_ALREADY_SET);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $database->setTable(DatabaseTestTableFixture::class);
@@ -103,7 +103,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(DatabaseException::DATABASE_TABLE_NOT_SET);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $database->getTable('foo');
@@ -115,7 +115,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $database->setImmutable();
@@ -128,7 +128,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $database->setImmutable();
@@ -141,7 +141,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $database->setImmutable();
@@ -154,7 +154,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $database->setImmutable();

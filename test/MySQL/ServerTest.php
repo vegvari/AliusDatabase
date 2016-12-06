@@ -7,7 +7,7 @@ use Alius\Database\ServerException;
 
 class ServerTestDatabaseFixture extends Database
 {
-    const NAME = 'test';
+    protected static $name = 'foo';
 }
 
 class ServerTestInvalidDatabaseFixture
@@ -83,12 +83,16 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(false, $server->hasDatabase(ServerTestDatabaseFixture::class));
 
         $server->setDatabase(ServerTestDatabaseFixture::class);
-        $server->setImmutable();
 
+        $this->assertSame(true, $server->hasDatabase());
+        $this->assertSame(true, $server->hasDatabase('foo'));
+
+        // getDatabase calls setImmutable on the new database class
+        $this->assertEquals((new ServerTestDatabaseFixture)->setImmutable(), $server->getDatabase('foo'));
+        $this->assertSame($server->getDatabase('foo'), $server->getDatabase('foo'));
+
+        $server->setImmutable();
         $this->assertSame(true, $server->isImmutable());
-        $this->assertSame(true, $server->hasDatabase('test'));
-        $this->assertEquals(new ServerTestDatabaseFixture, $server->getDatabase('test'));
-        $this->assertSame($server->getDatabase('test'), $server->getDatabase('test'));
     }
 
     public function testExecute()

@@ -124,14 +124,18 @@ abstract class Server implements ServerInterface
         }
 
         if (is_string($this->databases[$database_name])) {
-            $this->databases[$database_name] = new $this->databases[$database_name];
+            $this->databases[$database_name] = (new $this->databases[$database_name])->setImmutable();
         }
 
         return $this->databases[$database_name];
     }
 
-    final public function hasDatabase(string $database_name): bool
+    final public function hasDatabase(string $database_name = null): bool
     {
+        if ($database_name === null) {
+            return $this->databases !== [];
+        }
+
         return isset($this->databases[$database_name]);
     }
 }

@@ -14,11 +14,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function testDefaults()
     {
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $this->assertSame('bar', $table::getName());
@@ -43,7 +43,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([], $table->getForeignKeys());
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
 
             protected function setUp()
             {
@@ -54,7 +54,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $this->assertSame('bar', $table::getName());
@@ -66,11 +66,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
     public function testSetters()
     {
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setEngine('MyISAM');
@@ -115,7 +115,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
         // foreign key adds a new index if there is no index with the same columns
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setColumn(Column::int('foobar'));
@@ -129,7 +129,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::TABLE_INVALID_NAME);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $test = new class($database) extends Table {
@@ -150,11 +150,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::TABLE_COLUMN_ALREADY_SET);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setColumn(Column::int('foobar'));
@@ -167,11 +167,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(TableException::TABLE_COLUMN_NOT_SET);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->getColumn('foobar');
@@ -183,11 +183,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::TABLE_PRIMARY_KEY_ALREADY_SET);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setColumn(Column::int('foobar'));
@@ -201,11 +201,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(TableException::TABLE_COLUMN_NOT_SET);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setPrimaryKey('foobar');
@@ -217,11 +217,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(TableException::TABLE_PRIMARY_KEY_NOT_SET);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->getPrimaryKey();
@@ -233,11 +233,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::TABLE_UNIQUE_KEY_ALREADY_SET);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setColumn(Column::int('foobar'));
@@ -251,11 +251,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(TableException::TABLE_COLUMN_NOT_SET);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setUniqueKey('foobar');
@@ -267,11 +267,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(TableException::TABLE_UNIQUE_KEY_NOT_SET);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->getUniqueKey('foobar');
@@ -283,11 +283,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::TABLE_INDEX_ALREADY_SET);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setColumn(Column::int('foobar'));
@@ -301,11 +301,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(TableException::TABLE_COLUMN_NOT_SET);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setIndex('foobar');
@@ -317,11 +317,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(TableException::TABLE_INDEX_NOT_SET);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->getIndex('foobar');
@@ -333,11 +333,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::TABLE_FOREIGN_KEY_ALREADY_SET);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setColumn(Column::int('foobar'));
@@ -351,11 +351,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(TableException::TABLE_COLUMN_NOT_SET);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setForeignKey('foobar', 'parent');
@@ -367,11 +367,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(TableException::TABLE_FOREIGN_KEY_NOT_SET);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->getForeignKey('foobar');
@@ -383,11 +383,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setImmutable();
@@ -400,11 +400,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setImmutable();
@@ -417,11 +417,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setImmutable();
@@ -434,11 +434,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setImmutable();
@@ -451,11 +451,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setImmutable();
@@ -468,11 +468,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setImmutable();
@@ -485,11 +485,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setImmutable();
@@ -502,11 +502,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
-            const NAME = 'foo';
+            protected static $name = 'foo';
         };
 
         $table = new class($database) extends Table {
-            const NAME = 'bar';
+            protected static $name = 'bar';
         };
 
         $table->setImmutable();

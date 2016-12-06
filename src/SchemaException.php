@@ -71,7 +71,7 @@ final class SchemaException extends LogicException implements ExceptionInterface
 
     public static function invalidDatabaseName(string $class): ExceptionInterface
     {
-        return new static(sprintf('Invalid database name, set the NAME constant in class: "%s"', $class), self::DATABASE_INVALID_NAME);
+        return new static(sprintf('Invalid database name, set the $name static variable in class: "%s"', $class), self::DATABASE_INVALID_NAME);
     }
 
     public static function tableAlreadySet(string $database_class, string $table_class): ExceptionInterface
@@ -81,7 +81,7 @@ final class SchemaException extends LogicException implements ExceptionInterface
 
     public static function invalidTableName(string $class): ExceptionInterface
     {
-        return new static(sprintf('Invalid table name, set the NAME constant in class: "%s"', $class), self::TABLE_INVALID_NAME);
+        return new static(sprintf('Invalid table name, set the $name static variable in class: "%s"', $class), self::TABLE_INVALID_NAME);
     }
 
     public static function columnAlreadySet(string $table_class, string $column_name): ExceptionInterface
