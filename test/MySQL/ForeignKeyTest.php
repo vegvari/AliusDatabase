@@ -2,7 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\SchemaException;
+use Alius\Database\Exceptions;
 
 class ForeignKeyTest extends \PHPUnit_Framework_TestCase
 {
@@ -33,56 +33,56 @@ class ForeignKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testEmptyName()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_INVALID_NAME);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_INVALID_NAME);
 
         new ForeignKey('', 'column', 'parent');
     }
 
     public function testInvalidName()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_INVALID_NAME);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_INVALID_NAME);
 
         new ForeignKey('primary', 'column', 'parent');
     }
 
     public function testNoColumn()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_NO_COLUMN);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_NO_COLUMN);
 
         new ForeignKey('name', [], 'parent_table');
     }
 
     public function testDuplicatedChild()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_DUPLICATED_CHILD_COLUMN);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_DUPLICATED_CHILD_COLUMN);
 
         new ForeignKey('name', ['column', 'column'], 'parent_table');
     }
 
     public function testDuplicatedParent()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_DUPLICATED_PARENT_COLUMN);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_DUPLICATED_PARENT_COLUMN);
 
         new ForeignKey('name', ['column', 'column2'], 'parent_table', ['column', 'column']);
     }
 
     public function testDuplicatedMoreChild()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_MORE_CHILD_COLUMN);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_MORE_CHILD_COLUMN);
 
         new ForeignKey('name', ['column', 'column2'], 'parent_table', 'column');
     }
 
     public function testDuplicatedMoreParent()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_MORE_PARENT_COLUMN);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_MORE_PARENT_COLUMN);
 
         new ForeignKey('name', 'column', 'parent_table', ['column', 'column2']);
     }
@@ -108,16 +108,16 @@ class ForeignKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidUpdate()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_INVALID_UPDATE_RULE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_INVALID_UPDATE_RULE);
 
         new ForeignKey('name', 'column', 'parent_table', 'column', 'foo');
     }
 
     public function testInvalidDelete()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::FOREIGN_KEY_INVALID_DELETE_RULE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_INVALID_DELETE_RULE);
 
         new ForeignKey('name', 'column', 'parent_table', 'column', 'CASCADE', 'foo');
     }

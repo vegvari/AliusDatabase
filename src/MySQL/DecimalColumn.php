@@ -2,7 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\SchemaException;
+use Alius\Database\Exceptions;
 
 class DecimalColumn extends Column
 {
@@ -16,15 +16,15 @@ class DecimalColumn extends Column
         $this->type = 'decimal';
 
         if ($precision < 1 || $precision > 65) {
-            throw SchemaException::invalidColumnFloatPrecision($precision);
+            throw Exceptions\SchemaException::invalidColumnFloatPrecision($precision);
         }
 
         if ($scale < 0 || $scale > 30) {
-            throw SchemaException::invalidColumnFloatScale($scale);
+            throw Exceptions\SchemaException::invalidColumnFloatScale($scale);
         }
 
         if ($scale > $precision) {
-            throw SchemaException::invalidColumnFloatScaleMax($scale, $precision);
+            throw Exceptions\SchemaException::invalidColumnFloatScaleMax($scale, $precision);
         }
 
         $this->precision = $precision;
@@ -73,15 +73,15 @@ class DecimalColumn extends Column
         }
 
         if (($value = filter_var($value, FILTER_VALIDATE_FLOAT)) === false) {
-            throw SchemaException::invalidColumnFloatValue();
+            throw Exceptions\SchemaException::invalidColumnFloatValue();
         }
 
         if ($value <= $this->getMin()) {
-            throw SchemaException::invalidColumnFloatValueMin($this->getMin());
+            throw Exceptions\SchemaException::invalidColumnFloatValueMin($this->getMin());
         }
 
         if ($value >= $this->getMax()) {
-            throw SchemaException::invalidColumnFloatValueMax($this->getMax());
+            throw Exceptions\SchemaException::invalidColumnFloatValueMax($this->getMax());
         }
 
         return $value;

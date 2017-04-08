@@ -2,9 +2,10 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\SchemaException;
+use Alius\Database\Exceptions;
+use Alius\Database\Interfaces;
 
-class ForeignKey extends Constraint
+class ForeignKey extends Constraint implements Interfaces\ForeignKeyInterface
 {
     const RULES = ['CASCADE', 'NO ACTION', 'RESTRICT', 'SET DEFAULT', 'SET NULL'];
 
@@ -17,18 +18,18 @@ class ForeignKey extends Constraint
     public function __construct(string $name, $columns, string $parent_table, $parent_columns = null, string $update_rule = 'RESTRICT', string $delete_rule = 'RESTRICT')
     {
         if ($name === '' || strtolower($name) === 'primary') {
-            throw SchemaException::foreignKeyInvalidName($name);
+            throw Exceptions\SchemaException::foreignKeyInvalidName($name);
         }
 
         $columns = is_array($columns) ? $columns : [$columns];
 
         if ($columns === []) {
-            throw SchemaException::foreignKeyNoColumn($name);
+            throw Exceptions\SchemaException::foreignKeyNoColumn($name);
         }
 
         $duplicated = array_unique(array_diff_key($columns, array_unique($columns)));
         if ($duplicated !== []) {
-            throw SchemaException::foreignKeyDuplicatedChildColumn($name, ...$duplicated);
+            throw Exceptions\SchemaException::foreignKeyDuplicatedChildColumn($name, ...$duplicated);
         }
 
         if ($parent_columns === null) {
@@ -39,21 +40,21 @@ class ForeignKey extends Constraint
 
         $duplicated = array_unique(array_diff_key($parent_columns, array_unique($parent_columns)));
         if ($duplicated !== []) {
-            throw SchemaException::foreignKeyDuplicatedParentColumn($name, ...$duplicated);
+            throw Exceptions\SchemaException::foreignKeyDuplicatedParentColumn($name, ...$duplicated);
         }
 
         if (count($columns) > count($parent_columns)) {
-            throw SchemaException::foreignKeyMoreChildColumn($name);
+            throw Exceptions\SchemaException::foreignKeyMoreChildColumn($name);
         } elseif (count($columns) < count($parent_columns)) {
-            throw SchemaException::foreignKeyMoreParentColumn($name);
+            throw Exceptions\SchemaException::foreignKeyMoreParentColumn($name);
         }
 
         if (! in_array($update_rule, self::RULES)) {
-            throw SchemaException::foreignKeyInvalidUpdateRule($name, $update_rule);
+            throw Exceptions\SchemaException::foreignKeyInvalidUpdateRule($name, $update_rule);
         }
 
         if (! in_array($delete_rule, self::RULES)) {
-            throw SchemaException::foreignKeyInvalidDeleteRule($name, $delete_rule);
+            throw Exceptions\SchemaException::foreignKeyInvalidDeleteRule($name, $delete_rule);
         }
 
         $this->name = $name;

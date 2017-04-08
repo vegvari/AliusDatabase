@@ -2,7 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\SchemaException;
+use Alius\Database\Exceptions;
 
 class IntColumnTest extends \PHPUnit_Framework_TestCase
 {
@@ -156,16 +156,16 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidType()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_INVALID_TYPE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_INVALID_TYPE);
 
         $column = new IntColumn('foo', 'bar');
     }
 
     public function testAutoIncrementAndNullable()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_INT_INVALID_AUTO_INCREMENT_NULLABLE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_INT_INVALID_AUTO_INCREMENT_NULLABLE);
 
         $column = new IntColumn('foo', 'int');
         $column->setAutoIncrement()->setNullable();
@@ -173,8 +173,8 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
 
     public function testNullableAndAutoIncrement()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_INT_INVALID_AUTO_INCREMENT_NULLABLE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_INT_INVALID_AUTO_INCREMENT_NULLABLE);
 
         $column = new IntColumn('foo', 'int');
         $column->setNullable()->setAutoIncrement();
@@ -182,8 +182,8 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
 
     public function testAutoIncrementAndDefault()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_INT_INVALID_AUTO_INCREMENT_DEFAULT);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_INT_INVALID_AUTO_INCREMENT_DEFAULT);
 
         $column = new IntColumn('foo', 'int');
         $column->setAutoIncrement()->setDefault(1);
@@ -191,8 +191,8 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultAndAutoIncrement()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_INT_INVALID_AUTO_INCREMENT_DEFAULT);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_INT_INVALID_AUTO_INCREMENT_DEFAULT);
 
         $column = new IntColumn('foo', 'int');
         $column->setDefault(1)->setAutoIncrement();
@@ -203,8 +203,8 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckSignedMin(string $type, int $signed_min, int $signed_max, int $unsigned_max)
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_INT_INVALID_VALUE_MIN);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_INT_INVALID_VALUE_MIN);
 
         $column = new IntColumn('foo', $type);
         $column->check(bcsub($signed_min, 1));
@@ -215,8 +215,8 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckSignedMax(string $type, int $signed_min, int $signed_max, int $unsigned_max)
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_INT_INVALID_VALUE_MAX);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_INT_INVALID_VALUE_MAX);
 
         $column = new IntColumn('foo', $type);
         $column->check(bcadd($signed_max, 1));
@@ -227,8 +227,8 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckUnsignedMin(string $type, int $signed_min, int $signed_max, int $unsigned_max)
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_INT_INVALID_VALUE_MIN);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_INT_INVALID_VALUE_MIN);
 
         $column = new IntColumn('foo', $type);
         $column->setUnsigned();
@@ -240,8 +240,8 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckUnsignedMax(string $type, int $signed_min, int $signed_max, int $unsigned_max)
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_INT_INVALID_VALUE_MAX);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_INT_INVALID_VALUE_MAX);
 
         $column = new IntColumn('foo', $type);
         $column->setUnsigned();
@@ -253,8 +253,8 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckDefaultSignedMin(string $type, int $signed_min, int $signed_max, int $unsigned_max)
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_INT_INVALID_VALUE_MIN);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_INT_INVALID_VALUE_MIN);
 
         $column = new IntColumn('foo', $type);
         $column->setDefault(bcsub($signed_min, 1));
@@ -265,8 +265,8 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckDefaultSignedMax(string $type, int $signed_min, int $signed_max, int $unsigned_max)
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_INT_INVALID_VALUE_MAX);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_INT_INVALID_VALUE_MAX);
 
         $column = new IntColumn('foo', $type);
         $column->setDefault(bcadd($signed_max, 1));
@@ -277,8 +277,8 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckDefaultUnsignedMin(string $type, int $signed_min, int $signed_max, int $unsigned_max)
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_INT_INVALID_VALUE_MIN);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_INT_INVALID_VALUE_MIN);
 
         $column = new IntColumn('foo', $type);
         $column->setUnsigned();
@@ -290,8 +290,8 @@ class IntColumnTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckDefaultUnsignedMax(string $type, int $signed_min, int $signed_max, int $unsigned_max)
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_INT_INVALID_VALUE_MAX);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_INT_INVALID_VALUE_MAX);
 
         $column = new IntColumn('foo', $type);
         $column->setUnsigned();

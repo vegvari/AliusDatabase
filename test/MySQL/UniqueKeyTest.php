@@ -2,7 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\SchemaException;
+use Alius\Database\Exceptions;
 
 class UniqueKeyTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,32 +23,32 @@ class UniqueKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testEmptyName()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::UNIQUE_KEY_INVALID_NAME);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::UNIQUE_KEY_INVALID_NAME);
 
         new UniqueKey('', 'column');
     }
 
     public function testInvalidName()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::UNIQUE_KEY_INVALID_NAME);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::UNIQUE_KEY_INVALID_NAME);
 
         new UniqueKey('primary', 'column');
     }
 
     public function testNoColumn()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::UNIQUE_KEY_NO_COLUMN);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::UNIQUE_KEY_NO_COLUMN);
 
         new UniqueKey('foo');
     }
 
     public function testDuplicated()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::UNIQUE_KEY_DUPLICATED_COLUMN);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::UNIQUE_KEY_DUPLICATED_COLUMN);
 
         new UniqueKey('foo', 'column', 'column');
     }

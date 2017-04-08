@@ -1,6 +1,6 @@
 <?php
 
-namespace Alius\Database;
+namespace Alius\Database\Exceptions;
 
 class DatabaseException extends RuntimeException
 {

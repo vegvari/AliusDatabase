@@ -2,19 +2,20 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\SchemaException;
+use Alius\Database\Exceptions;
+use Alius\Database\Interfaces;
 
-class PrimaryKey extends Constraint
+class PrimaryKey extends Constraint implements Interfaces\PrimaryKeyInterface
 {
     public function __construct(string ...$columns)
     {
         if ($columns === []) {
-            throw SchemaException::primaryKeyNoColumn();
+            throw Exceptions\SchemaException::primaryKeyNoColumn();
         }
 
         $duplicated = array_unique(array_diff_key($columns, array_unique($columns)));
         if ($duplicated !== []) {
-            throw SchemaException::primaryKeyDuplicatedColumn(...$duplicated);
+            throw Exceptions\SchemaException::primaryKeyDuplicatedColumn(...$duplicated);
         }
 
         $this->columns = $columns;

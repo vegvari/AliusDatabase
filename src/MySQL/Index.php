@@ -2,25 +2,26 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\SchemaException;
+use Alius\Database\Exceptions;
+use Alius\Database\Interfaces;
 
-class Index extends Constraint
+class Index extends Constraint implements Interfaces\IndexInterface
 {
     protected $name;
 
     public function __construct(string $name, string ...$columns)
     {
         if ($name === '' || strtolower($name) === 'primary') {
-            throw SchemaException::indexInvalidName($name);
+            throw Exceptions\SchemaException::indexInvalidName($name);
         }
 
         if ($columns === []) {
-            throw SchemaException::indexNoColumn($name);
+            throw Exceptions\SchemaException::indexNoColumn($name);
         }
 
         $duplicated = array_unique(array_diff_key($columns, array_unique($columns)));
         if ($duplicated !== []) {
-            throw SchemaException::indexDuplicatedColumn($name, ...$duplicated);
+            throw Exceptions\SchemaException::indexDuplicatedColumn($name, ...$duplicated);
         }
 
         $this->name = $name;

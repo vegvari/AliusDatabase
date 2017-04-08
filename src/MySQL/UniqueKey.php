@@ -2,25 +2,26 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\SchemaException;
+use Alius\Database\Exceptions;
+use Alius\Database\Interfaces;
 
-class UniqueKey extends Constraint
+class UniqueKey extends Constraint implements Interfaces\UniqueKeyInterface
 {
     protected $name;
 
     public function __construct(string $name, string ...$columns)
     {
         if ($name === '' || strtolower($name) === 'primary') {
-            throw SchemaException::uniqueKeyInvalidName($name);
+            throw Exceptions\SchemaException::uniqueKeyInvalidName($name);
         }
 
         if ($columns === []) {
-            throw SchemaException::uniqueKeyNoColumn($name);
+            throw Exceptions\SchemaException::uniqueKeyNoColumn($name);
         }
 
         $duplicated = array_unique(array_diff_key($columns, array_unique($columns)));
         if ($duplicated !== []) {
-            throw SchemaException::uniqueKeyDuplicatedColumn($name, ...$duplicated);
+            throw Exceptions\SchemaException::uniqueKeyDuplicatedColumn($name, ...$duplicated);
         }
 
         $this->name = $name;

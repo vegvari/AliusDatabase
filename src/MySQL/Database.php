@@ -2,10 +2,10 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\SchemaException;
-use Alius\Database\DatabaseException;
+use Alius\Database\Exceptions;
+use Alius\Database\Interfaces;
 
-abstract class Database implements DatabaseInterface
+abstract class Database implements Interfaces\DatabaseInterface
 {
     protected static $name;
 
@@ -21,7 +21,7 @@ abstract class Database implements DatabaseInterface
         $this->setUp();
     }
 
-    final public function setImmutable(): DatabaseInterface
+    final public function setImmutable(): Interfaces\DatabaseInterface
     {
         $this->immutable = true;
         return $this;
@@ -35,7 +35,7 @@ abstract class Database implements DatabaseInterface
     final public static function getName(): string
     {
         if (! is_string(static::$name) || static::$name === '') {
-            throw SchemaException::invalidDatabaseName(static::class);
+            throw Exceptions\SchemaException::invalidDatabaseName(static::class);
         }
 
         return static::$name;
@@ -45,10 +45,10 @@ abstract class Database implements DatabaseInterface
     {
     }
 
-    final public function setEngine(string $engine): DatabaseInterface
+    final public function setEngine(string $engine): Interfaces\DatabaseInterface
     {
         if ($this->isImmutable()) {
-            throw SchemaException::immutable(static::class);
+            throw Exceptions\SchemaException::immutable(static::class);
         }
 
         $this->engine = $engine;
@@ -60,10 +60,10 @@ abstract class Database implements DatabaseInterface
         return $this->engine;
     }
 
-    final public function setCharset(string $charset): DatabaseInterface
+    final public function setCharset(string $charset): Interfaces\DatabaseInterface
     {
         if ($this->isImmutable()) {
-            throw SchemaException::immutable(static::class);
+            throw Exceptions\SchemaException::immutable(static::class);
         }
 
         $this->charset = $charset;
@@ -75,10 +75,10 @@ abstract class Database implements DatabaseInterface
         return $this->charset;
     }
 
-    final public function setCollation(string $collation): DatabaseInterface
+    final public function setCollation(string $collation): Interfaces\DatabaseInterface
     {
         if ($this->isImmutable()) {
-            throw SchemaException::immutable(static::class);
+            throw Exceptions\SchemaException::immutable(static::class);
         }
 
         $this->collation = $collation;
@@ -90,28 +90,28 @@ abstract class Database implements DatabaseInterface
         return $this->collation;
     }
 
-    final public function setTable(string $table_class): DatabaseInterface
+    final public function setTable(string $table_class): Interfaces\DatabaseInterface
     {
         if ($this->isImmutable()) {
-            throw SchemaException::immutable(static::class);
+            throw Exceptions\SchemaException::immutable(static::class);
         }
 
-        if (! isset(class_implements($table_class)[TableInterface::class])) {
-            throw SchemaException::invalidTable(TableInterface::class, $table_class);
+        if (! isset(class_implements($table_class)[Interfaces\TableInterface::class])) {
+            throw Exceptions\SchemaException::invalidTable(Interfaces\TableInterface::class, $table_class);
         }
 
         if ($this->hasTable($table_class::getName())) {
-            throw SchemaException::tableAlreadySet(static::class, $table_class);
+            throw Exceptions\SchemaException::tableAlreadySet(static::class, $table_class);
         }
 
         $this->tables[$table_class::getName()] = $table_class;
         return $this;
     }
 
-    final public function getTable(string $table_name): TableInterface
+    final public function getTable(string $table_name): Interfaces\TableInterface
     {
         if (! $this->hasTable($table_name)) {
-            throw DatabaseException::tableNotSet(static::class, $table_name);
+            throw Exceptions\DatabaseException::tableNotSet(static::class, $table_name);
         }
 
         if (is_string($this->tables[$table_name])) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Alius\Database\MySQL;
+namespace Alius\Database\Exceptions;
 
 class Exception extends \Exception
 {

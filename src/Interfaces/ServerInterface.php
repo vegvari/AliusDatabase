@@ -1,6 +1,6 @@
 <?php
 
-namespace Alius\Database\MySQL;
+namespace Alius\Database\Interfaces;
 
 interface ServerInterface
 {

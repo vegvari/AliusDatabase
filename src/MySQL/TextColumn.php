@@ -2,7 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\SchemaException;
+use Alius\Database\Exceptions;
 
 class TextColumn extends Column
 {
@@ -22,7 +22,7 @@ class TextColumn extends Column
         $this->name = $name;
 
         if (! isset(self::$types[$type])) {
-            throw SchemaException::invalidColumnType($type);
+            throw Exceptions\SchemaException::invalidColumnType($type);
         }
 
         $this->type = $type;
@@ -75,7 +75,7 @@ class TextColumn extends Column
         $value = (string) $value;
 
         if (mb_strlen($value) > $this->getLength()) {
-            throw SchemaException::invalidColumnStringLength($this->getType());
+            throw Exceptions\SchemaException::invalidColumnStringLength($this->getType());
         }
 
         return $value;

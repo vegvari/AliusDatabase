@@ -2,8 +2,8 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\SchemaException;
-use Alius\Database\ServerException;
+use Alius\Database\Exceptions;
+use Alius\Database\Interfaces;
 
 class ServerTestDatabaseFixture extends Database
 {
@@ -63,12 +63,12 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($reader, $server->getReader());
 
         // transaction with callable
-        $server->transaction(function (ServerInterface $server) {
+        $server->transaction(function (Interfaces\ServerInterface $server) {
             $this->assertSame(true, $server->inTransaction());
         });
         $this->assertSame(false, $server->inTransaction());
 
-        $server->transaction(function (ServerInterface $server) {
+        $server->transaction(function (Interfaces\ServerInterface $server) {
             throw new \Exception('foo');
         });
         $this->assertSame(false, $server->inTransaction());
@@ -105,8 +105,8 @@ class ServerTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDatabaseImmutable()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
 
         $server = new class($this->getConnection()) extends Server {
         };
@@ -118,8 +118,8 @@ class ServerTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidDatabase()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::INVALID_DATABASE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::INVALID_DATABASE);
 
         $server = new class($this->getConnection()) extends Server {
         };
@@ -129,8 +129,8 @@ class ServerTest extends \PHPUnit_Framework_TestCase
 
     public function testDatabaseAlreadySet()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::SERVER_DATABASE_ALREADY_SET);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::SERVER_DATABASE_ALREADY_SET);
 
         $server = new class($this->getConnection()) extends Server {
         };
@@ -141,8 +141,8 @@ class ServerTest extends \PHPUnit_Framework_TestCase
 
     public function testTableNotSet()
     {
-        $this->expectException(ServerException::class);
-        $this->expectExceptionCode(ServerException::SERVER_DATABASE_NOT_SET);
+        $this->expectException(Exceptions\ServerException::class);
+        $this->expectExceptionCode(Exceptions\ServerException::SERVER_DATABASE_NOT_SET);
 
         $server = new class($this->getConnection()) extends Server {
         };

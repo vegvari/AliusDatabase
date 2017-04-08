@@ -2,7 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\SchemaException;
+use Alius\Database\Exceptions;
 
 class CharColumnTest extends \PHPUnit_Framework_TestCase
 {
@@ -162,8 +162,8 @@ class CharColumnTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidType()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_INVALID_TYPE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_INVALID_TYPE);
 
         $column = new CharColumn('foo', 'bar', 0);
     }
@@ -173,8 +173,8 @@ class CharColumnTest extends \PHPUnit_Framework_TestCase
      */
     public function testLengthMin(string $type)
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_STRING_INVALID_LENGTH);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_STRING_INVALID_LENGTH);
 
         $column = new CharColumn('foo', $type, -1);
     }
@@ -184,8 +184,8 @@ class CharColumnTest extends \PHPUnit_Framework_TestCase
      */
     public function testLengthMax(string $type, int $length)
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_STRING_INVALID_LENGTH);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_STRING_INVALID_LENGTH);
 
         $column = new CharColumn('foo', $type, $length + 1);
     }
@@ -195,8 +195,8 @@ class CharColumnTest extends \PHPUnit_Framework_TestCase
      */
     public function testTooLong(string $type, int $length)
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_STRING_INVALID_LENGTH);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_STRING_INVALID_LENGTH);
 
         $column = new CharColumn('foo', $type, $length);
         $column->check(str_repeat('a', $length + 1));
@@ -207,8 +207,8 @@ class CharColumnTest extends \PHPUnit_Framework_TestCase
      */
     public function testDefaultTooLong(string $type, int $length)
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::COLUMN_STRING_INVALID_LENGTH);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::COLUMN_STRING_INVALID_LENGTH);
 
         $column = new CharColumn('foo', $type, $length);
         $column->setDefault(str_repeat('a', $length + 1));

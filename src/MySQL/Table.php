@@ -2,10 +2,10 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\TableException;
-use Alius\Database\SchemaException;
+use Alius\Database\Exceptions;
+use Alius\Database\Interfaces;
 
-abstract class Table implements TableInterface
+abstract class Table implements Interfaces\TableInterface
 {
     protected static $name;
 
@@ -21,7 +21,7 @@ abstract class Table implements TableInterface
     private $indexes = [];
     private $foreign_keys = [];
 
-    final public function __construct(DatabaseInterface $database)
+    final public function __construct(Interfaces\DatabaseInterface $database)
     {
         $this->getName();
 
@@ -33,7 +33,7 @@ abstract class Table implements TableInterface
         $this->setUp();
     }
 
-    final public function setImmutable(): TableInterface
+    final public function setImmutable(): Interfaces\TableInterface
     {
         $this->immutable = true;
         return $this;
@@ -47,7 +47,7 @@ abstract class Table implements TableInterface
     final public static function getName(): string
     {
         if (! is_string(static::$name) || static::$name === '') {
-            throw SchemaException::invalidTableName(static::class);
+            throw Exceptions\SchemaException::invalidTableName(static::class);
         }
 
         return static::$name;
@@ -62,10 +62,10 @@ abstract class Table implements TableInterface
         return $this->database_name;
     }
 
-    final public function setEngine(string $engine): TableInterface
+    final public function setEngine(string $engine): Interfaces\TableInterface
     {
         if ($this->isImmutable()) {
-            throw SchemaException::immutable(static::class);
+            throw Exceptions\SchemaException::immutable(static::class);
         }
 
         $this->engine = $engine;
@@ -77,10 +77,10 @@ abstract class Table implements TableInterface
         return $this->engine;
     }
 
-    final public function setCharset(string $charset): TableInterface
+    final public function setCharset(string $charset): Interfaces\TableInterface
     {
         if ($this->isImmutable()) {
-            throw SchemaException::immutable(static::class);
+            throw Exceptions\SchemaException::immutable(static::class);
         }
 
         $this->charset = $charset;
@@ -92,10 +92,10 @@ abstract class Table implements TableInterface
         return $this->charset;
     }
 
-    final public function setCollation(string $collation): TableInterface
+    final public function setCollation(string $collation): Interfaces\TableInterface
     {
         if ($this->isImmutable()) {
-            throw SchemaException::immutable(static::class);
+            throw Exceptions\SchemaException::immutable(static::class);
         }
 
         $this->collation = $collation;
@@ -107,24 +107,24 @@ abstract class Table implements TableInterface
         return $this->collation;
     }
 
-    final public function setColumn(ColumnInterface $column): TableInterface
+    final public function setColumn(Interfaces\ColumnInterface $column): Interfaces\TableInterface
     {
         if ($this->isImmutable()) {
-            throw SchemaException::immutable(static::class);
+            throw Exceptions\SchemaException::immutable(static::class);
         }
 
         if ($this->hasColumn($column->getName())) {
-            throw SchemaException::columnAlreadySet(static::class, $column->getName());
+            throw Exceptions\SchemaException::columnAlreadySet(static::class, $column->getName());
         }
 
         $this->columns[$column->getName()] = $column;
         return $this;
     }
 
-    final public function getColumn(string $column_name): ColumnInterface
+    final public function getColumn(string $column_name): Interfaces\ColumnInterface
     {
         if (! $this->hasColumn($column_name)) {
-            throw TableException::columnNotSet(static::class, $column_name);
+            throw Exceptions\TableException::columnNotSet(static::class, $column_name);
         }
 
         return $this->columns[$column_name];
@@ -144,34 +144,34 @@ abstract class Table implements TableInterface
         return isset($this->columns[$column_name]);
     }
 
-    final public function setPrimaryKeyObject(PrimaryKey $primary_key): TableInterface
+    final public function setPrimaryKeyObject(Interfaces\PrimaryKeyInterface $primary_key): Interfaces\TableInterface
     {
         if ($this->isImmutable()) {
-            throw SchemaException::immutable(static::class);
+            throw Exceptions\SchemaException::immutable(static::class);
         }
 
         if ($this->hasPrimaryKey()) {
-            throw SchemaException::primaryKeyAlreadySet(static::class);
+            throw Exceptions\SchemaException::primaryKeyAlreadySet(static::class);
         }
 
         $missing = array_diff($primary_key->getColumns(), array_keys($this->getColumns()));
         if ($missing !== []) {
-            throw TableException::columnNotSet(static::class, implode(', ', $missing));
+            throw Exceptions\TableException::columnNotSet(static::class, implode(', ', $missing));
         }
 
         $this->primary_key = $primary_key;
         return $this;
     }
 
-    final public function setPrimaryKey(string ...$columns): TableInterface
+    final public function setPrimaryKey(string ...$columns): Interfaces\TableInterface
     {
         return $this->setPrimaryKeyObject(new PrimaryKey(...$columns));
     }
 
-    final public function getPrimaryKey(): PrimaryKey
+    final public function getPrimaryKey(): Interfaces\PrimaryKeyInterface
     {
         if (! $this->hasPrimaryKey()) {
-            throw TableException::primaryKeyNotSet(static::class);
+            throw Exceptions\TableException::primaryKeyNotSet(static::class);
         }
 
         return $this->primary_key;
@@ -187,34 +187,34 @@ abstract class Table implements TableInterface
         return $this->hasPrimaryKey() && $this->getPrimaryKey()->isComposite();
     }
 
-    final public function setUniqueKeyObject(UniqueKey $unique_key): TableInterface
+    final public function setUniqueKeyObject(Interfaces\UniqueKeyInterface $unique_key): Interfaces\TableInterface
     {
         if ($this->isImmutable()) {
-            throw SchemaException::immutable(static::class);
+            throw Exceptions\SchemaException::immutable(static::class);
         }
 
         if ($this->hasUniqueKey($unique_key->getName())) {
-            throw SchemaException::uniqueKeyAlreadySet(static::class, $unique_key->getName());
+            throw Exceptions\SchemaException::uniqueKeyAlreadySet(static::class, $unique_key->getName());
         }
 
         $missing = array_diff($unique_key->getColumns(), array_keys($this->getColumns()));
         if ($missing !== []) {
-            throw TableException::columnNotSet(static::class, implode(', ', $missing));
+            throw Exceptions\TableException::columnNotSet(static::class, implode(', ', $missing));
         }
 
         $this->unique_keys[$unique_key->getName()] = $unique_key;
         return $this;
     }
 
-    final public function setUniqueKey(string ...$columns): TableInterface
+    final public function setUniqueKey(string ...$columns): Interfaces\TableInterface
     {
         return $this->setUniqueKeyObject(new UniqueKey(sprintf('unique-%s', implode('-', $columns)), ...$columns));
     }
 
-    final public function getUniqueKey(string $name): UniqueKey
+    final public function getUniqueKey(string $name): Interfaces\UniqueKeyInterface
     {
         if (! $this->hasUniqueKey($name)) {
-            throw TableException::uniqueKeyNotSet(static::class, $name);
+            throw Exceptions\TableException::uniqueKeyNotSet(static::class, $name);
         }
 
         return $this->unique_keys[$name];
@@ -234,34 +234,34 @@ abstract class Table implements TableInterface
         return $this->unique_keys !== [];
     }
 
-    final public function setIndexObject(Index $index): TableInterface
+    final public function setIndexObject(Interfaces\IndexInterface $index): Interfaces\TableInterface
     {
         if ($this->isImmutable()) {
-            throw SchemaException::immutable(static::class);
+            throw Exceptions\SchemaException::immutable(static::class);
         }
 
         if ($this->hasIndex($index->getName())) {
-            throw SchemaException::indexAlreadySet(static::class, $index->getName());
+            throw Exceptions\SchemaException::indexAlreadySet(static::class, $index->getName());
         }
 
         $missing = array_diff($index->getColumns(), array_keys($this->getColumns()));
         if ($missing !== []) {
-            throw TableException::columnNotSet(static::class, implode(', ', $missing));
+            throw Exceptions\TableException::columnNotSet(static::class, implode(', ', $missing));
         }
 
         $this->indexes[$index->getName()] = $index;
         return $this;
     }
 
-    final public function setIndex(string ...$columns): TableInterface
+    final public function setIndex(string ...$columns): Interfaces\TableInterface
     {
         return $this->setIndexObject(new Index(sprintf('index-%s', implode('-', $columns)), ...$columns));
     }
 
-    final public function getIndex(string $name): Index
+    final public function getIndex(string $name): Interfaces\IndexInterface
     {
         if (! $this->hasIndex($name)) {
-            throw TableException::indexNotSet(static::class, $name);
+            throw Exceptions\TableException::indexNotSet(static::class, $name);
         }
 
         return $this->indexes[$name];
@@ -292,19 +292,19 @@ abstract class Table implements TableInterface
         return false;
     }
 
-    final public function setForeignKeyObject(ForeignKey $foreign_key): TableInterface
+    final public function setForeignKeyObject(Interfaces\ForeignKeyInterface $foreign_key): Interfaces\TableInterface
     {
         if ($this->isImmutable()) {
-            throw SchemaException::immutable(static::class);
+            throw Exceptions\SchemaException::immutable(static::class);
         }
 
         if ($this->hasForeignKey($foreign_key->getName())) {
-            throw SchemaException::foreignKeyAlreadySet(static::class, $foreign_key->getName());
+            throw Exceptions\SchemaException::foreignKeyAlreadySet(static::class, $foreign_key->getName());
         }
 
         $missing = array_diff($foreign_key->getColumns(), array_keys($this->getColumns()));
         if ($missing !== []) {
-            throw TableException::columnNotSet(static::class, implode(', ', $missing));
+            throw Exceptions\TableException::columnNotSet(static::class, implode(', ', $missing));
         }
 
         $this->foreign_keys[$foreign_key->getName()] = $foreign_key;
@@ -316,16 +316,16 @@ abstract class Table implements TableInterface
         return $this;
     }
 
-    final public function setForeignKey($columns, string $parent_table, $parent_columns = null, string $on_update = 'RESTRICT', string $on_delete = 'RESTRICT'): TableInterface
+    final public function setForeignKey($columns, string $parent_table, $parent_columns = null, string $on_update = 'RESTRICT', string $on_delete = 'RESTRICT'): Interfaces\TableInterface
     {
         $name = sprintf('%s_ibfk_%d', static::getName(), count($this->foreign_keys) + 1);
         return $this->setForeignKeyObject(new ForeignKey($name, $columns, $parent_table, $parent_columns, $on_update, $on_delete));
     }
 
-    final public function getForeignKey(string $name): ForeignKey
+    final public function getForeignKey(string $name): Interfaces\ForeignKeyInterface
     {
         if (! $this->hasForeignKey($name)) {
-            throw TableException::foreignKeyNotSet(static::class, $name);
+            throw Exceptions\TableException::foreignKeyNotSet(static::class, $name);
         }
 
         return $this->foreign_keys[$name];

@@ -2,6 +2,8 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\Interfaces;
+
 class DateTimeColumn extends Column
 {
     protected $default_current = false;
@@ -13,7 +15,7 @@ class DateTimeColumn extends Column
         $this->type = 'datetime';
     }
 
-    public function setDefault($value): Column
+    public function setDefault($value): Interfaces\ColumnInterface
     {
         if ($value === 'CURRENT_TIMESTAMP') {
             $this->default_current = true;
@@ -22,7 +24,7 @@ class DateTimeColumn extends Column
         return parent::setDefault($value);
     }
 
-    public function setDefaultCurrent(): Column
+    public function setDefaultCurrent(): Interfaces\ColumnInterface
     {
         return $this->setDefault('CURRENT_TIMESTAMP');
     }
@@ -32,7 +34,7 @@ class DateTimeColumn extends Column
         return $this->default_current;
     }
 
-    public function setOnUpdateCurrent(): Column
+    public function setOnUpdateCurrent(): Interfaces\ColumnInterface
     {
         $this->on_update_current = true;
         return $this;

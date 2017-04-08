@@ -1,6 +1,8 @@
 <?php
 
-namespace Alius\Database;
+namespace Alius\Database\Exceptions;
+
+use Alius\Database\Interfaces\ExceptionInterface;
 
 class LogicException extends \LogicException implements ExceptionInterface
 {

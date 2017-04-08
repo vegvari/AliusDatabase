@@ -2,7 +2,9 @@
 
 namespace Alius\Database\MySQL;
 
-class Connection implements ConnectionInterface, \Serializable
+use Alius\Database\Interfaces;
+
+class Connection implements Interfaces\ConnectionInterface, \Serializable
 {
     const DEFAULT_OPTIONS = [
         \PDO::ATTR_EMULATE_PREPARES   => false,

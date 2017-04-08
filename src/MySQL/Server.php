@@ -2,17 +2,17 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\SchemaException;
-use Alius\Database\ServerException;
+use Alius\Database\Exceptions;
+use Alius\Database\Interfaces;
 
-abstract class Server implements ServerInterface
+abstract class Server implements Interfaces\ServerInterface
 {
     private $immutable = false;
     private $writer;
     private $readers = [];
     private $databases = [];
 
-    public function __construct(Connection $writer, Connection ...$readers)
+    public function __construct(Interfaces\ConnectionInterface $writer, Interfaces\ConnectionInterface ...$readers)
     {
         $this->writer = $writer;
         $this->readers = $readers;
@@ -23,7 +23,7 @@ abstract class Server implements ServerInterface
     {
     }
 
-    final public function setImmutable(): ServerInterface
+    final public function setImmutable(): Interfaces\ServerInterface
     {
         $this->immutable = true;
         return $this;
@@ -34,12 +34,12 @@ abstract class Server implements ServerInterface
         return $this->immutable;
     }
 
-    final public function getWriter(): ConnectionInterface
+    final public function getWriter(): Interfaces\ConnectionInterface
     {
         return $this->writer;
     }
 
-    final public function getReader(): ConnectionInterface
+    final public function getReader(): Interfaces\ConnectionInterface
     {
         if (! $this->hasReader() || $this->inTransaction()) {
             return $this->writer;
@@ -99,28 +99,28 @@ abstract class Server implements ServerInterface
         }
     }
 
-    final public function setDatabase(string $database_class): ServerInterface
+    final public function setDatabase(string $database_class): Interfaces\ServerInterface
     {
         if ($this->isImmutable()) {
-            throw SchemaException::immutable(static::class);
+            throw Exceptions\SchemaException::immutable(static::class);
         }
 
-        if (! isset(class_implements($database_class)[DatabaseInterface::class])) {
-            throw SchemaException::invalidDatabase(DatabaseInterface::class, $database_class);
+        if (! isset(class_implements($database_class)[Interfaces\DatabaseInterface::class])) {
+            throw Exceptions\SchemaException::invalidDatabase(Interfaces\DatabaseInterface::class, $database_class);
         }
 
         if ($this->hasDatabase($database_class::getName())) {
-            throw SchemaException::databaseAlreadySet(get_class($this), $database_class);
+            throw Exceptions\SchemaException::databaseAlreadySet(get_class($this), $database_class);
         }
 
         $this->databases[$database_class::getName()] = $database_class;
         return $this;
     }
 
-    final public function getDatabase(string $database_name): DatabaseInterface
+    final public function getDatabase(string $database_name): Interfaces\DatabaseInterface
     {
         if (! $this->hasDatabase($database_name)) {
-            throw ServerException::databaseNotSet(static::class, $database_name);
+            throw Exceptions\ServerException::databaseNotSet(static::class, $database_name);
         }
 
         if (is_string($this->databases[$database_name])) {

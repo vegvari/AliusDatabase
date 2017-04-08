@@ -2,7 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\SchemaException;
+use Alius\Database\Exceptions;
 
 class IndexTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,32 +23,32 @@ class IndexTest extends \PHPUnit_Framework_TestCase
 
     public function testEmptyName()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::INDEX_INVALID_NAME);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::INDEX_INVALID_NAME);
 
         new Index('', 'column');
     }
 
     public function testInvalidName()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::INDEX_INVALID_NAME);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::INDEX_INVALID_NAME);
 
         new Index('primary', 'column');
     }
 
     public function testNoColumn()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::INDEX_NO_COLUMN);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::INDEX_NO_COLUMN);
 
         new Index('foo');
     }
 
     public function testDuplicatedColumn()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::INDEX_DUPLICATED_COLUMN);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::INDEX_DUPLICATED_COLUMN);
 
         new Index('foo', 'column', 'column');
     }

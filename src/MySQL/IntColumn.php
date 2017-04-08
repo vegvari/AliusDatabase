@@ -2,7 +2,8 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\SchemaException;
+use Alius\Database\Exceptions;
+use Alius\Database\Interfaces;
 
 class IntColumn extends Column
 {
@@ -30,13 +31,13 @@ class IntColumn extends Column
         $this->name = $name;
 
         if (! isset(self::$types[$type])) {
-            throw SchemaException::invalidColumnType($type);
+            throw Exceptions\SchemaException::invalidColumnType($type);
         }
 
         $this->type = $type;
     }
 
-    public function setUnsigned(): Column
+    public function setUnsigned(): Interfaces\ColumnInterface
     {
         $this->unsigned = true;
         return $this;
@@ -47,32 +48,32 @@ class IntColumn extends Column
         return $this->unsigned;
     }
 
-    public function setNullable(): Column
+    public function setNullable(): Interfaces\ColumnInterface
     {
         if ($this->isAutoIncrement()) {
-            throw SchemaException::invalidColumnIntAutoIncrementNullable();
+            throw Exceptions\SchemaException::invalidColumnIntAutoIncrementNullable();
         }
 
         return parent::setNullable();
     }
 
-    public function setDefault($value): Column
+    public function setDefault($value): Interfaces\ColumnInterface
     {
         if ($this->isAutoIncrement()) {
-            throw SchemaException::invalidColumnIntAutoIncrementDefault();
+            throw Exceptions\SchemaException::invalidColumnIntAutoIncrementDefault();
         }
 
         return parent::setDefault($value);
     }
 
-    public function setAutoIncrement(): Column
+    public function setAutoIncrement(): Interfaces\ColumnInterface
     {
         if ($this->isNullable()) {
-            throw SchemaException::invalidColumnIntAutoIncrementNullable();
+            throw Exceptions\SchemaException::invalidColumnIntAutoIncrementNullable();
         }
 
         if ($this->hasDefault()) {
-            throw SchemaException::invalidColumnIntAutoIncrementDefault();
+            throw Exceptions\SchemaException::invalidColumnIntAutoIncrementDefault();
         }
 
         $this->auto_increment = true;
@@ -109,11 +110,11 @@ class IntColumn extends Column
         }
 
         if (bccomp($value, $this->getMin()) === -1) {
-            throw SchemaException::invalidColumnIntValueMin($this->getMin());
+            throw Exceptions\SchemaException::invalidColumnIntValueMin($this->getMin());
         }
 
         if (bccomp($value, $this->getMax()) === 1) {
-            throw SchemaException::invalidColumnIntValueMax($this->getMax());
+            throw Exceptions\SchemaException::invalidColumnIntValueMax($this->getMax());
         }
 
         return (int) $value;

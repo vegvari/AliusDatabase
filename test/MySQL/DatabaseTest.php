@@ -2,8 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\SchemaException;
-use Alius\Database\DatabaseException;
+use Alius\Database\Exceptions;
 
 class DatabaseTestTableFixture extends Table
 {
@@ -57,8 +56,8 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidNameConstructor()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::DATABASE_INVALID_NAME);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::DATABASE_INVALID_NAME);
 
         $database = new class() extends Database {
         };
@@ -66,16 +65,16 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidNameGetName()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::DATABASE_INVALID_NAME);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::DATABASE_INVALID_NAME);
 
         DatabaseTestDatabaseFixtureInvalidName::getName();
     }
 
     public function testInvalidTable()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::INVALID_TABLE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::INVALID_TABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -86,8 +85,8 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function testTableAlreadySet()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::DATABASE_TABLE_ALREADY_SET);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::DATABASE_TABLE_ALREADY_SET);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -99,8 +98,8 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function testTableNotSet()
     {
-        $this->expectException(DatabaseException::class);
-        $this->expectExceptionCode(DatabaseException::DATABASE_TABLE_NOT_SET);
+        $this->expectException(Exceptions\DatabaseException::class);
+        $this->expectExceptionCode(Exceptions\DatabaseException::DATABASE_TABLE_NOT_SET);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -111,8 +110,8 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function testImmutableSetEngine()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -124,8 +123,8 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function testImmutableSetCharset()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -137,8 +136,8 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function testImmutableSetCollation()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -150,8 +149,8 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
     public function testImmutableSetTable()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';

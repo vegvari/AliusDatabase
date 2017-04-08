@@ -2,8 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\TableException;
-use Alius\Database\SchemaException;
+use Alius\Database\Exceptions;
 
 class TableTestTableFixtureInvalidName extends Table
 {
@@ -125,8 +124,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidNameConstructor()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::TABLE_INVALID_NAME);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::TABLE_INVALID_NAME);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -138,16 +137,16 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidNameGetName()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::TABLE_INVALID_NAME);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::TABLE_INVALID_NAME);
 
         TableTestTableFixtureInvalidName::getName();
     }
 
     public function testSetColumnAlreadySet()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::TABLE_COLUMN_ALREADY_SET);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::TABLE_COLUMN_ALREADY_SET);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -163,8 +162,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testGetColumnNotSet()
     {
-        $this->expectException(TableException::class);
-        $this->expectExceptionCode(TableException::TABLE_COLUMN_NOT_SET);
+        $this->expectException(Exceptions\TableException::class);
+        $this->expectExceptionCode(Exceptions\TableException::TABLE_COLUMN_NOT_SET);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -179,8 +178,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testSetPrimaryKeyAlradySet()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::TABLE_PRIMARY_KEY_ALREADY_SET);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::TABLE_PRIMARY_KEY_ALREADY_SET);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -197,8 +196,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testSetPrimaryKeyColumnNotSet()
     {
-        $this->expectException(TableException::class);
-        $this->expectExceptionCode(TableException::TABLE_COLUMN_NOT_SET);
+        $this->expectException(Exceptions\TableException::class);
+        $this->expectExceptionCode(Exceptions\TableException::TABLE_COLUMN_NOT_SET);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -213,8 +212,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPrimaryKeyNotSet()
     {
-        $this->expectException(TableException::class);
-        $this->expectExceptionCode(TableException::TABLE_PRIMARY_KEY_NOT_SET);
+        $this->expectException(Exceptions\TableException::class);
+        $this->expectExceptionCode(Exceptions\TableException::TABLE_PRIMARY_KEY_NOT_SET);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -229,8 +228,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testSetUniqueKeyAlradySet()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::TABLE_UNIQUE_KEY_ALREADY_SET);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::TABLE_UNIQUE_KEY_ALREADY_SET);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -247,8 +246,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testSetUniqueKeyColumnNotSet()
     {
-        $this->expectException(TableException::class);
-        $this->expectExceptionCode(TableException::TABLE_COLUMN_NOT_SET);
+        $this->expectException(Exceptions\TableException::class);
+        $this->expectExceptionCode(Exceptions\TableException::TABLE_COLUMN_NOT_SET);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -263,8 +262,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testGetUniqueKeyNotSet()
     {
-        $this->expectException(TableException::class);
-        $this->expectExceptionCode(TableException::TABLE_UNIQUE_KEY_NOT_SET);
+        $this->expectException(Exceptions\TableException::class);
+        $this->expectExceptionCode(Exceptions\TableException::TABLE_UNIQUE_KEY_NOT_SET);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -279,8 +278,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testSetIndexAlradySet()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::TABLE_INDEX_ALREADY_SET);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::TABLE_INDEX_ALREADY_SET);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -297,8 +296,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testSetIndexColumnNotSet()
     {
-        $this->expectException(TableException::class);
-        $this->expectExceptionCode(TableException::TABLE_COLUMN_NOT_SET);
+        $this->expectException(Exceptions\TableException::class);
+        $this->expectExceptionCode(Exceptions\TableException::TABLE_COLUMN_NOT_SET);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -313,8 +312,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testGetIndexKeyNotSet()
     {
-        $this->expectException(TableException::class);
-        $this->expectExceptionCode(TableException::TABLE_INDEX_NOT_SET);
+        $this->expectException(Exceptions\TableException::class);
+        $this->expectExceptionCode(Exceptions\TableException::TABLE_INDEX_NOT_SET);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -329,8 +328,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testSetForeignKeyAlradySet()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::TABLE_FOREIGN_KEY_ALREADY_SET);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::TABLE_FOREIGN_KEY_ALREADY_SET);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -347,8 +346,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testSetForeignKeyColumnNotSet()
     {
-        $this->expectException(TableException::class);
-        $this->expectExceptionCode(TableException::TABLE_COLUMN_NOT_SET);
+        $this->expectException(Exceptions\TableException::class);
+        $this->expectExceptionCode(Exceptions\TableException::TABLE_COLUMN_NOT_SET);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -363,8 +362,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testGetForeignKeyNotSet()
     {
-        $this->expectException(TableException::class);
-        $this->expectExceptionCode(TableException::TABLE_FOREIGN_KEY_NOT_SET);
+        $this->expectException(Exceptions\TableException::class);
+        $this->expectExceptionCode(Exceptions\TableException::TABLE_FOREIGN_KEY_NOT_SET);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -379,8 +378,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testImmutableSetEngine()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -396,8 +395,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testImmutableSetCharset()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -413,8 +412,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testImmutableSetCollation()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -430,8 +429,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testImmutableSetColumn()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -447,8 +446,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testImmutableSetPrimaryKey()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -464,8 +463,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testImmutableSetUniqueKey()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -481,8 +480,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testImmutableSetIndex()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -498,8 +497,8 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
     public function testImmutableSetForeignKey()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';

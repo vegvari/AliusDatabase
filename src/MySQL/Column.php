@@ -2,7 +2,9 @@
 
 namespace Alius\Database\MySQL;
 
-abstract class Column implements ColumnInterface
+use Alius\Database\Interfaces;
+
+abstract class Column implements Interfaces\ColumnInterface
 {
     protected $name;
     protected $type;
@@ -20,7 +22,7 @@ abstract class Column implements ColumnInterface
         return $this->type;
     }
 
-    public function setNullable(): Column
+    public function setNullable(): Interfaces\ColumnInterface
     {
         $this->nullable = true;
         return $this;
@@ -31,7 +33,7 @@ abstract class Column implements ColumnInterface
         return $this->nullable;
     }
 
-    public function setDefault($value): Column
+    public function setDefault($value): Interfaces\ColumnInterface
     {
         $this->default = $this->check($value);
         return $this;
@@ -47,7 +49,7 @@ abstract class Column implements ColumnInterface
         return $this->getDefault() !== null;
     }
 
-    public function setComment(string $comment): Column
+    public function setComment(string $comment): Interfaces\ColumnInterface
     {
         $this->comment = $comment;
         return $this;

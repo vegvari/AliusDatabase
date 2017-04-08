@@ -2,7 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
-use Alius\Database\SchemaException;
+use Alius\Database\Exceptions;
 
 class PrimaryKeyTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,16 +23,16 @@ class PrimaryKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testNoColumn()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::PRIMARY_KEY_NO_COLUMN);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::PRIMARY_KEY_NO_COLUMN);
 
         new PrimaryKey();
     }
 
     public function testDuplicated()
     {
-        $this->expectException(SchemaException::class);
-        $this->expectExceptionCode(SchemaException::PRIMARY_KEY_DUPLICATED_COLUMN);
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::PRIMARY_KEY_DUPLICATED_COLUMN);
 
         new PrimaryKey('column', 'column');
     }
