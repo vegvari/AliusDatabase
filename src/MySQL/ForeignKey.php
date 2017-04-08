@@ -9,7 +9,6 @@ class ForeignKey extends Constraint implements Interfaces\ForeignKeyInterface
 {
     const RULES = ['CASCADE', 'NO ACTION', 'RESTRICT', 'SET DEFAULT', 'SET NULL'];
 
-    protected $name;
     protected $parent_table;
     protected $parent_columns;
     protected $update_rule;
@@ -63,11 +62,6 @@ class ForeignKey extends Constraint implements Interfaces\ForeignKeyInterface
         $this->parent_columns = $parent_columns;
         $this->update_rule = $update_rule === 'NO ACTION' ? 'RESTRICT' : $update_rule;
         $this->delete_rule = $delete_rule === 'NO ACTION' ? 'RESTRICT' : $delete_rule;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
     }
 
     public function getParentTable(): string

@@ -6,9 +6,15 @@ use Alius\Database\Interfaces;
 
 abstract class Constraint implements Interfaces\ConstraintInterface
 {
+    protected $name = '';
     protected $columns = [];
 
-    public function getColumns(): array
+    final public function getName(): string
+    {
+        return $this->name;
+    }
+
+    final public function getColumns(): array
     {
         return $this->columns;
     }

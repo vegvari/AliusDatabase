@@ -84,7 +84,7 @@ abstract class Column implements Interfaces\ColumnInterface
         return sprintf('DROP COLUMN `%s`', $this->getName());
     }
 
-    public function buildAdd(Column $after = null): string
+    public function buildAdd(Interfaces\ColumnInterface $after = null): string
     {
         $build = sprintf('ADD COLUMN %s', $this->buildCreate());
 
@@ -95,7 +95,7 @@ abstract class Column implements Interfaces\ColumnInterface
         return $build;
     }
 
-    public function buildChange(Column $column): string
+    public function buildChange(Interfaces\ColumnInterface $column): string
     {
         return sprintf('CHANGE COLUMN `%s` %s', $column->getName(), $this->buildCreate());
     }

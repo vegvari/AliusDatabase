@@ -7,8 +7,6 @@ use Alius\Database\Interfaces;
 
 class UniqueKey extends Constraint implements Interfaces\UniqueKeyInterface
 {
-    protected $name;
-
     public function __construct(string $name, string ...$columns)
     {
         if ($name === '' || strtolower($name) === 'primary') {
@@ -26,11 +24,6 @@ class UniqueKey extends Constraint implements Interfaces\UniqueKeyInterface
 
         $this->name = $name;
         $this->columns = $columns;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
     }
 
     public function buildCreate(): string
