@@ -2,7 +2,9 @@
 
 namespace Alius\Database\MySQL;
 
-abstract class Constraint
+use Alius\Database\Interfaces;
+
+abstract class Constraint implements Interfaces\ConstraintInterface
 {
     protected $columns = [];
 
