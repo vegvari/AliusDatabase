@@ -20,23 +20,42 @@ class TableTest extends \PHPUnit_Framework_TestCase
             protected static $name = 'bar';
         };
 
-        $this->assertSame('bar', $table::getName());
+        // database name
         $this->assertSame('foo', $table->getDatabaseName());
+
+        // table name
+        $this->assertSame('bar', $table::getName());
+
+        // engine
         $this->assertSame('InnoDB', $table->getEngine());
+
+        // charset
         $this->assertSame('utf8', $table->getCharset());
+
+        // collation
         $this->assertSame('utf8_general_ci', $table->getCollation());
+
+        // column
         $this->assertSame(false, $table->hasColumn());
         $this->assertSame(false, $table->hasColumn('foobar'));
         $this->assertSame([], $table->getColumns());
+
+        // primary key
         $this->assertSame(false, $table->hasPrimaryKey());
         $this->assertSame(false, $table->hasCompositePrimaryKey());
+
+        // unique key
         $this->assertSame(false, $table->hasUniqueKey());
         $this->assertSame(false, $table->hasUniqueKey('foobar'));
         $this->assertSame([], $table->getUniqueKeys());
+
+        // index
         $this->assertSame(false, $table->hasIndex());
         $this->assertSame(false, $table->hasIndex('foobar'));
         $this->assertSame(false, $table->hasIndexWithColumns('foobar'));
         $this->assertSame([], $table->getIndexes());
+
+        // foreign key
         $this->assertSame(false, $table->hasForeignKey());
         $this->assertSame(false, $table->hasForeignKey('foobar'));
         $this->assertSame([], $table->getForeignKeys());
@@ -44,10 +63,18 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $database = new class() extends Database {
             protected static $name = 'foo';
 
-            protected function setUp()
+            protected function setUpEngine()
             {
                 $this->setEngine('MyISAM');
+            }
+
+            protected function setUpCharset()
+            {
                 $this->setCharset('latin1');
+            }
+
+            protected function setUpCollation()
+            {
                 $this->setCollation('latin1_bin');
             }
         };
@@ -56,10 +83,45 @@ class TableTest extends \PHPUnit_Framework_TestCase
             protected static $name = 'bar';
         };
 
+        // database name
+        $this->assertSame('foo', $table->getDatabaseName());
+
+        // table name
         $this->assertSame('bar', $table::getName());
+
+        // engine
         $this->assertSame('MyISAM', $table->getEngine());
+
+        // charset
         $this->assertSame('latin1', $table->getCharset());
+
+        // collation
         $this->assertSame('latin1_bin', $table->getCollation());
+
+        // column
+        $this->assertSame(false, $table->hasColumn());
+        $this->assertSame(false, $table->hasColumn('foobar'));
+        $this->assertSame([], $table->getColumns());
+
+        // primary key
+        $this->assertSame(false, $table->hasPrimaryKey());
+        $this->assertSame(false, $table->hasCompositePrimaryKey());
+
+        // unique key
+        $this->assertSame(false, $table->hasUniqueKey());
+        $this->assertSame(false, $table->hasUniqueKey('foobar'));
+        $this->assertSame([], $table->getUniqueKeys());
+
+        // index
+        $this->assertSame(false, $table->hasIndex());
+        $this->assertSame(false, $table->hasIndex('foobar'));
+        $this->assertSame(false, $table->hasIndexWithColumns('foobar'));
+        $this->assertSame([], $table->getIndexes());
+
+        // foreign key
+        $this->assertSame(false, $table->hasForeignKey());
+        $this->assertSame(false, $table->hasForeignKey('foobar'));
+        $this->assertSame([], $table->getForeignKeys());
     }
 
     public function testSetters()
@@ -70,56 +132,91 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
         $table = new class($database) extends Table {
             protected static $name = 'bar';
+
+            protected function setUpEngine()
+            {
+                $this->setEngine('MyISAM');
+            }
+
+            protected function setUpCharset()
+            {
+                $this->setCharset('latin1');
+            }
+
+            protected function setUpCollation()
+            {
+                $this->setCollation('latin1_bin');
+            }
+
+            protected function setUpColumn()
+            {
+                $this->setColumn(Column::int('foobar'));
+            }
+
+            protected function setUpPrimaryKey()
+            {
+                $this->setPrimaryKey('foobar');
+            }
+
+            protected function setUpUniqueKey()
+            {
+                $this->setUniqueKey('foobar');
+            }
+
+            protected function setUpIndex()
+            {
+                $this->setIndex('foobar');
+            }
+
+            protected function setUpForeignKey()
+            {
+                $this->setForeignKey('foobar', 'parent');
+            }
         };
 
-        $table->setEngine('MyISAM');
+        // database name
+        $this->assertSame('foo', $table->getDatabaseName());
+
+        // table name
+        $this->assertSame('bar', $table::getName());
+
+        // engine
         $this->assertSame('MyISAM', $table->getEngine());
 
-        $table->setCharset('latin1');
+        // charset
         $this->assertSame('latin1', $table->getCharset());
 
-        $table->setCollation('latin1_bin');
+        // collation
         $this->assertSame('latin1_bin', $table->getCollation());
 
-        $column = Column::int('foobar');
-        $table->setColumn($column);
+        // column
         $this->assertSame(true, $table->hasColumn());
         $this->assertSame(true, $table->hasColumn('foobar'));
-        $this->assertSame($column, $table->getColumn('foobar'));
-        $this->assertSame(['foobar' => $column], $table->getColumns());
+        $this->assertSame(['foobar' => $table->getColumn('foobar')], $table->getColumns());
 
-        $table->setPrimaryKey('foobar');
+        // primary key
         $this->assertSame(true, $table->hasPrimaryKey());
         $this->assertSame(false, $table->hasCompositePrimaryKey());
         $this->assertEquals(new PrimaryKey('foobar'), $table->getPrimaryKey());
 
-        $table->setUniqueKey('foobar');
+        // unique key
         $this->assertSame(true, $table->hasUniqueKey());
         $this->assertSame(true, $table->hasUniqueKey('unique-foobar'));
         $this->assertEquals(new UniqueKey('unique-foobar', 'foobar'), $table->getUniqueKey('unique-foobar'));
         $this->assertEquals(['unique-foobar' => new UniqueKey('unique-foobar', 'foobar')], $table->getUniqueKeys());
 
-        $table->setIndex('foobar');
+        // index
         $this->assertSame(true, $table->hasIndex());
         $this->assertSame(true, $table->hasIndex('index-foobar'));
         $this->assertSame(true, $table->hasIndexWithColumns('foobar'));
         $this->assertEquals(new Index('index-foobar', 'foobar'), $table->getIndex('index-foobar'));
         $this->assertEquals(['index-foobar' => new Index('index-foobar', 'foobar')], $table->getIndexes());
 
-        $table->setForeignKey('foobar', 'parent');
+        // foreign key
         $this->assertSame(true, $table->hasForeignKey());
         $this->assertSame(true, $table->hasForeignKey('bar_ibfk_1'));
         $this->assertEquals(new ForeignKey('bar_ibfk_1', 'foobar', 'parent'), $table->getForeignKey('bar_ibfk_1'));
         $this->assertEquals(['bar_ibfk_1' => new ForeignKey('bar_ibfk_1', 'foobar', 'parent')], $table->getForeignKeys());
-
-        // foreign key adds a new index if there is no index with the same columns
-        $table = new class($database) extends Table {
-            protected static $name = 'bar';
-        };
-
-        $table->setColumn(Column::int('foobar'));
-        $table->setForeignKey('foobar', 'parent');
-        $this->assertSame(true, $table->hasIndex('bar_ibfk_1'));
     }
 
     public function testInvalidNameConstructor()
@@ -154,10 +251,13 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
         $table = new class($database) extends Table {
             protected static $name = 'bar';
-        };
 
-        $table->setColumn(Column::int('foobar'));
-        $table->setColumn(Column::int('foobar'));
+            protected function setUpColumn()
+            {
+                $this->setColumn(Column::int('foobar'));
+                $this->setColumn(Column::int('foobar'));
+            }
+        };
     }
 
     public function testGetColumnNotSet()
@@ -187,11 +287,18 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
         $table = new class($database) extends Table {
             protected static $name = 'bar';
-        };
 
-        $table->setColumn(Column::int('foobar'));
-        $table->setPrimaryKey('foobar');
-        $table->setPrimaryKey('foobar');
+            protected function setUpColumn()
+            {
+                $this->setColumn(Column::int('foobar'));
+            }
+
+            protected function setUpForeignKey()
+            {
+                $this->setPrimaryKey('foobar');
+                $this->setPrimaryKey('foobar');
+            }
+        };
     }
 
     public function testSetPrimaryKeyColumnNotSet()
@@ -205,9 +312,12 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
         $table = new class($database) extends Table {
             protected static $name = 'bar';
-        };
 
-        $table->setPrimaryKey('foobar');
+            protected function setUpForeignKey()
+            {
+                $this->setPrimaryKey('foobar');
+            }
+        };
     }
 
     public function testGetPrimaryKeyNotSet()
@@ -237,11 +347,18 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
         $table = new class($database) extends Table {
             protected static $name = 'bar';
-        };
 
-        $table->setColumn(Column::int('foobar'));
-        $table->setUniqueKey('foobar');
-        $table->setUniqueKey('foobar');
+            protected function setUpColumn()
+            {
+                $this->setColumn(Column::int('foobar'));
+            }
+
+            protected function setUpUniqueKey()
+            {
+                $this->setUniqueKey('foobar');
+                $this->setUniqueKey('foobar');
+            }
+        };
     }
 
     public function testSetUniqueKeyColumnNotSet()
@@ -255,9 +372,12 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
         $table = new class($database) extends Table {
             protected static $name = 'bar';
-        };
 
-        $table->setUniqueKey('foobar');
+            protected function setUpUniqueKey()
+            {
+                $this->setUniqueKey('foobar');
+            }
+        };
     }
 
     public function testGetUniqueKeyNotSet()
@@ -287,11 +407,18 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
         $table = new class($database) extends Table {
             protected static $name = 'bar';
-        };
 
-        $table->setColumn(Column::int('foobar'));
-        $table->setIndex('foobar');
-        $table->setIndex('foobar');
+            protected function setUpColumn()
+            {
+                $this->setColumn(Column::int('foobar'));
+            }
+
+            protected function setUpUniqueKey()
+            {
+                $this->setIndex('foobar');
+                $this->setIndex('foobar');
+            }
+        };
     }
 
     public function testSetIndexColumnNotSet()
@@ -305,9 +432,12 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
         $table = new class($database) extends Table {
             protected static $name = 'bar';
-        };
 
-        $table->setIndex('foobar');
+            protected function setUpUniqueKey()
+            {
+                $this->setIndex('foobar');
+            }
+        };
     }
 
     public function testGetIndexKeyNotSet()
@@ -337,11 +467,18 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
         $table = new class($database) extends Table {
             protected static $name = 'bar';
-        };
 
-        $table->setColumn(Column::int('foobar'));
-        $table->setForeignKeyObject(new ForeignKey('fk', 'foobar', 'parent'));
-        $table->setForeignKeyObject(new ForeignKey('fk', 'foobar', 'parent'));
+            protected function setUpColumn()
+            {
+                $this->setColumn(Column::int('foobar'));
+            }
+
+            protected function setUpUniqueKey()
+            {
+                $this->setForeignKeyObject(new ForeignKey('fk', 'foobar', 'parent'));
+                $this->setForeignKeyObject(new ForeignKey('fk', 'foobar', 'parent'));
+            }
+        };
     }
 
     public function testSetForeignKeyColumnNotSet()
@@ -355,9 +492,12 @@ class TableTest extends \PHPUnit_Framework_TestCase
 
         $table = new class($database) extends Table {
             protected static $name = 'bar';
-        };
 
-        $table->setForeignKey('foobar', 'parent');
+            protected function setUpUniqueKey()
+            {
+                $this->setForeignKey('foobar', 'parent');
+            }
+        };
     }
 
     public function testGetForeignKeyNotSet()
@@ -389,7 +529,6 @@ class TableTest extends \PHPUnit_Framework_TestCase
             protected static $name = 'bar';
         };
 
-        $table->setImmutable();
         $table->setEngine('MyISAM');
     }
 
@@ -406,7 +545,6 @@ class TableTest extends \PHPUnit_Framework_TestCase
             protected static $name = 'bar';
         };
 
-        $table->setImmutable();
         $table->setCharset('latin1');
     }
 
@@ -423,7 +561,6 @@ class TableTest extends \PHPUnit_Framework_TestCase
             protected static $name = 'bar';
         };
 
-        $table->setImmutable();
         $table->setCollation('latin1');
     }
 
@@ -440,7 +577,6 @@ class TableTest extends \PHPUnit_Framework_TestCase
             protected static $name = 'bar';
         };
 
-        $table->setImmutable();
         $table->setColumn(Column::int('foobar'));
     }
 
@@ -457,7 +593,6 @@ class TableTest extends \PHPUnit_Framework_TestCase
             protected static $name = 'bar';
         };
 
-        $table->setImmutable();
         $table->setPrimaryKey('foobar');
     }
 
@@ -474,7 +609,6 @@ class TableTest extends \PHPUnit_Framework_TestCase
             protected static $name = 'bar';
         };
 
-        $table->setImmutable();
         $table->setUniqueKey('foobar');
     }
 
@@ -491,7 +625,6 @@ class TableTest extends \PHPUnit_Framework_TestCase
             protected static $name = 'bar';
         };
 
-        $table->setImmutable();
         $table->setIndex('foobar');
     }
 
@@ -508,7 +641,6 @@ class TableTest extends \PHPUnit_Framework_TestCase
             protected static $name = 'bar';
         };
 
-        $table->setImmutable();
         $table->setForeignKey('foobar', 'parent');
     }
 }

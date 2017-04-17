@@ -2,8 +2,8 @@
 
 namespace Alius\Database\Exceptions;
 
-use Alius\Database\Interfaces\ExceptionInterface;
+use Alius\Database\Interfaces;
 
-class RuntimeException extends \RuntimeException implements ExceptionInterface
+class RuntimeException extends \RuntimeException implements Interfaces\ExceptionInterface
 {
 }

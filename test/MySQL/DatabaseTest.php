@@ -19,7 +19,7 @@ class DatabaseTestDatabaseFixtureInvalidName extends Database
 
 class DatabaseTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSetters()
+    public function testDefaults()
     {
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -31,27 +31,41 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('utf8_general_ci', $database->getCollation());
         $this->assertSame(false, $database->hasTable());
         $this->assertSame([], $database->getTables());
-        $this->assertSame(false, $database->isImmutable());
+    }
 
-        $database->setEngine('MyISAM');
+    public function testSetters()
+    {
+        $database = new class() extends Database {
+            protected static $name = 'foo';
+
+            protected function setUpEngine()
+            {
+                $this->setEngine('MyISAM');
+            }
+
+            protected function setUpCharset()
+            {
+                $this->setCharset('latin1');
+            }
+
+            protected function setUpCollation()
+            {
+                $this->setCollation('latin1_bin');
+            }
+
+            protected function setUpTable()
+            {
+                $this->setTable(DatabaseTestTableFixture::class);
+            }
+        };
+
+        $this->assertSame('foo', $database::getName());
         $this->assertSame('MyISAM', $database->getEngine());
-
-        $database->setCharset('latin1');
         $this->assertSame('latin1', $database->getCharset());
-
-        $database->setCollation('latin1_bin');
         $this->assertSame('latin1_bin', $database->getCollation());
-
-        $database->setTable(DatabaseTestTableFixture::class);
         $this->assertSame(true, $database->hasTable());
-        $this->assertSame(true, $database->hasTable('foo'));
-
-        // getTable calls setImmutable on the new table class
-        $this->assertEquals((new DatabaseTestTableFixture($database))->setImmutable(), $database->getTable('foo'));
         $this->assertSame(['foo' => $database->getTable('foo')], $database->getTables());
-
-        $database->setImmutable();
-        $this->assertSame(true, $database->isImmutable());
+        $this->assertSame(true, $database->hasTable('foo'));
     }
 
     public function testInvalidNameConstructor()
@@ -78,9 +92,12 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
         $database = new class() extends Database {
             protected static $name = 'foo';
-        };
 
-        $database->setTable(DatabaseTestInvalidTableFixture::class);
+            protected function setUpTable()
+            {
+                $this->setTable(DatabaseTestInvalidTableFixture::class);
+            }
+        };
     }
 
     public function testTableAlreadySet()
@@ -90,10 +107,13 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
 
         $database = new class() extends Database {
             protected static $name = 'foo';
-        };
 
-        $database->setTable(DatabaseTestTableFixture::class);
-        $database->setTable(DatabaseTestTableFixture::class);
+            protected function setUpTable()
+            {
+                $this->setTable(DatabaseTestTableFixture::class);
+                $this->setTable(DatabaseTestTableFixture::class);
+            }
+        };
     }
 
     public function testTableNotSet()
@@ -117,7 +137,6 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
             protected static $name = 'foo';
         };
 
-        $database->setImmutable();
         $database->setEngine('MyISAM');
     }
 
@@ -130,7 +149,6 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
             protected static $name = 'foo';
         };
 
-        $database->setImmutable();
         $database->setCharset('latin1');
     }
 
@@ -143,7 +161,6 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
             protected static $name = 'foo';
         };
 
-        $database->setImmutable();
         $database->setCollation('latin1_bin');
     }
 
@@ -156,7 +173,6 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
             protected static $name = 'foo';
         };
 
-        $database->setImmutable();
         $database->setTable(DatabaseTestTableFixture::class);
     }
 }

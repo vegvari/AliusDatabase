@@ -25,14 +25,17 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $reader2 = $this->getConnection();
 
         $server = new class($writer) extends Server {
+            protected static $name = 'foo';
         };
 
+        $this->assertSame('foo', $server::getName());
         $this->assertSame(false, $server->hasReader());
         $this->assertSame($writer, $server->getWriter());
         $this->assertSame($writer, $server->getReader());
         $this->assertSame(false, $server->inTransaction());
 
         $server = new class($writer, $reader, $reader2) extends Server {
+            protected static $name = 'foo';
         };
 
         $this->assertSame(true, $server->hasReader());
@@ -77,27 +80,23 @@ class ServerTest extends \PHPUnit_Framework_TestCase
     public function testSetDatabase()
     {
         $server = new class($this->getConnection()) extends Server {
+            protected static $name = 'foo';
+
+            protected function setUpDatabase()
+            {
+                $this->setDatabase(ServerTestDatabaseFixture::class);
+            }
         };
-
-        $this->assertSame(false, $server->isImmutable());
-        $this->assertSame(false, $server->hasDatabase(ServerTestDatabaseFixture::class));
-
-        $server->setDatabase(ServerTestDatabaseFixture::class);
 
         $this->assertSame(true, $server->hasDatabase());
         $this->assertSame(true, $server->hasDatabase('foo'));
-
-        // getDatabase calls setImmutable on the new database class
-        $this->assertEquals((new ServerTestDatabaseFixture)->setImmutable(), $server->getDatabase('foo'));
         $this->assertSame($server->getDatabase('foo'), $server->getDatabase('foo'));
-
-        $server->setImmutable();
-        $this->assertSame(true, $server->isImmutable());
     }
 
     public function testExecute()
     {
         $server = new class($this->getConnection()) extends Server {
+            protected static $name = 'foo';
         };
 
         $server->execute('SELECT 1=1');
@@ -109,12 +108,20 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
 
         $server = new class($this->getConnection()) extends Server {
+            protected static $name = 'foo';
         };
-
-        $server->setImmutable();
 
         $server->setDatabase(ServerTestDatabaseFixture::class);
     }
+
+    // public function testInvalidNameConstructor()
+    // {
+    //     $this->expectException(Exceptions\SchemaException::class);
+    //     $this->expectExceptionCode(Exceptions\SchemaException::SERVER_INVALID_NAME);
+
+    //     $database = new class() extends Server {
+    //     };
+    // }
 
     public function testInvalidDatabase()
     {
@@ -122,9 +129,13 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(Exceptions\SchemaException::INVALID_DATABASE);
 
         $server = new class($this->getConnection()) extends Server {
-        };
+            protected static $name = 'foo';
 
-        $server->setDatabase(ServerTestInvalidDatabaseFixture::class);
+            protected function setUpDatabase()
+            {
+                $this->setDatabase(ServerTestInvalidDatabaseFixture::class);
+            }
+        };
     }
 
     public function testDatabaseAlreadySet()
@@ -133,10 +144,14 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(Exceptions\SchemaException::SERVER_DATABASE_ALREADY_SET);
 
         $server = new class($this->getConnection()) extends Server {
-        };
+            protected static $name = 'foo';
 
-        $server->setDatabase(ServerTestDatabaseFixture::class);
-        $server->setDatabase(ServerTestDatabaseFixture::class);
+            protected function setUpDatabase()
+            {
+                $this->setDatabase(ServerTestDatabaseFixture::class);
+                $this->setDatabase(ServerTestDatabaseFixture::class);
+            }
+        };
     }
 
     public function testTableNotSet()
@@ -145,6 +160,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionCode(Exceptions\ServerException::SERVER_DATABASE_NOT_SET);
 
         $server = new class($this->getConnection()) extends Server {
+            protected static $name = 'foo';
         };
 
         $server->getDatabase('foo');

@@ -30,7 +30,16 @@ abstract class Table implements Interfaces\TableInterface
         $this->charset = $database->getCharset();
         $this->collation = $database->getCollation();
 
-        $this->setUp();
+        $this->setUpEngine();
+        $this->setUpCharset();
+        $this->setUpCollation();
+        $this->setUpColumn();
+        $this->setUpPrimaryKey();
+        $this->setUpUniqueKey();
+        $this->setUpIndex();
+        $this->setUpForeignKey();
+
+        $this->setImmutable();
     }
 
     final public function setImmutable(): Interfaces\TableInterface
@@ -53,7 +62,35 @@ abstract class Table implements Interfaces\TableInterface
         return static::$name;
     }
 
-    protected function setUp()
+    protected function setUpEngine()
+    {
+    }
+
+    protected function setUpCharset()
+    {
+    }
+
+    protected function setUpCollation()
+    {
+    }
+
+    protected function setUpColumn()
+    {
+    }
+
+    protected function setUpPrimaryKey()
+    {
+    }
+
+    protected function setUpUniqueKey()
+    {
+    }
+
+    protected function setUpIndex()
+    {
+    }
+
+    protected function setUpForeignKey()
     {
     }
 

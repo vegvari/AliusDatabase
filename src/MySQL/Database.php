@@ -18,16 +18,20 @@ abstract class Database implements Interfaces\DatabaseInterface
     final public function __construct()
     {
         static::getName();
-        $this->setUp();
+        $this->setUpEngine();
+        $this->setUpCharset();
+        $this->setUpCollation();
+        $this->setUpTable();
+        $this->setImmutable();
     }
 
-    final public function setImmutable(): Interfaces\DatabaseInterface
+    final private function setImmutable(): Interfaces\DatabaseInterface
     {
         $this->immutable = true;
         return $this;
     }
 
-    final public function isImmutable(): bool
+    final private function isImmutable(): bool
     {
         return $this->immutable;
     }
@@ -41,7 +45,19 @@ abstract class Database implements Interfaces\DatabaseInterface
         return static::$name;
     }
 
-    protected function setUp()
+    protected function setUpEngine()
+    {
+    }
+
+    protected function setUpCharset()
+    {
+    }
+
+    protected function setUpCollation()
+    {
+    }
+
+    protected function setUpTable()
     {
     }
 

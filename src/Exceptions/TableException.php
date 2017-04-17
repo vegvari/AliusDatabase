@@ -4,12 +4,6 @@ namespace Alius\Database\Exceptions;
 
 class TableException extends RuntimeException
 {
-    const TABLE_COLUMN_NOT_SET      = 3401;
-    const TABLE_PRIMARY_KEY_NOT_SET = 3501;
-    const TABLE_UNIQUE_KEY_NOT_SET  = 3601;
-    const TABLE_INDEX_NOT_SET       = 3701;
-    const TABLE_FOREIGN_KEY_NOT_SET = 3801;
-
     public static function columnNotSet(string $table_class, string $column_name): ExceptionInterface
     {
         throw new static(sprintf('Column is not set in table "%s": "%s"', $table_class, $column_name), self::TABLE_COLUMN_NOT_SET);

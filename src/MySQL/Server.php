@@ -7,6 +7,8 @@ use Alius\Database\Interfaces;
 
 abstract class Server implements Interfaces\ServerInterface
 {
+    protected static $name;
+
     private $immutable = false;
     private $writer;
     private $readers = [];
@@ -16,20 +18,32 @@ abstract class Server implements Interfaces\ServerInterface
     {
         $this->writer = $writer;
         $this->readers = $readers;
-        $this->setUp();
+
+        static::getName();
+        $this->setUpDatabase();
+        $this->setImmutable();
     }
 
-    protected function setUp()
+    final public static function getName(): string
+    {
+        if (! is_string(static::$name) || static::$name === '') {
+            throw Exceptions\SchemaException::invalidServerName(static::class);
+        }
+
+        return static::$name;
+    }
+
+    protected function setUpDatabase()
     {
     }
 
-    final public function setImmutable(): Interfaces\ServerInterface
+    final private function setImmutable(): Interfaces\ServerInterface
     {
         $this->immutable = true;
         return $this;
     }
 
-    final public function isImmutable(): bool
+    final private function isImmutable(): bool
     {
         return $this->immutable;
     }
@@ -124,7 +138,7 @@ abstract class Server implements Interfaces\ServerInterface
         }
 
         if (is_string($this->databases[$database_name])) {
-            $this->databases[$database_name] = (new $this->databases[$database_name])->setImmutable();
+            $this->databases[$database_name] = new $this->databases[$database_name];
         }
 
         return $this->databases[$database_name];

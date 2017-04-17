@@ -2,25 +2,26 @@
 
 namespace Alius\Database\Exceptions;
 
-use Alius\Database\Interfaces\ExceptionInterface;
+use Alius\Database\Interfaces;
 
-class LogicException extends \LogicException implements ExceptionInterface
+class LogicException extends \LogicException implements Interfaces\ExceptionInterface
 {
-    const IMMUTABLE        = 1;
-    const INVALID_DATABASE = 2;
-    const INVALID_TABLE    = 3;
-
-    public static function immutable(string $class): ExceptionInterface
+    public static function immutable(string $class): Interfaces\ExceptionInterface
     {
         return new static(sprintf('Class "%s" is immutable', $class), self::IMMUTABLE);
     }
 
-    public static function invalidDatabase(string $interface, string $class): ExceptionInterface
+    public static function invalidServer(string $interface, string $class): Interfaces\ExceptionInterface
+    {
+        throw new static(sprintf('Server must implement interface "%s": "%s"', $interface, $class), self::INVALID_SERVER);
+    }
+
+    public static function invalidDatabase(string $interface, string $class): Interfaces\ExceptionInterface
     {
         throw new static(sprintf('Database must implement interface "%s": "%s"', $interface, $class), self::INVALID_DATABASE);
     }
 
-    public static function invalidTable(string $interface, string $class): ExceptionInterface
+    public static function invalidTable(string $interface, string $class): Interfaces\ExceptionInterface
     {
         throw new static(sprintf('Table must implement interface "%s": "%s"', $interface, $class), self::INVALID_TABLE);
     }

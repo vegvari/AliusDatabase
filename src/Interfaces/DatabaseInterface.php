@@ -5,8 +5,6 @@ namespace Alius\Database\Interfaces;
 interface DatabaseInterface
 {
     public function __construct();
-    public function setImmutable(): DatabaseInterface;
-    public function isImmutable(): bool;
     public function setEngine(string $engine): DatabaseInterface;
     public function getEngine(): string;
     public function setCharset(string $charset): DatabaseInterface;
