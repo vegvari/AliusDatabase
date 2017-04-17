@@ -102,7 +102,7 @@ abstract class Table implements Interfaces\TableInterface
     final public function setEngine(string $engine): Interfaces\TableInterface
     {
         if ($this->isImmutable()) {
-            throw Exceptions\SchemaException::immutable(static::class);
+            throw Exceptions\LogicException::immutable(static::class);
         }
 
         $this->engine = $engine;
@@ -117,7 +117,7 @@ abstract class Table implements Interfaces\TableInterface
     final public function setCharset(string $charset): Interfaces\TableInterface
     {
         if ($this->isImmutable()) {
-            throw Exceptions\SchemaException::immutable(static::class);
+            throw Exceptions\LogicException::immutable(static::class);
         }
 
         $this->charset = $charset;
@@ -132,7 +132,7 @@ abstract class Table implements Interfaces\TableInterface
     final public function setCollation(string $collation): Interfaces\TableInterface
     {
         if ($this->isImmutable()) {
-            throw Exceptions\SchemaException::immutable(static::class);
+            throw Exceptions\LogicException::immutable(static::class);
         }
 
         $this->collation = $collation;
@@ -147,7 +147,7 @@ abstract class Table implements Interfaces\TableInterface
     final public function setColumn(Interfaces\ColumnInterface $column): Interfaces\TableInterface
     {
         if ($this->isImmutable()) {
-            throw Exceptions\SchemaException::immutable(static::class);
+            throw Exceptions\LogicException::immutable(static::class);
         }
 
         if ($this->hasColumn($column->getName())) {
@@ -184,7 +184,7 @@ abstract class Table implements Interfaces\TableInterface
     final public function setPrimaryKeyObject(Interfaces\PrimaryKeyInterface $primary_key): Interfaces\TableInterface
     {
         if ($this->isImmutable()) {
-            throw Exceptions\SchemaException::immutable(static::class);
+            throw Exceptions\LogicException::immutable(static::class);
         }
 
         if ($this->hasPrimaryKey()) {
@@ -227,7 +227,7 @@ abstract class Table implements Interfaces\TableInterface
     final public function setUniqueKeyObject(Interfaces\UniqueKeyInterface $unique_key): Interfaces\TableInterface
     {
         if ($this->isImmutable()) {
-            throw Exceptions\SchemaException::immutable(static::class);
+            throw Exceptions\LogicException::immutable(static::class);
         }
 
         if ($this->hasUniqueKey($unique_key->getName())) {
@@ -274,7 +274,7 @@ abstract class Table implements Interfaces\TableInterface
     final public function setIndexObject(Interfaces\IndexInterface $index): Interfaces\TableInterface
     {
         if ($this->isImmutable()) {
-            throw Exceptions\SchemaException::immutable(static::class);
+            throw Exceptions\LogicException::immutable(static::class);
         }
 
         if ($this->hasIndex($index->getName())) {
@@ -332,7 +332,7 @@ abstract class Table implements Interfaces\TableInterface
     final public function setForeignKeyObject(Interfaces\ForeignKeyInterface $foreign_key): Interfaces\TableInterface
     {
         if ($this->isImmutable()) {
-            throw Exceptions\SchemaException::immutable(static::class);
+            throw Exceptions\LogicException::immutable(static::class);
         }
 
         if ($this->hasForeignKey($foreign_key->getName())) {

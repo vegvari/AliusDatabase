@@ -519,8 +519,8 @@ class TableTest extends TestCase
 
     public function testImmutableSetEngine()
     {
-        $this->expectException(Exceptions\SchemaException::class);
-        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -535,8 +535,8 @@ class TableTest extends TestCase
 
     public function testImmutableSetCharset()
     {
-        $this->expectException(Exceptions\SchemaException::class);
-        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -551,8 +551,8 @@ class TableTest extends TestCase
 
     public function testImmutableSetCollation()
     {
-        $this->expectException(Exceptions\SchemaException::class);
-        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -567,8 +567,8 @@ class TableTest extends TestCase
 
     public function testImmutableSetColumn()
     {
-        $this->expectException(Exceptions\SchemaException::class);
-        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -583,8 +583,8 @@ class TableTest extends TestCase
 
     public function testImmutableSetPrimaryKey()
     {
-        $this->expectException(Exceptions\SchemaException::class);
-        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -599,8 +599,8 @@ class TableTest extends TestCase
 
     public function testImmutableSetUniqueKey()
     {
-        $this->expectException(Exceptions\SchemaException::class);
-        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -615,8 +615,8 @@ class TableTest extends TestCase
 
     public function testImmutableSetIndex()
     {
-        $this->expectException(Exceptions\SchemaException::class);
-        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';
@@ -631,8 +631,8 @@ class TableTest extends TestCase
 
     public function testImmutableSetForeignKey()
     {
-        $this->expectException(Exceptions\SchemaException::class);
-        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
         $database = new class() extends Database {
             protected static $name = 'foo';

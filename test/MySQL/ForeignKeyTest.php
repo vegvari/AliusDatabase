@@ -9,27 +9,27 @@ class ForeignKeyTest extends TestCase
 {
     public function test()
     {
-        $constraint = new ForeignKey('name', 'column', 'parent_table');
-        $this->assertSame('CONSTRAINT `name` FOREIGN KEY (`column`) REFERENCES `parent_table` (`column`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildCreate());
-        $this->assertSame('ADD CONSTRAINT `name` FOREIGN KEY (`column`) REFERENCES `parent_table` (`column`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildAdd());
-        $this->assertSame('DROP FOREIGN KEY `name`', $constraint->buildDrop());
+        $constraint = new ForeignKey('fk', 'foo', 'parent_table');
+        $this->assertSame('CONSTRAINT `fk` FOREIGN KEY (`foo`) REFERENCES `parent_table` (`foo`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildCreate());
+        $this->assertSame('ADD CONSTRAINT `fk` FOREIGN KEY (`foo`) REFERENCES `parent_table` (`foo`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildAdd());
+        $this->assertSame('DROP FOREIGN KEY `fk`', $constraint->buildDrop());
 
-        $constraint = new ForeignKey('name', 'column', 'parent_table', 'column2');
-        $this->assertSame(['column2'], $constraint->getParentColumns());
-        $this->assertSame('CONSTRAINT `name` FOREIGN KEY (`column`) REFERENCES `parent_table` (`column2`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildCreate());
-        $this->assertSame('ADD CONSTRAINT `name` FOREIGN KEY (`column`) REFERENCES `parent_table` (`column2`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildAdd());
+        $constraint = new ForeignKey('fk', 'foo', 'parent_table', 'bar');
+        $this->assertSame(['bar'], $constraint->getParentColumns());
+        $this->assertSame('CONSTRAINT `fk` FOREIGN KEY (`foo`) REFERENCES `parent_table` (`bar`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildCreate());
+        $this->assertSame('ADD CONSTRAINT `fk` FOREIGN KEY (`foo`) REFERENCES `parent_table` (`bar`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildAdd());
 
-        $constraint = new ForeignKey('name', ['column', 'column2'], 'parent_table');
-        $this->assertSame(['column', 'column2'], $constraint->getColumns());
-        $this->assertSame(['column', 'column2'], $constraint->getParentColumns());
-        $this->assertSame('CONSTRAINT `name` FOREIGN KEY (`column`, `column2`) REFERENCES `parent_table` (`column`, `column2`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildCreate());
-        $this->assertSame('ADD CONSTRAINT `name` FOREIGN KEY (`column`, `column2`) REFERENCES `parent_table` (`column`, `column2`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildAdd());
+        $constraint = new ForeignKey('fk', ['foo', 'bar'], 'parent_table');
+        $this->assertSame(['foo', 'bar'], $constraint->getColumns());
+        $this->assertSame(['foo', 'bar'], $constraint->getParentColumns());
+        $this->assertSame('CONSTRAINT `fk` FOREIGN KEY (`foo`, `bar`) REFERENCES `parent_table` (`foo`, `bar`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildCreate());
+        $this->assertSame('ADD CONSTRAINT `fk` FOREIGN KEY (`foo`, `bar`) REFERENCES `parent_table` (`foo`, `bar`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildAdd());
 
-        $constraint = new ForeignKey('name', ['column', 'column2'], 'parent_table', ['column3', 'column4']);
-        $this->assertSame(['column', 'column2'], $constraint->getColumns());
-        $this->assertSame(['column3', 'column4'], $constraint->getParentColumns());
-        $this->assertSame('CONSTRAINT `name` FOREIGN KEY (`column`, `column2`) REFERENCES `parent_table` (`column3`, `column4`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildCreate());
-        $this->assertSame('ADD CONSTRAINT `name` FOREIGN KEY (`column`, `column2`) REFERENCES `parent_table` (`column3`, `column4`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildAdd());
+        $constraint = new ForeignKey('fk', ['foo', 'bar'], 'parent_table', ['baz', 'qux']);
+        $this->assertSame(['foo', 'bar'], $constraint->getColumns());
+        $this->assertSame(['baz', 'qux'], $constraint->getParentColumns());
+        $this->assertSame('CONSTRAINT `fk` FOREIGN KEY (`foo`, `bar`) REFERENCES `parent_table` (`baz`, `qux`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildCreate());
+        $this->assertSame('ADD CONSTRAINT `fk` FOREIGN KEY (`foo`, `bar`) REFERENCES `parent_table` (`baz`, `qux`) ON UPDATE RESTRICT ON DELETE RESTRICT', $constraint->buildAdd());
     }
 
     public function testEmptyName()
@@ -37,7 +37,7 @@ class ForeignKeyTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_INVALID_NAME);
 
-        new ForeignKey('', 'column', 'parent');
+        new ForeignKey('', 'foo', 'parent');
     }
 
     public function testInvalidName()
@@ -45,7 +45,7 @@ class ForeignKeyTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_INVALID_NAME);
 
-        new ForeignKey('primary', 'column', 'parent');
+        new ForeignKey('primary', 'foo', 'parent');
     }
 
     public function testNoColumn()
@@ -53,7 +53,7 @@ class ForeignKeyTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_NO_COLUMN);
 
-        new ForeignKey('name', [], 'parent_table');
+        new ForeignKey('fk', [], 'parent_table');
     }
 
     public function testDuplicatedChild()
@@ -61,7 +61,7 @@ class ForeignKeyTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_DUPLICATED_CHILD_COLUMN);
 
-        new ForeignKey('name', ['column', 'column'], 'parent_table');
+        new ForeignKey('fk', ['foo', 'foo'], 'parent_table');
     }
 
     public function testDuplicatedParent()
@@ -69,7 +69,7 @@ class ForeignKeyTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_DUPLICATED_PARENT_COLUMN);
 
-        new ForeignKey('name', ['column', 'column2'], 'parent_table', ['column', 'column']);
+        new ForeignKey('fk', ['foo', 'bar'], 'parent_table', ['foo', 'foo']);
     }
 
     public function testDuplicatedMoreChild()
@@ -77,7 +77,7 @@ class ForeignKeyTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_MORE_CHILD_COLUMN);
 
-        new ForeignKey('name', ['column', 'column2'], 'parent_table', 'column');
+        new ForeignKey('fk', ['foo', 'bar'], 'parent_table', 'foo');
     }
 
     public function testDuplicatedMoreParent()
@@ -85,24 +85,24 @@ class ForeignKeyTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_MORE_PARENT_COLUMN);
 
-        new ForeignKey('name', 'column', 'parent_table', ['column', 'column2']);
+        new ForeignKey('fk', 'foo', 'parent_table', ['foo', 'bar']);
     }
 
     public function testActions()
     {
-        $constraint = new ForeignKey('name', 'column', 'parent_table', 'column', 'CASCADE', 'CASCADE');
+        $constraint = new ForeignKey('fk', 'foo', 'parent_table', 'foo', 'CASCADE', 'CASCADE');
         $this->assertSame('CASCADE', $constraint->getUpdateRule());
         $this->assertSame('CASCADE', $constraint->getDeleteRule());
 
-        $constraint = new ForeignKey('name', 'column', 'parent_table', 'column', 'NO ACTION', 'NO ACTION');
+        $constraint = new ForeignKey('fk', 'foo', 'parent_table', 'foo', 'NO ACTION', 'NO ACTION');
         $this->assertSame('RESTRICT', $constraint->getUpdateRule());
         $this->assertSame('RESTRICT', $constraint->getDeleteRule());
 
-        $constraint = new ForeignKey('name', 'column', 'parent_table', 'column', 'SET DEFAULT', 'SET DEFAULT');
+        $constraint = new ForeignKey('fk', 'foo', 'parent_table', 'foo', 'SET DEFAULT', 'SET DEFAULT');
         $this->assertSame('SET DEFAULT', $constraint->getUpdateRule());
         $this->assertSame('SET DEFAULT', $constraint->getDeleteRule());
 
-        $constraint = new ForeignKey('name', 'column', 'parent_table', 'column', 'SET NULL', 'SET NULL');
+        $constraint = new ForeignKey('fk', 'foo', 'parent_table', 'foo', 'SET NULL', 'SET NULL');
         $this->assertSame('SET NULL', $constraint->getUpdateRule());
         $this->assertSame('SET NULL', $constraint->getDeleteRule());
     }
@@ -112,7 +112,7 @@ class ForeignKeyTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_INVALID_UPDATE_RULE);
 
-        new ForeignKey('name', 'column', 'parent_table', 'column', 'foo');
+        new ForeignKey('fk', 'foo', 'parent_table', 'foo', 'foo');
     }
 
     public function testInvalidDelete()
@@ -120,6 +120,6 @@ class ForeignKeyTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::FOREIGN_KEY_INVALID_DELETE_RULE);
 
-        new ForeignKey('name', 'column', 'parent_table', 'column', 'CASCADE', 'foo');
+        new ForeignKey('fk', 'foo', 'parent_table', 'foo', 'CASCADE', 'foo');
     }
 }

@@ -298,4 +298,69 @@ class IntColumnTest extends TestCase
         $column->setUnsigned();
         $column->setDefault(bcadd($unsigned_max, 1));
     }
+
+    /**
+     * @dataProvider dataProviderIntTypes
+     */
+    public function testSetNullableImmutable(string $type, int $signed_min, int $signed_max, int $unsigned_max)
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new IntColumn('foo', $type);
+        $column->setImmutable();
+        $column->setNullable();
+    }
+
+    /**
+     * @dataProvider dataProviderIntTypes
+     */
+    public function testSetDefaultImmutable(string $type, int $signed_min, int $signed_max, int $unsigned_max)
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new IntColumn('foo', $type);
+        $column->setImmutable();
+        $column->setDefault('bar');
+    }
+
+    /**
+     * @dataProvider dataProviderIntTypes
+     */
+    public function testSetCommentImmutable(string $type, int $signed_min, int $signed_max, int $unsigned_max)
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new IntColumn('foo', $type);
+        $column->setImmutable();
+        $column->setComment('bar');
+    }
+
+    /**
+     * @dataProvider dataProviderIntTypes
+     */
+    public function testSetUnsignedImmutable(string $type, int $signed_min, int $signed_max, int $unsigned_max)
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new IntColumn('foo', $type);
+        $column->setImmutable();
+        $column->setUnsigned();
+    }
+
+    /**
+     * @dataProvider dataProviderIntTypes
+     */
+    public function testSetAutoIncrementImmutable(string $type, int $signed_min, int $signed_max, int $unsigned_max)
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new IntColumn('foo', $type);
+        $column->setImmutable();
+        $column->setAutoIncrement();
+    }
 }

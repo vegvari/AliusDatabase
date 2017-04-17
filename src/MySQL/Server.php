@@ -116,7 +116,7 @@ abstract class Server implements Interfaces\ServerInterface
     final public function setDatabase(string $database_class): Interfaces\ServerInterface
     {
         if ($this->isImmutable()) {
-            throw Exceptions\SchemaException::immutable(static::class);
+            throw Exceptions\LogicException::immutable(static::class);
         }
 
         if (! isset(class_implements($database_class)[Interfaces\DatabaseInterface::class])) {

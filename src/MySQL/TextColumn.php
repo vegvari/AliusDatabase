@@ -30,6 +30,10 @@ class TextColumn extends Column
 
     public function setBinary(): Column
     {
+        if ($this->isImmutable()) {
+            throw Exceptions\LogicException::immutable(static::class);
+        }
+
         $this->binary = true;
         return $this;
     }
@@ -41,6 +45,10 @@ class TextColumn extends Column
 
     public function setCharset(string $charset): Column
     {
+        if ($this->isImmutable()) {
+            throw Exceptions\LogicException::immutable(static::class);
+        }
+
         $this->charset = $charset;
         return $this;
     }
@@ -52,6 +60,10 @@ class TextColumn extends Column
 
     public function setCollation(string $collation): Column
     {
+        if ($this->isImmutable()) {
+            throw Exceptions\LogicException::immutable(static::class);
+        }
+
         $this->collation = $collation;
         return $this;
     }

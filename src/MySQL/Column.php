@@ -2,15 +2,28 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\Exceptions;
 use Alius\Database\Interfaces;
 
 abstract class Column implements Interfaces\ColumnInterface
 {
+    private $immutable = false;
     protected $name;
     protected $type;
     protected $nullable = false;
     protected $default;
     protected $comment = '';
+
+    final public function setImmutable(): Interfaces\ColumnInterface
+    {
+        $this->immutable = true;
+        return $this;
+    }
+
+    final protected function isImmutable(): bool
+    {
+        return $this->immutable;
+    }
 
     public function getName(): string
     {
@@ -24,6 +37,10 @@ abstract class Column implements Interfaces\ColumnInterface
 
     public function setNullable(): Interfaces\ColumnInterface
     {
+        if ($this->isImmutable()) {
+            throw Exceptions\LogicException::immutable(static::class);
+        }
+
         $this->nullable = true;
         return $this;
     }
@@ -35,6 +52,10 @@ abstract class Column implements Interfaces\ColumnInterface
 
     public function setDefault($value): Interfaces\ColumnInterface
     {
+        if ($this->isImmutable()) {
+            throw Exceptions\LogicException::immutable(static::class);
+        }
+
         $this->default = $this->check($value);
         return $this;
     }
@@ -51,6 +72,10 @@ abstract class Column implements Interfaces\ColumnInterface
 
     public function setComment(string $comment): Interfaces\ColumnInterface
     {
+        if ($this->isImmutable()) {
+            throw Exceptions\LogicException::immutable(static::class);
+        }
+
         $this->comment = $comment;
         return $this;
     }

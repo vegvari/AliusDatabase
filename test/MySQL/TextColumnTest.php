@@ -148,4 +148,82 @@ class TextColumnTest extends TestCase
         $column = new TextColumn('foo', 'text');
         $column->check(str_repeat('a', 65536));
     }
+
+    /**
+     * @dataProvider dataProviderTextTypes
+     */
+    public function testSetNullableImmutable(string $type, int $length)
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new TextColumn('foo', $type);
+        $column->setImmutable();
+        $column->setNullable();
+    }
+
+    /**
+     * @dataProvider dataProviderTextTypes
+     */
+    public function testSetDefaultImmutable(string $type, int $length)
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new TextColumn('foo', $type);
+        $column->setImmutable();
+        $column->setDefault('bar');
+    }
+
+    /**
+     * @dataProvider dataProviderTextTypes
+     */
+    public function testSetCommentImmutable(string $type, int $length)
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new TextColumn('foo', $type);
+        $column->setImmutable();
+        $column->setComment('bar');
+    }
+
+    /**
+     * @dataProvider dataProviderTextTypes
+     */
+    public function testSetBinaryImmutable(string $type, int $length)
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new TextColumn('foo', $type);
+        $column->setImmutable();
+        $column->setBinary();
+    }
+
+    /**
+     * @dataProvider dataProviderTextTypes
+     */
+    public function testSetCharsetImmutable(string $type, int $length)
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new TextColumn('foo', $type);
+        $column->setImmutable();
+        $column->setCharset('bar');
+    }
+
+    /**
+     * @dataProvider dataProviderTextTypes
+     */
+    public function testSetCollationImmutable(string $type, int $length)
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new TextColumn('foo', $type);
+        $column->setImmutable();
+        $column->setCollation('bar');
+    }
 }

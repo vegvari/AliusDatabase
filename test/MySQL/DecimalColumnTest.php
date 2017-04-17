@@ -228,4 +228,44 @@ class DecimalColumnTest extends TestCase
         $column = new DecimalColumn('foo', 10, 2);
         $column->setDefault('bar');
     }
+
+    public function testSetNullableImmutable()
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new DecimalColumn('foo', 10, 2);
+        $column->setImmutable();
+        $column->setNullable();
+    }
+
+    public function testSetDefaultImmutable()
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new DecimalColumn('foo', 10, 2);
+        $column->setImmutable();
+        $column->setDefault('bar');
+    }
+
+    public function testSetCommentImmutable()
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new DecimalColumn('foo', 10, 2);
+        $column->setImmutable();
+        $column->setComment('bar');
+    }
+
+    public function testSetUnsignedImmutable()
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new DecimalColumn('foo', 10, 2);
+        $column->setImmutable();
+        $column->setUnsigned();
+    }
 }

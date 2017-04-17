@@ -64,7 +64,7 @@ abstract class Database implements Interfaces\DatabaseInterface
     final public function setEngine(string $engine): Interfaces\DatabaseInterface
     {
         if ($this->isImmutable()) {
-            throw Exceptions\SchemaException::immutable(static::class);
+            throw Exceptions\LogicException::immutable(static::class);
         }
 
         $this->engine = $engine;
@@ -79,7 +79,7 @@ abstract class Database implements Interfaces\DatabaseInterface
     final public function setCharset(string $charset): Interfaces\DatabaseInterface
     {
         if ($this->isImmutable()) {
-            throw Exceptions\SchemaException::immutable(static::class);
+            throw Exceptions\LogicException::immutable(static::class);
         }
 
         $this->charset = $charset;
@@ -94,7 +94,7 @@ abstract class Database implements Interfaces\DatabaseInterface
     final public function setCollation(string $collation): Interfaces\DatabaseInterface
     {
         if ($this->isImmutable()) {
-            throw Exceptions\SchemaException::immutable(static::class);
+            throw Exceptions\LogicException::immutable(static::class);
         }
 
         $this->collation = $collation;
@@ -109,7 +109,7 @@ abstract class Database implements Interfaces\DatabaseInterface
     final public function setTable(string $table_class): Interfaces\DatabaseInterface
     {
         if ($this->isImmutable()) {
-            throw Exceptions\SchemaException::immutable(static::class);
+            throw Exceptions\LogicException::immutable(static::class);
         }
 
         if (! isset(class_implements($table_class)[Interfaces\TableInterface::class])) {

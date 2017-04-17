@@ -39,6 +39,10 @@ class IntColumn extends Column
 
     public function setUnsigned(): Interfaces\ColumnInterface
     {
+        if ($this->isImmutable()) {
+            throw Exceptions\LogicException::immutable(static::class);
+        }
+
         $this->unsigned = true;
         return $this;
     }
@@ -50,6 +54,10 @@ class IntColumn extends Column
 
     public function setNullable(): Interfaces\ColumnInterface
     {
+        if ($this->isImmutable()) {
+            throw Exceptions\LogicException::immutable(static::class);
+        }
+
         if ($this->isAutoIncrement()) {
             throw Exceptions\SchemaException::invalidColumnIntAutoIncrementNullable();
         }
@@ -59,6 +67,10 @@ class IntColumn extends Column
 
     public function setDefault($value): Interfaces\ColumnInterface
     {
+        if ($this->isImmutable()) {
+            throw Exceptions\LogicException::immutable(static::class);
+        }
+
         if ($this->isAutoIncrement()) {
             throw Exceptions\SchemaException::invalidColumnIntAutoIncrementDefault();
         }
@@ -68,6 +80,10 @@ class IntColumn extends Column
 
     public function setAutoIncrement(): Interfaces\ColumnInterface
     {
+        if ($this->isImmutable()) {
+            throw Exceptions\LogicException::immutable(static::class);
+        }
+
         if ($this->isNullable()) {
             throw Exceptions\SchemaException::invalidColumnIntAutoIncrementNullable();
         }

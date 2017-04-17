@@ -228,4 +228,34 @@ class FloatColumnTest extends TestCase
         $column = new FloatColumn('foo', 10, 2);
         $column->setDefault('bar');
     }
+
+    public function testSetNullableImmutable()
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new FloatColumn('foo', 10, 2);
+        $column->setImmutable();
+        $column->setNullable();
+    }
+
+    public function testSetDefaultImmutable()
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new FloatColumn('foo', 10, 2);
+        $column->setImmutable();
+        $column->setDefault('bar');
+    }
+
+    public function testSetCommentImmutable()
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new FloatColumn('foo', 10, 2);
+        $column->setImmutable();
+        $column->setComment('bar');
+    }
 }

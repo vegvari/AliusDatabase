@@ -2,6 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\Exceptions;
 use PHPUnit\Framework\TestCase;
 
 class DateTimeColumnTest extends TestCase
@@ -102,5 +103,45 @@ class DateTimeColumnTest extends TestCase
         $this->assertSame(true, $column->hasDefault());
         $this->assertSame(true, $column->isDefaultCurrent());
         $this->assertSame('`foo` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP', $column->buildCreate());
+    }
+
+    public function testSetNullableImmutable()
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new DateTimeColumn('foo');
+        $column->setImmutable();
+        $column->setNullable();
+    }
+
+    public function testSetDefaultImmutable()
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new DateTimeColumn('foo');
+        $column->setImmutable();
+        $column->setDefault('bar');
+    }
+
+    public function testSetCommentImmutable()
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new DateTimeColumn('foo');
+        $column->setImmutable();
+        $column->setComment('bar');
+    }
+
+    public function testSetOnUpdateCurrentImmutable()
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new DateTimeColumn('foo');
+        $column->setImmutable();
+        $column->setOnUpdateCurrent();
     }
 }

@@ -214,4 +214,17 @@ class CharColumnTest extends TestCase
         $column = new CharColumn('foo', $type, $length);
         $column->setDefault(str_repeat('a', $length + 1));
     }
+
+    /**
+     * @dataProvider dataProviderCharTypes
+     */
+    public function testImmutable(string $type, int $length)
+    {
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
+
+        $column = new CharColumn('foo', $type, $length);
+        $column->setImmutable();
+        $column->setDefault('bar');
+    }
 }

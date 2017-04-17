@@ -9,16 +9,16 @@ class PrimaryKeyTest extends TestCase
 {
     public function test()
     {
-        $constraint = new PrimaryKey('column');
+        $constraint = new PrimaryKey('foo');
         $this->assertSame(false, $constraint->isComposite());
-        $this->assertSame('PRIMARY KEY (`column`)', $constraint->buildCreate());
-        $this->assertSame('ADD PRIMARY KEY (`column`)', $constraint->buildAdd());
+        $this->assertSame('PRIMARY KEY (`foo`)', $constraint->buildCreate());
+        $this->assertSame('ADD PRIMARY KEY (`foo`)', $constraint->buildAdd());
         $this->assertSame('DROP PRIMARY KEY', $constraint->buildDrop());
 
-        $constraint = new PrimaryKey('column', 'column2');
+        $constraint = new PrimaryKey('foo', 'bar');
         $this->assertSame(true, $constraint->isComposite());
-        $this->assertSame('PRIMARY KEY (`column`, `column2`)', $constraint->buildCreate());
-        $this->assertSame('ADD PRIMARY KEY (`column`, `column2`)', $constraint->buildAdd());
+        $this->assertSame('PRIMARY KEY (`foo`, `bar`)', $constraint->buildCreate());
+        $this->assertSame('ADD PRIMARY KEY (`foo`, `bar`)', $constraint->buildAdd());
         $this->assertSame('DROP PRIMARY KEY', $constraint->buildDrop());
     }
 

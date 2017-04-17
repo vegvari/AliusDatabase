@@ -43,6 +43,10 @@ class DecimalColumn extends Column
 
     public function setUnsigned(): Column
     {
+        if ($this->isImmutable()) {
+            throw Exceptions\LogicException::immutable(static::class);
+        }
+
         $this->unsigned = true;
         return $this;
     }

@@ -2,6 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\Exceptions;
 use Alius\Database\Interfaces;
 
 class DateTimeColumn extends Column
@@ -17,6 +18,10 @@ class DateTimeColumn extends Column
 
     public function setDefault($value): Interfaces\ColumnInterface
     {
+        if ($this->isImmutable()) {
+            throw Exceptions\LogicException::immutable(static::class);
+        }
+
         if ($value === 'CURRENT_TIMESTAMP') {
             $this->default_current = true;
         }
@@ -36,6 +41,10 @@ class DateTimeColumn extends Column
 
     public function setOnUpdateCurrent(): Interfaces\ColumnInterface
     {
+        if ($this->isImmutable()) {
+            throw Exceptions\LogicException::immutable(static::class);
+        }
+
         $this->on_update_current = true;
         return $this;
     }

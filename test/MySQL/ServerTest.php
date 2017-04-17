@@ -105,8 +105,8 @@ class ServerTest extends TestCase
 
     public function testSetDatabaseImmutable()
     {
-        $this->expectException(Exceptions\SchemaException::class);
-        $this->expectExceptionCode(Exceptions\SchemaException::IMMUTABLE);
+        $this->expectException(Exceptions\LogicException::class);
+        $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
         $server = new class($this->getConnection()) extends Server {
             protected static $name = 'foo';
