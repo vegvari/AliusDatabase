@@ -2,7 +2,9 @@
 
 namespace Alius\Database\MySQL;
 
-class DateTimeColumnTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class DateTimeColumnTest extends TestCase
 {
     public function testDateTimeColumn()
     {

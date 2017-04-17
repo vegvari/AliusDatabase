@@ -3,6 +3,7 @@
 namespace Alius\Database\MySQL;
 
 use Alius\Database\Exceptions;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseTestTableFixture extends Table
 {
@@ -17,7 +18,7 @@ class DatabaseTestDatabaseFixtureInvalidName extends Database
 {
 }
 
-class DatabaseTest extends \PHPUnit_Framework_TestCase
+class DatabaseTest extends TestCase
 {
     public function testDefaults()
     {

@@ -2,7 +2,9 @@
 
 namespace Alius\Database\MySQL;
 
-class TimestampColumnTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class TimestampColumnTest extends TestCase
 {
     public function testTimestampColumn()
     {

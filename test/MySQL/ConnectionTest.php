@@ -2,7 +2,9 @@
 
 namespace Alius\Database\MySQL;
 
-class ConnectionTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class ConnectionTest extends TestCase
 {
     use ConnectionTrait;
 

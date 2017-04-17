@@ -4,6 +4,7 @@ namespace Alius\Database\MySQL;
 
 use Alius\Database\Exceptions;
 use Alius\Database\Interfaces;
+use PHPUnit\Framework\TestCase;
 
 class ServerTestDatabaseFixture extends Database
 {
@@ -14,7 +15,7 @@ class ServerTestInvalidDatabaseFixture
 {
 }
 
-class ServerTest extends \PHPUnit_Framework_TestCase
+class ServerTest extends TestCase
 {
     use ConnectionTrait;
 

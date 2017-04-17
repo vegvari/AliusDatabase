@@ -3,8 +3,9 @@
 namespace Alius\Database\MySQL;
 
 use Alius\Database\Exceptions;
+use PHPUnit\Framework\TestCase;
 
-class DecimalColumnTest extends \PHPUnit_Framework_TestCase
+class DecimalColumnTest extends TestCase
 {
     public function testDecimal()
     {

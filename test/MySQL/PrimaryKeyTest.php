@@ -3,8 +3,9 @@
 namespace Alius\Database\MySQL;
 
 use Alius\Database\Exceptions;
+use PHPUnit\Framework\TestCase;
 
-class PrimaryKeyTest extends \PHPUnit_Framework_TestCase
+class PrimaryKeyTest extends TestCase
 {
     public function test()
     {

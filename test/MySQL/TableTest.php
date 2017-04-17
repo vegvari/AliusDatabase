@@ -3,12 +3,13 @@
 namespace Alius\Database\MySQL;
 
 use Alius\Database\Exceptions;
+use PHPUnit\Framework\TestCase;
 
 class TableTestTableFixtureInvalidName extends Table
 {
 }
 
-class TableTest extends \PHPUnit_Framework_TestCase
+class TableTest extends TestCase
 {
     public function testDefaults()
     {

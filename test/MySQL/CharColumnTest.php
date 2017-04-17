@@ -3,8 +3,9 @@
 namespace Alius\Database\MySQL;
 
 use Alius\Database\Exceptions;
+use PHPUnit\Framework\TestCase;
 
-class CharColumnTest extends \PHPUnit_Framework_TestCase
+class CharColumnTest extends TestCase
 {
     /**
      * @dataProvider dataProviderCharTypes

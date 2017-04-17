@@ -2,7 +2,9 @@
 
 namespace Alius\Database\MySQL;
 
-class ColumnTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class ColumnTest extends TestCase
 {
     public function testFactories()
     {
