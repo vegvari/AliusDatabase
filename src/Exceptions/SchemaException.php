@@ -6,6 +6,11 @@ use Alius\Database\Interfaces;
 
 final class SchemaException extends LogicException implements Interfaces\ExceptionInterface
 {
+    public static function serverAlreadySet(string $server_name): Interfaces\ExceptionInterface
+    {
+        return new static(sprintf('Server is alrady set in container: "%s"', $server_name), self::CONTAINER_SERVER_ALREADY_SET);
+    }
+
     public static function invalidServerName(string $class): Interfaces\ExceptionInterface
     {
         return new static(sprintf('Invalid server name, set the $name static variable in class: "%s"', $class), self::SERVER_INVALID_NAME);

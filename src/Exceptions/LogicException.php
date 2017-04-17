@@ -11,11 +11,6 @@ class LogicException extends \LogicException implements Interfaces\ExceptionInte
         return new static(sprintf('Class "%s" is immutable', $class), self::IMMUTABLE);
     }
 
-    public static function invalidServer(string $interface, string $class): Interfaces\ExceptionInterface
-    {
-        throw new static(sprintf('Server must implement interface "%s": "%s"', $interface, $class), self::INVALID_SERVER);
-    }
-
     public static function invalidDatabase(string $interface, string $class): Interfaces\ExceptionInterface
     {
         throw new static(sprintf('Database must implement interface "%s": "%s"', $interface, $class), self::INVALID_DATABASE);

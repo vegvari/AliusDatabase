@@ -2,6 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\Container;
 use Alius\Database\Exceptions;
 use Alius\Database\Interfaces;
 use PHPUnit\Framework\TestCase;
@@ -22,6 +23,11 @@ class ServerTest extends TestCase
 {
     use ConnectionTrait;
 
+    public function setUp()
+    {
+        Container::clearServers();
+    }
+
     public function testWriterAndReader()
     {
         $writer = $this->getConnection();
@@ -39,7 +45,7 @@ class ServerTest extends TestCase
         $this->assertSame(false, $server->inTransaction());
 
         $server = new class($writer, $reader, $reader2) extends Server {
-            protected static $name = 'foo';
+            protected static $name = 'bar';
         };
 
         $this->assertSame(true, $server->hasReader());

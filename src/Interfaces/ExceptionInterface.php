@@ -4,7 +4,10 @@ namespace Alius\Database\Interfaces;
 
 interface ExceptionInterface extends \Throwable
 {
-    const IMMUTABLE                                  = 0;
+    const IMMUTABLE                                  = -1;
+
+    const CONTAINER_SERVER_ALREADY_SET               = 0;
+    const CONTAINER_SERVER_NOT_SET                   = 1;
 
     // server
     const INVALID_SERVER                             = 1000;

@@ -2,6 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\Container;
 use Alius\Database\Exceptions;
 use Alius\Database\Interfaces;
 
@@ -22,6 +23,8 @@ abstract class Server implements Interfaces\ServerInterface
         static::getName();
         $this->setUpDatabase();
         $this->setImmutable();
+
+        Container::setServer($this);
     }
 
     final public static function getName(): string
