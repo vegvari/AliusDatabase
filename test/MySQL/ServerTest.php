@@ -14,6 +14,9 @@ class ServerTestDatabaseFixture extends Database
 class ServerTestInvalidDatabaseFixture
 {
 }
+class ServerTestServerFixtureInvalidName extends Server
+{
+}
 
 class ServerTest extends TestCase
 {
@@ -115,14 +118,22 @@ class ServerTest extends TestCase
         $server->setDatabase(ServerTestDatabaseFixture::class);
     }
 
-    // public function testInvalidNameConstructor()
-    // {
-    //     $this->expectException(Exceptions\SchemaException::class);
-    //     $this->expectExceptionCode(Exceptions\SchemaException::SERVER_INVALID_NAME);
+    public function testInvalidNameConstructor()
+    {
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::SERVER_INVALID_NAME);
 
-    //     $database = new class() extends Server {
-    //     };
-    // }
+        $server = new class($this->getConnection()) extends Server {
+        };
+    }
+
+    public function testInvalidNameGetName()
+    {
+        $this->expectException(Exceptions\SchemaException::class);
+        $this->expectExceptionCode(Exceptions\SchemaException::SERVER_INVALID_NAME);
+
+        ServerTestServerFixtureInvalidName::getName();
+    }
 
     public function testInvalidDatabase()
     {
