@@ -381,4 +381,85 @@ abstract class Table implements Interfaces\TableInterface
 
         return isset($this->foreign_keys[$name]);
     }
+
+    final protected function buildColumns(): string
+    {
+        $build = [];
+
+        foreach ($this->getColumns() as $column) {
+            $build[] = $column->buildCreate();
+        }
+
+        return implode(', ', $build);
+    }
+
+    final protected function buildUniqueKeys(): string
+    {
+        $build = [];
+
+        foreach ($this->getUniqueKeys() as $unique_key) {
+            $build[] = $unique_key->buildCreate();
+        }
+
+        return implode(', ', $build);
+    }
+
+    final protected function buildIndexes(): string
+    {
+        $build = [];
+
+        foreach ($this->getIndexes() as $index) {
+            $build[] = $index->buildCreate();
+        }
+
+        return implode(', ', $build);
+    }
+
+    final protected function buildForeignKeys(): string
+    {
+        $build = [];
+
+        foreach ($this->getForeignKeys() as $foreign_key) {
+            $build[] = $foreign_key->buildCreate();
+        }
+
+        return implode(', ', $build);
+    }
+
+    final public function buildCreate(): string
+    {
+        $build = [];
+
+        if ($this->hasColumn()) {
+            $build[] = $this->buildColumns();
+        }
+
+        if ($this->hasPrimaryKey()) {
+            $build[] = $this->getPrimaryKey()->buildCreate();
+        }
+
+        if ($this->hasUniqueKey()) {
+            $build[] = $this->buildUniqueKeys();
+        }
+
+        if ($this->hasIndex()) {
+            $build[] = $this->buildIndexes();
+        }
+
+        if ($this->hasForeignKey()) {
+            $build[] = $this->buildForeignKeys();
+        }
+
+        return sprintf('CREATE TABLE `%s` (%s) ENGINE=%s DEFAULT CHARSET=%s COLLATE=%s', static::getName(), implode(', ', $build), $this->getEngine(), $this->getCharset(), $this->getCollation());
+    }
+
+    final public function buildDrop(): string
+    {
+        return sprintf('DROP TABLE `%s`', static::getName());
+    }
+
+    final public function buildTruncate(): string
+    {
+        return sprintf('TRUNCATE TABLE `%s`', static::getName());
+    }
 }

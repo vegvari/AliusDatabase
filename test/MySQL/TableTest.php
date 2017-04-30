@@ -644,4 +644,94 @@ class TableTest extends TestCase
 
         $table->setForeignKey('foobar', 'parent');
     }
+
+    public function testBuildCreate()
+    {
+        $database = new class() extends Database {
+            protected static $name = 'foo';
+        };
+
+        // no columns
+        $table = new class($database) extends Table {
+            protected static $name = 'foo';
+        };
+
+        $this->assertSame('CREATE TABLE `foo` () ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci', $table->buildCreate());
+
+        // everything
+        $table = new class($database) extends Table {
+            protected static $name = 'foo';
+
+            protected function setUpEngine()
+            {
+                $this->setEngine('MyISAM');
+            }
+
+            protected function setUpCharset()
+            {
+                $this->setCharset('latin1');
+            }
+
+            protected function setUpCollation()
+            {
+                $this->setCollation('latin1_bin');
+            }
+
+            protected function setUpColumn()
+            {
+                $this->setColumn(Column::int('foo_primary_key'));
+                $this->setColumn(Column::int('foo_unique_key'));
+                $this->setColumn(Column::int('foo_index'));
+                $this->setColumn(Column::int('foo_foreign_key'));
+            }
+
+            protected function setUpPrimaryKey()
+            {
+                $this->setPrimaryKey('foo_primary_key');
+            }
+
+            protected function setUpUniqueKey()
+            {
+                $this->setUniqueKey('foo_unique_key');
+            }
+
+            protected function setUpIndex()
+            {
+                $this->setIndex('foo_index');
+            }
+
+            protected function setUpForeignKey()
+            {
+                $this->setForeignKey('foo_foreign_key', 'bar');
+            }
+        };
+
+        $this->assertSame('CREATE TABLE `foo` (`foo_primary_key` int NOT NULL, `foo_unique_key` int NOT NULL, `foo_index` int NOT NULL, `foo_foreign_key` int NOT NULL, PRIMARY KEY (`foo_primary_key`), UNIQUE KEY `unique-foo_unique_key` (`foo_unique_key`), KEY `index-foo_index` (`foo_index`), KEY `foo_ibfk_1` (`foo_foreign_key`), CONSTRAINT `foo_ibfk_1` FOREIGN KEY (`foo_foreign_key`) REFERENCES `bar` (`foo_foreign_key`) ON UPDATE RESTRICT ON DELETE RESTRICT) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_bin', $table->buildCreate());
+    }
+
+    public function testBuildDrop()
+    {
+        $database = new class() extends Database {
+            protected static $name = 'foo';
+        };
+
+        $table = new class($database) extends Table {
+            protected static $name = 'foo';
+        };
+
+        $this->assertSame('DROP TABLE `foo`', $table->buildDrop());
+    }
+
+    public function testBuildTruncate()
+    {
+        $database = new class() extends Database {
+            protected static $name = 'foo';
+        };
+
+        $table = new class($database) extends Table {
+            protected static $name = 'foo';
+        };
+
+        $this->assertSame('TRUNCATE TABLE `foo`', $table->buildTruncate());
+    }
 }
