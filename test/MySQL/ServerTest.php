@@ -17,6 +17,9 @@ class ServerTestInvalidDatabaseFixture
 }
 class ServerTestServerFixtureInvalidName extends Server
 {
+    protected function setUpDatabase()
+    {
+    }
 }
 
 class ServerTest extends TestCase
@@ -36,6 +39,10 @@ class ServerTest extends TestCase
 
         $server = new class($writer) extends Server {
             protected static $name = 'foo';
+
+            protected function setUpDatabase()
+            {
+            }
         };
 
         $this->assertSame('foo', $server::getName());
@@ -46,6 +53,10 @@ class ServerTest extends TestCase
 
         $server = new class($writer, $reader, $reader2) extends Server {
             protected static $name = 'bar';
+
+            protected function setUpDatabase()
+            {
+            }
         };
 
         $this->assertSame(true, $server->hasReader());
@@ -107,6 +118,10 @@ class ServerTest extends TestCase
     {
         $server = new class($this->getConnection()) extends Server {
             protected static $name = 'foo';
+
+            protected function setUpDatabase()
+            {
+            }
         };
 
         $server->execute('SELECT 1=1');
@@ -119,6 +134,10 @@ class ServerTest extends TestCase
 
         $server = new class($this->getConnection()) extends Server {
             protected static $name = 'foo';
+
+            protected function setUpDatabase()
+            {
+            }
         };
 
         $server->setDatabase(ServerTestDatabaseFixture::class);
@@ -130,6 +149,9 @@ class ServerTest extends TestCase
         $this->expectExceptionCode(Exceptions\SchemaException::SERVER_INVALID_NAME);
 
         $server = new class($this->getConnection()) extends Server {
+            protected function setUpDatabase()
+            {
+            }
         };
     }
 
@@ -179,6 +201,10 @@ class ServerTest extends TestCase
 
         $server = new class($this->getConnection()) extends Server {
             protected static $name = 'foo';
+
+            protected function setUpDatabase()
+            {
+            }
         };
 
         $server->getDatabase('foo');
