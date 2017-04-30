@@ -176,4 +176,38 @@ class DatabaseTest extends TestCase
 
         $database->setTable(DatabaseTestTableFixture::class);
     }
+
+    public function testBuildCreate()
+    {
+        $database = new class() extends Database {
+            protected static $name = 'foo';
+        };
+
+        $this->assertSame('CREATE DATABASE `foo` DEFAULT CHARACTER SET = `utf8` DEFAULT COLLATE = `utf8_general_ci`', $database->buildCreate());
+
+        $database = new class() extends Database {
+            protected static $name = 'foo';
+
+            protected function setUpCharset()
+            {
+                $this->setCharset('latin1');
+            }
+
+            protected function setUpCollation()
+            {
+                $this->setCollation('latin1_bin');
+            }
+        };
+
+        $this->assertSame('CREATE DATABASE `foo` DEFAULT CHARACTER SET = `latin1` DEFAULT COLLATE = `latin1_bin`', $database->buildCreate());
+    }
+
+    public function testBuildDrop()
+    {
+        $database = new class() extends Database {
+            protected static $name = 'foo';
+        };
+
+        $this->assertSame('DROP DATABASE `foo`', $database->buildDrop());
+    }
 }

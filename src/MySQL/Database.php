@@ -154,4 +154,14 @@ abstract class Database implements Interfaces\DatabaseInterface
 
         return $this->tables;
     }
+
+    final public function buildCreate(): string
+    {
+        return sprintf('CREATE DATABASE `%s` DEFAULT CHARACTER SET = `%s` DEFAULT COLLATE = `%s`', static::getName(), $this->getCharset(), $this->getCollation());
+    }
+
+    final public function buildDrop(): string
+    {
+        return sprintf('DROP DATABASE `%s`', static::getName());
+    }
 }
