@@ -2,6 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\Container;
 use Alius\Database\Exceptions;
 use PHPUnit\Framework\TestCase;
 
@@ -9,20 +10,53 @@ class TableTestTableFixtureInvalidName extends Table
 {
 }
 
+class TableTestDatabaseFixture extends Database
+{
+    protected static $name = 'foo';
+}
+
 class TableTest extends TestCase
 {
+    use ConnectionTrait;
+
+    protected $server;
+
+    public function getServer()
+    {
+        if ($this->server === null) {
+            Container::clearServers();
+
+            $this->server = new class($this->getConnection()) extends Server {
+                protected static $name = 'foo';
+
+                protected function setUpDatabase()
+                {
+                    $this->setDatabase(TableTestDatabaseFixture::class);
+                }
+            };
+        }
+
+        return $this->server;
+    }
+
+    public function getDatabase()
+    {
+        return $this->getServer()->getDatabase('foo');
+    }
+
     public function testDefaults()
     {
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
         };
 
-        // database name
+        // server
+        $this->assertSame($this->getServer()::getName(), $table->getServerName());
+        $this->assertSame($this->getServer(), $table->getServer());
+
+        // database
         $this->assertSame('foo', $table->getDatabaseName());
+        $this->assertSame($this->getDatabase(), $table->getDatabase());
 
         // table name
         $this->assertSame('bar', $table::getName());
@@ -61,7 +95,7 @@ class TableTest extends TestCase
         $this->assertSame(false, $table->hasForeignKey('foobar'));
         $this->assertSame([], $table->getForeignKeys());
 
-        $database = new class() extends Database {
+        $database = new class($this->getServer()) extends Database {
             protected static $name = 'foo';
 
             protected function setUpEngine()
@@ -127,11 +161,7 @@ class TableTest extends TestCase
 
     public function testSetters()
     {
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
 
             protected function setUpEngine()
@@ -225,11 +255,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::TABLE_INVALID_NAME);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $test = new class($database) extends Table {
+        $test = new class($this->getDatabase()) extends Table {
         };
     }
 
@@ -246,11 +272,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::TABLE_COLUMN_ALREADY_SET);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
 
             protected function setUpColumn()
@@ -266,11 +288,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\TableException::class);
         $this->expectExceptionCode(Exceptions\TableException::TABLE_COLUMN_NOT_SET);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
         };
 
@@ -282,11 +300,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::TABLE_PRIMARY_KEY_ALREADY_SET);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
 
             protected function setUpColumn()
@@ -307,11 +321,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\TableException::class);
         $this->expectExceptionCode(Exceptions\TableException::TABLE_COLUMN_NOT_SET);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
 
             protected function setUpForeignKey()
@@ -326,11 +336,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\TableException::class);
         $this->expectExceptionCode(Exceptions\TableException::TABLE_PRIMARY_KEY_NOT_SET);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
         };
 
@@ -342,11 +348,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::TABLE_UNIQUE_KEY_ALREADY_SET);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
 
             protected function setUpColumn()
@@ -367,11 +369,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\TableException::class);
         $this->expectExceptionCode(Exceptions\TableException::TABLE_COLUMN_NOT_SET);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
 
             protected function setUpUniqueKey()
@@ -386,11 +384,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\TableException::class);
         $this->expectExceptionCode(Exceptions\TableException::TABLE_UNIQUE_KEY_NOT_SET);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
         };
 
@@ -402,11 +396,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::TABLE_INDEX_ALREADY_SET);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
 
             protected function setUpColumn()
@@ -427,11 +417,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\TableException::class);
         $this->expectExceptionCode(Exceptions\TableException::TABLE_COLUMN_NOT_SET);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
 
             protected function setUpUniqueKey()
@@ -446,11 +432,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\TableException::class);
         $this->expectExceptionCode(Exceptions\TableException::TABLE_INDEX_NOT_SET);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
         };
 
@@ -462,11 +444,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::TABLE_FOREIGN_KEY_ALREADY_SET);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
 
             protected function setUpColumn()
@@ -487,11 +465,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\TableException::class);
         $this->expectExceptionCode(Exceptions\TableException::TABLE_COLUMN_NOT_SET);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
 
             protected function setUpUniqueKey()
@@ -506,11 +480,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\TableException::class);
         $this->expectExceptionCode(Exceptions\TableException::TABLE_FOREIGN_KEY_NOT_SET);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
         };
 
@@ -522,11 +492,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\LogicException::class);
         $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
         };
 
@@ -538,11 +504,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\LogicException::class);
         $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
         };
 
@@ -554,11 +516,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\LogicException::class);
         $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
         };
 
@@ -570,11 +528,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\LogicException::class);
         $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
         };
 
@@ -586,11 +540,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\LogicException::class);
         $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
         };
 
@@ -602,11 +552,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\LogicException::class);
         $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
         };
 
@@ -618,11 +564,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\LogicException::class);
         $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
         };
 
@@ -634,11 +576,7 @@ class TableTest extends TestCase
         $this->expectException(Exceptions\LogicException::class);
         $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'bar';
         };
 
@@ -647,19 +585,15 @@ class TableTest extends TestCase
 
     public function testBuildCreate()
     {
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
         // no columns
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'foo';
         };
 
         $this->assertSame('CREATE TABLE `foo` () ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci', $table->buildCreate());
 
         // everything
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'foo';
 
             protected function setUpEngine()
@@ -711,11 +645,7 @@ class TableTest extends TestCase
 
     public function testBuildDrop()
     {
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'foo';
         };
 
@@ -724,11 +654,7 @@ class TableTest extends TestCase
 
     public function testBuildTruncate()
     {
-        $database = new class() extends Database {
-            protected static $name = 'foo';
-        };
-
-        $table = new class($database) extends Table {
+        $table = new class($this->getDatabase()) extends Table {
             protected static $name = 'foo';
         };
 

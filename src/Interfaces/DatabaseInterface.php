@@ -4,7 +4,7 @@ namespace Alius\Database\Interfaces;
 
 interface DatabaseInterface
 {
-    public function __construct();
+    public function __construct(ServerInterface $server);
     public function setEngine(string $engine): DatabaseInterface;
     public function getEngine(): string;
     public function setCharset(string $charset): DatabaseInterface;

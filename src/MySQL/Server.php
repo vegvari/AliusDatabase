@@ -141,7 +141,7 @@ abstract class Server implements Interfaces\ServerInterface
         }
 
         if (is_string($this->databases[$database_name])) {
-            $this->databases[$database_name] = new $this->databases[$database_name];
+            $this->databases[$database_name] = new $this->databases[$database_name]($this);
         }
 
         return $this->databases[$database_name];

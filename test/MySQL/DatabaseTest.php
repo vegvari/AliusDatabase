@@ -2,6 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\Container;
 use Alius\Database\Exceptions;
 use PHPUnit\Framework\TestCase;
 
@@ -20,12 +21,31 @@ class DatabaseTestDatabaseFixtureInvalidName extends Database
 
 class DatabaseTest extends TestCase
 {
+    use ConnectionTrait;
+
+    protected $server;
+
+    public function getServer()
+    {
+        if ($this->server === null) {
+            Container::clearServers();
+
+            $this->server = new class($this->getConnection()) extends Server {
+                protected static $name = 'foo';
+            };
+        }
+
+        return $this->server;
+    }
+
     public function testDefaults()
     {
-        $database = new class() extends Database {
+        $database = new class($this->getServer()) extends Database {
             protected static $name = 'foo';
         };
 
+        $this->assertSame($this->getServer()::getName(), $database->getServerName());
+        $this->assertSame($this->getServer(), $database->getServer());
         $this->assertSame('foo', $database::getName());
         $this->assertSame('InnoDB', $database->getEngine());
         $this->assertSame('utf8', $database->getCharset());
@@ -36,7 +56,9 @@ class DatabaseTest extends TestCase
 
     public function testSetters()
     {
-        $database = new class() extends Database {
+        Container::clearServers();
+
+        $database = new class($this->getServer()) extends Database {
             protected static $name = 'foo';
 
             protected function setUpEngine()
@@ -74,7 +96,9 @@ class DatabaseTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::DATABASE_INVALID_NAME);
 
-        $database = new class() extends Database {
+        Container::clearServers();
+
+        $database = new class($this->getServer()) extends Database {
         };
     }
 
@@ -91,7 +115,9 @@ class DatabaseTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::INVALID_TABLE);
 
-        $database = new class() extends Database {
+        Container::clearServers();
+
+        $database = new class($this->getServer()) extends Database {
             protected static $name = 'foo';
 
             protected function setUpTable()
@@ -106,7 +132,9 @@ class DatabaseTest extends TestCase
         $this->expectException(Exceptions\SchemaException::class);
         $this->expectExceptionCode(Exceptions\SchemaException::DATABASE_TABLE_ALREADY_SET);
 
-        $database = new class() extends Database {
+        Container::clearServers();
+
+        $database = new class($this->getServer()) extends Database {
             protected static $name = 'foo';
 
             protected function setUpTable()
@@ -122,7 +150,9 @@ class DatabaseTest extends TestCase
         $this->expectException(Exceptions\DatabaseException::class);
         $this->expectExceptionCode(Exceptions\DatabaseException::DATABASE_TABLE_NOT_SET);
 
-        $database = new class() extends Database {
+        Container::clearServers();
+
+        $database = new class($this->getServer()) extends Database {
             protected static $name = 'foo';
         };
 
@@ -134,7 +164,11 @@ class DatabaseTest extends TestCase
         $this->expectException(Exceptions\LogicException::class);
         $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
-        $database = new class() extends Database {
+        Container::clearServers();
+
+        Container::clearServers();
+
+        $database = new class($this->getServer()) extends Database {
             protected static $name = 'foo';
         };
 
@@ -146,7 +180,9 @@ class DatabaseTest extends TestCase
         $this->expectException(Exceptions\LogicException::class);
         $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
-        $database = new class() extends Database {
+        Container::clearServers();
+
+        $database = new class($this->getServer()) extends Database {
             protected static $name = 'foo';
         };
 
@@ -158,7 +194,9 @@ class DatabaseTest extends TestCase
         $this->expectException(Exceptions\LogicException::class);
         $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
-        $database = new class() extends Database {
+        Container::clearServers();
+
+        $database = new class($this->getServer()) extends Database {
             protected static $name = 'foo';
         };
 
@@ -170,7 +208,9 @@ class DatabaseTest extends TestCase
         $this->expectException(Exceptions\LogicException::class);
         $this->expectExceptionCode(Exceptions\LogicException::IMMUTABLE);
 
-        $database = new class() extends Database {
+        Container::clearServers();
+
+        $database = new class($this->getServer()) extends Database {
             protected static $name = 'foo';
         };
 
@@ -179,13 +219,17 @@ class DatabaseTest extends TestCase
 
     public function testBuildCreate()
     {
-        $database = new class() extends Database {
+        Container::clearServers();
+
+        $database = new class($this->getServer()) extends Database {
             protected static $name = 'foo';
         };
 
         $this->assertSame('CREATE DATABASE `foo` DEFAULT CHARACTER SET = `utf8` DEFAULT COLLATE = `utf8_general_ci`', $database->buildCreate());
 
-        $database = new class() extends Database {
+        Container::clearServers();
+
+        $database = new class($this->getServer()) extends Database {
             protected static $name = 'foo';
 
             protected function setUpCharset()
@@ -204,7 +248,9 @@ class DatabaseTest extends TestCase
 
     public function testBuildDrop()
     {
-        $database = new class() extends Database {
+        Container::clearServers();
+
+        $database = new class($this->getServer()) extends Database {
             protected static $name = 'foo';
         };
 

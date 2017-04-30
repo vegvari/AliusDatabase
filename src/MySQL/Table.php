@@ -2,6 +2,7 @@
 
 namespace Alius\Database\MySQL;
 
+use Alius\Database\Container;
 use Alius\Database\Exceptions;
 use Alius\Database\Interfaces;
 
@@ -10,6 +11,7 @@ abstract class Table implements Interfaces\TableInterface
     protected static $name;
 
     private $immutable = false;
+    private $server_name;
     private $database_name;
     private $engine;
     private $charset;
@@ -26,6 +28,7 @@ abstract class Table implements Interfaces\TableInterface
         $this->getName();
 
         $this->database_name = $database::getName();
+        $this->server_name = $database->getServer()::getName();
         $this->engine = $database->getEngine();
         $this->charset = $database->getCharset();
         $this->collation = $database->getCollation();
@@ -94,9 +97,24 @@ abstract class Table implements Interfaces\TableInterface
     {
     }
 
+    final public function getServerName(): string
+    {
+        return $this->server_name;
+    }
+
+    final public function getServer(): Interfaces\ServerInterface
+    {
+        return Container::getServer($this->getServerName());
+    }
+
     final public function getDatabaseName(): string
     {
         return $this->database_name;
+    }
+
+    final public function getDatabase(): Interfaces\DatabaseInterface
+    {
+        return $this->getServer()->getDatabase($this->getDatabaseName());
     }
 
     final public function setEngine(string $engine): Interfaces\TableInterface
