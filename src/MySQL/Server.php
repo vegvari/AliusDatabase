@@ -36,7 +36,9 @@ abstract class Server implements Interfaces\ServerInterface
         return static::$name;
     }
 
-    abstract protected function setUpDatabase();
+    protected function setUpDatabase()
+    {
+    }
 
     final private function setImmutable(): Interfaces\ServerInterface
     {

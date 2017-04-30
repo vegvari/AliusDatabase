@@ -23,18 +23,10 @@ class ContainerTest extends TestCase
 
         $foo = new class($this->getConnection()) extends Server {
             protected static $name = 'foo';
-
-            protected function setUpDatabase()
-            {
-            }
         };
 
         $bar = new class($this->getConnection()) extends Server {
             protected static $name = 'bar';
-
-            protected function setUpDatabase()
-            {
-            }
         };
 
         $this->assertSame(true, Container::hasServer());
@@ -49,18 +41,10 @@ class ContainerTest extends TestCase
 
         $foo = new class($this->getConnection()) extends Server {
             protected static $name = 'foo';
-
-            protected function setUpDatabase()
-            {
-            }
         };
 
         $bar = new class($this->getConnection()) extends Server {
             protected static $name = 'foo';
-
-            protected function setUpDatabase()
-            {
-            }
         };
     }
 
